@@ -1,0 +1,2820 @@
+/* Bloomberg-Style Terminal Theme - Main App Layout */
+.app-layout {
+  min-height: 100vh;
+  background: #000000; /* Pure black like Bloomberg Terminal */
+  overflow-x: hidden;
+  font-family: 'Arial', 'Helvetica', sans-serif; /* Bloomberg uses Arial */
+  color: #ff8c00;
+  letter-spacing: 0.3px; /* Slightly tighter letter spacing */
+  /* Ensure main layout is not draggable */
+  -webkit-app-region: no-drag;
+}
+
+/* Frameless window adjustments */
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  user-select: none; /* Prevent text selection for better app feel */
+  /* Ensure body is not draggable */
+  -webkit-app-region: no-drag;
+}
+
+/* Allow text selection in content areas */
+.dashboard-content,
+.ant-table,
+.ant-input,
+.ant-select {
+  user-select: text;
+}
+
+.app-header {
+  position: sticky;
+  top: 28px; /* Below ticker bar */
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+  background: #000000; /* Pure black like Bloomberg */
+  border-bottom: 2px solid #1a1a1a; /* Stronger border like Bloomberg */
+  border-top: 1px solid #333333; /* Top border for definition */
+  position: relative;
+  height: 48px; /* Bloomberg-style compact header */
+}
+
+.app-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.app-title {
+  color: #ff8c00;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Arial', 'Helvetica', sans-serif; /* Bloomberg font */
+  text-transform: uppercase;
+  position: fixed;
+  left: -200px;
+  top: 76px; /* Below ticker (28px) + title bar (32px) + margin (16px) */
+  padding: 6px 12px;
+  background: #000000;
+  border: 2px solid #1a1a1a;
+  border-radius: 4px; /* Sharp corners like Bloomberg */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  z-index: 1001;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  min-width: 120px;
+  text-align: center;
+}
+
+.app-title.slide-in {
+  left: 12px;
+  opacity: 1;
+}
+
+.app-title.slide-out {
+  left: -200px;
+  opacity: 0;
+}
+
+.app-title-icon {
+  font-size: 24px;
+  color: #00d4ff;
+  filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.3));
+}
+
+.app-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.app-footer {
+  text-align: center;
+  background: #000000; /* Pure black */
+  border-top: 2px solid #1a1a1a; /* Bloomberg-style strong border */
+  padding: 8px 16px; /* More compact like Bloomberg */
+  font-size: 10px;
+  font-family: 'Arial', 'Helvetica', sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #666666; /* Dimmer text */
+}
+
+.footer-text {
+  color: #a6a6a6;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .app-header-content {
+    padding: 0 16px;
+  }
+
+  .app-title {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header-content {
+    padding: 0 12px;
+  }
+
+  .app-title {
+    font-size: 14px;
+  }
+
+  .app-footer {
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-title {
+    font-size: 13px;
+  }
+}
+
+/* Component-specific responsive styles */
+.soldier-ea-panel .ant-card-head-title {
+  font-size: 14px;
+}
+
+/* Enhanced Soldier EA Panel Styles - Dark Theme */
+.soldier-ea-panel {
+  background: #141414;
+  border: 1px solid #303030;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.soldier-ea-panel .ant-card {
+  background: #141414;
+  border: 1px solid #303030;
+}
+
+.soldier-ea-panel .ant-card-head {
+  background: #1f1f1f;
+  border-bottom: 1px solid #303030;
+}
+
+.soldier-ea-panel .ant-collapse-ghost>.ant-collapse-item {
+  border-bottom: 1px solid #303030;
+}
+
+.soldier-ea-panel .ant-collapse-ghost>.ant-collapse-item:last-child {
+  border-bottom: none;
+}
+
+.soldier-ea-panel .ant-collapse-header {
+  padding: 8px 0 !important;
+  font-size: 12px !important;
+  font-weight: 600;
+  color: #e0e0e0 !important;
+}
+
+.soldier-ea-panel .ant-collapse-content-box {
+  padding: 8px 0 !important;
+  background: #141414;
+}
+
+.soldier-ea-panel .ant-statistic-title {
+  font-size: 10px !important;
+  margin-bottom: 2px !important;
+  color: #a6a6a6 !important;
+}
+
+.soldier-ea-panel .ant-statistic-content {
+  font-size: 12px !important;
+  color: #e0e0e0 !important;
+}
+
+.soldier-ea-panel .ant-list-item {
+  border-bottom: 1px solid #262626;
+  background: #141414;
+}
+
+.soldier-ea-panel .ant-list-item:last-child {
+  border-bottom: none;
+}
+
+/* Module status grid styling - Dark Theme */
+.soldier-ea-panel .module-status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 8px;
+}
+
+.soldier-ea-panel .module-status-item {
+  text-align: center;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 10px;
+  background: #262626;
+  border: 1px solid #404040;
+  color: #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.soldier-ea-panel .module-status-item:hover {
+  background: #303030;
+  border-color: #00d4ff;
+  box-shadow: 0 2px 8px rgba(0, 212, 255, 0.2);
+}
+
+/* Override panel styling - Dark Theme */
+.soldier-ea-panel .override-panel {
+  background: linear-gradient(135deg, #2b1f00 0%, #3d2a00 100%);
+  border: 1px solid #faad14;
+  border-radius: 6px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(250, 173, 20, 0.1);
+}
+
+/* Performance metrics styling - Dark Theme */
+.soldier-ea-panel .performance-metrics .ant-row {
+  margin-bottom: 8px;
+}
+
+.soldier-ea-panel .performance-metrics .ant-row:last-child {
+  margin-bottom: 0;
+}
+
+.global-stats-panel {
+  background: #141414;
+  border: 1px solid #303030;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.global-stats-panel .ant-statistic-title {
+  font-size: 12px;
+  color: #a6a6a6 !important;
+}
+
+.global-stats-panel .ant-statistic-content {
+  color: #ffffff !important;
+}
+
+.news-event-panel {
+  background: #141414;
+  border: 1px solid #303030;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.news-event-panel .ant-list-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #262626;
+}
+
+.command-center {
+  background: #141414;
+  border: 1px solid #303030;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.command-center .ant-select,
+.command-center .ant-input {
+  font-size: 12px;
+  background: #262626 !important;
+  border-color: #404040 !important;
+  color: #ffffff !important;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .soldier-ea-panel {
+    margin-bottom: 8px;
+  }
+
+  .soldier-ea-panel .ant-card-body {
+    padding: 12px;
+  }
+
+  .soldier-ea-panel .module-status-grid {
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+    gap: 4px;
+  }
+
+  .soldier-ea-panel .ant-collapse-header {
+    font-size: 11px !important;
+  }
+
+  .soldier-ea-panel .ant-statistic-title {
+    font-size: 9px !important;
+  }
+
+  .soldier-ea-panel .ant-statistic-content {
+    font-size: 11px !important;
+  }
+
+  .global-stats-panel .ant-row {
+    text-align: center;
+  }
+
+  .global-stats-panel .ant-col {
+    margin-bottom: 16px;
+  }
+
+  .news-event-panel .ant-card-body {
+    padding: 8px;
+  }
+
+  .command-center .ant-space {
+    width: 100%;
+  }
+}
+
+/* Print styles */
+@media print {
+
+  .app-header,
+  .app-footer,
+  .command-center {
+    display: none;
+  }
+
+  .dashboard-content {
+    padding: 0;
+  }
+}
+
+/* Modern Black Theme - Additional Visual Enhancements */
+
+/* Enhanced Glassmorphism Effects */
+.glass-card {
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  opacity: 0.6;
+}
+
+.glass-card-dark {
+  background: rgba(10, 10, 10, 0.9);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.glass-panel {
+  background: rgba(17, 17, 17, 0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  box-shadow:
+    0 10px 35px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  position: relative;
+}
+
+.glass-panel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.02) 0%,
+      transparent 50%,
+      rgba(255, 255, 255, 0.01) 100%);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.glass-header {
+  background: rgba(26, 26, 26, 0.9);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+}
+
+.glass-header::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(0, 212, 255, 0.3),
+      transparent);
+}
+
+.glass-sidebar {
+  background: rgba(15, 15, 15, 0.92);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    4px 0 20px rgba(0, 0, 0, 0.5),
+    inset -1px 0 0 rgba(255, 255, 255, 0.05);
+}
+
+.glass-modal {
+  background: rgba(20, 20, 20, 0.95);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.glass-input {
+  background: rgba(26, 26, 26, 0.8) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+  color: #ffffff !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.glass-input:hover {
+  background: rgba(30, 30, 30, 0.85) !important;
+  border-color: rgba(0, 212, 255, 0.3) !important;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.1) !important;
+}
+
+.glass-input:focus {
+  background: rgba(35, 35, 35, 0.9) !important;
+  border-color: rgba(0, 212, 255, 0.5) !important;
+  box-shadow:
+    0 0 20px rgba(0, 212, 255, 0.2) !important,
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.glass-select {
+  background: rgba(26, 26, 26, 0.8) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+}
+
+.glass-dropdown {
+  background: rgba(20, 20, 20, 0.95) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px !important;
+  box-shadow:
+    0 15px 45px rgba(0, 0, 0, 0.8) !important,
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.glass-tooltip {
+  background: rgba(15, 15, 15, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 8px !important;
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.7) !important,
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.glass-notification {
+  background: rgba(20, 20, 20, 0.92) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.7) !important,
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Neon glow effects for important elements */
+.neon-glow-primary {
+  box-shadow:
+    0 0 5px #00d4ff,
+    0 0 10px #00d4ff,
+    0 0 15px #00d4ff,
+    0 0 20px #00d4ff;
+  animation: neonPulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes neonPulse {
+  from {
+    box-shadow:
+      0 0 5px #00d4ff,
+      0 0 10px #00d4ff,
+      0 0 15px #00d4ff,
+      0 0 20px #00d4ff;
+  }
+
+  to {
+    box-shadow:
+      0 0 2px #00d4ff,
+      0 0 5px #00d4ff,
+      0 0 8px #00d4ff,
+      0 0 12px #00d4ff;
+  }
+}
+
+/* Enhanced connection status indicator */
+.connection-status {
+  position: fixed;
+  top: 70px;
+  right: 24px;
+  z-index: 1000;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.connection-status.connected {
+  background: rgba(82, 196, 26, 0.2);
+  color: #52c41a;
+  border-color: #52c41a;
+}
+
+.connection-status.disconnected {
+  background: rgba(255, 77, 79, 0.2);
+  color: #ff4d4f;
+  border-color: #ff4d4f;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* Modern data visualization containers */
+.chart-wrapper {
+  background: linear-gradient(135deg, #141414 0%, #1f1f1f 100%);
+  border: 1px solid #303030;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+.chart-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #00d4ff 0%, #52c41a 50%, #faad14 100%);
+  opacity: 0.6;
+}
+
+/* Enhanced table styling */
+.modern-table .ant-table {
+  background: #141414;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.modern-table .ant-table-thead>tr>th {
+  background: #1f1f1f;
+  color: #ffffff;
+  border-bottom: 2px solid #303030;
+  font-weight: 600;
+}
+
+.modern-table .ant-table-tbody>tr {
+  background: #141414;
+  transition: all 0.3s ease;
+}
+
+.modern-table .ant-table-tbody>tr:hover {
+  background: #262626;
+  box-shadow: 0 2px 8px rgba(0, 212, 255, 0.1);
+}
+
+.modern-table .ant-table-tbody>tr>td {
+  border-bottom: 1px solid #262626;
+  color: #ffffff;
+}
+
+/* Floating action button */
+.floating-action-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+  border: none;
+  color: #000000;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 212, 255, 0.3);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.floating-action-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 12px 32px rgba(0, 212, 255, 0.5);
+}
+
+/* Modern notification styles */
+.modern-notification {
+  background: #1f1f1f;
+  border: 1px solid #303030;
+  border-radius: 8px;
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.modern-notification.success {
+  border-left: 4px solid #52c41a;
+}
+
+.modern-notification.error {
+  border-left: 4px solid #ff4d4f;
+}
+
+.modern-notification.warning {
+  border-left: 4px solid #faad14;
+}
+
+.modern-notification.info {
+  border-left: 4px solid #00d4ff;
+}
+
+/* Enhanced mobile responsiveness */
+@media (max-width: 768px) {
+  .connection-status {
+    top: 60px;
+    right: 12px;
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+
+  .floating-action-btn {
+    bottom: 16px;
+    right: 16px;
+    width: 48px;
+    height: 48px;
+    font-size: 18px;
+  }
+
+  .chart-wrapper {
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  .glass-card {
+    border-radius: 8px;
+  }
+}
+
+/* Performance optimizations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Accessibility enhancements */
+@media (prefers-reduced-motion: reduce) {
+
+  .neon-glow-primary,
+  .pulse-glow,
+  .floating-action-btn {
+    animation: none;
+  }
+
+  .modern-card,
+  .news-event-item,
+  .modern-button {
+    transition: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+
+  .modern-card,
+  .glass-card,
+  .chart-wrapper {
+    border-width: 2px;
+    border-color: #ffffff;
+  }
+
+  .app-title,
+  .modern-title {
+    color: #ffffff;
+    text-shadow: 2px 2px 4px #000000;
+  }
+}
+
+/* Print styles for dark theme */
+@media print {
+
+  .app-layout,
+  .dashboard,
+  .modern-card {
+    background: white !important;
+    color: black !important;
+  }
+
+  .neon-glow-primary,
+  .pulse-glow {
+    animation: none;
+    box-shadow: none;
+  }
+}
+
+/* Enhanced Global Stats Panel */
+.stats-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.stats-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stats-icon {
+  color: #00d4ff;
+  font-size: 18px;
+  filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.3));
+}
+
+.stats-badges {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Enhanced EA Grid Header */
+.ea-grid-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.grid-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.grid-filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Enhanced Progress Bars */
+.modern-progress {
+  position: relative;
+  overflow: hidden;
+}
+
+.modern-progress .ant-progress-bg {
+  background: linear-gradient(90deg, #00d4ff 0%, #52c41a 100%);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+  animation: progressGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes progressGlow {
+  from {
+    box-shadow: 0 0 5px rgba(0, 212, 255, 0.3);
+  }
+
+  to {
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
+  }
+}
+
+/* Enhanced Statistics Display */
+.modern-statistic {
+  position: relative;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(20, 20, 20, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.modern-statistic:hover {
+  background: rgba(25, 25, 25, 0.8);
+  border-color: rgba(0, 212, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.modern-statistic .ant-statistic-title {
+  color: #a6a6a6 !important;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.modern-statistic .ant-statistic-content {
+  color: #ffffff !important;
+  font-weight: 700;
+}
+
+/* Enhanced Empty State */
+.modern-empty {
+  padding: 60px 20px;
+  text-align: center;
+  background: rgba(20, 20, 20, 0.4);
+  border-radius: 12px;
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+}
+
+.modern-empty .ant-empty-description {
+  color: #a6a6a6;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Enhanced Glass Button Styles */
+.glass-button {
+  position: relative;
+  overflow: hidden;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(26, 26, 26, 0.8);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  color: #ffffff;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.glass-button:hover {
+  background: rgba(35, 35, 35, 0.85);
+  border-color: rgba(0, 212, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(0, 212, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.glass-button:active {
+  transform: translateY(0);
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.glass-button-primary {
+  background: linear-gradient(135deg,
+      rgba(21, 101, 192, 0.8) 0%,
+      rgba(13, 71, 161, 0.8) 100%);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(21, 101, 192, 0.4);
+  box-shadow:
+    0 4px 15px rgba(21, 101, 192, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.glass-button-primary:hover {
+  background: linear-gradient(135deg,
+      rgba(21, 101, 192, 0.9) 0%,
+      rgba(13, 71, 161, 0.9) 100%);
+  border-color: rgba(21, 101, 192, 0.6);
+  box-shadow:
+    0 8px 25px rgba(21, 101, 192, 0.4),
+    0 0 25px rgba(21, 101, 192, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.glass-button-success {
+  background: linear-gradient(135deg,
+      rgba(76, 175, 80, 0.8) 0%,
+      rgba(56, 142, 60, 0.8) 100%);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(76, 175, 80, 0.4);
+  box-shadow:
+    0 4px 15px rgba(76, 175, 80, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.glass-button-danger {
+  background: linear-gradient(135deg,
+      rgba(244, 67, 54, 0.8) 0%,
+      rgba(211, 47, 47, 0.8) 100%);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(244, 67, 54, 0.4);
+  box-shadow:
+    0 4px 15px rgba(244, 67, 54, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.glass-button-warning {
+  background: linear-gradient(135deg,
+      rgba(255, 152, 0, 0.8) 0%,
+      rgba(245, 124, 0, 0.8) 100%);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 152, 0, 0.4);
+  box-shadow:
+    0 4px 15px rgba(255, 152, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.glass-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.glass-button:hover::before {
+  left: 100%;
+}
+
+.glass-button:active {
+  transform: scale(0.98);
+}
+
+/* Enhanced Form Elements */
+.glass-form .ant-input,
+.glass-form .ant-select-selector {
+  transition: all 0.3s ease;
+}
+
+.glass-form .ant-input:hover,
+.glass-form .ant-select:hover .ant-select-selector {
+  border-color: rgba(0, 212, 255, 0.4) !important;
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.2) !important;
+}
+
+/* Enhanced Tooltips */
+.modern-tooltip {
+  background: rgba(20, 20, 20, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Enhanced Tags */
+.modern-tag {
+  background: rgba(38, 38, 38, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.modern-tag:hover {
+  background: rgba(45, 45, 45, 0.9);
+  border-color: rgba(0, 212, 255, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* Enhanced Dividers */
+.modern-divider {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  margin: 24px 0 !important;
+}
+
+.modern-divider::before,
+.modern-divider::after {
+  border-top-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Responsive Enhancements for Components */
+@media (max-width: 1200px) {
+  .ea-grid-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .grid-filters {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .stats-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .stats-badges {
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .grid-filters .ant-input,
+  .grid-filters .ant-select {
+    width: 100% !important;
+  }
+
+  .stats-badges {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .modern-statistic {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 576px) {
+
+  .stats-header,
+  .ea-grid-header {
+    gap: 8px;
+  }
+
+  .stats-title,
+  .grid-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .modern-statistic {
+    padding: 8px;
+  }
+
+  .modern-statistic .ant-statistic-title {
+    font-size: 10px;
+  }
+
+  .modern-statistic .ant-statistic-content {
+    font-size: 16px;
+  }
+}
+
+/* Performance Optimizations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Accessibility Improvements */
+@media (prefers-reduced-motion: reduce) {
+
+  .modern-statistic,
+  .glass-button,
+  .modern-tag {
+    transition: none;
+    animation: none;
+  }
+
+  .modern-statistic:hover,
+  .modern-tag:hover {
+    transform: none;
+  }
+
+  .progressGlow {
+    animation: none;
+  }
+}
+
+/* Focus Indicators */
+.glass-input:focus,
+.glass-button:focus {
+  outline: 2px solid #00d4ff !important;
+  outline-offset: 2px !important;
+}
+
+/* High Contrast Support */
+@media (prefers-contrast: high) {
+
+  .modern-statistic,
+  .glass-button,
+  .modern-tag {
+    border-width: 2px;
+    border-color: #ffffff;
+  }
+
+  .modern-divider {
+    border-color: #ffffff !important;
+  }
+}
+
+/* Glass Effects for Dashboard Components */
+.glass-stats-panel {
+  background: rgba(17, 17, 17, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-stats-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+      rgba(0, 212, 255, 0.6) 0%,
+      rgba(82, 196, 26, 0.6) 50%,
+      rgba(250, 173, 20, 0.6) 100%);
+  opacity: 0.8;
+}
+
+.glass-ea-grid {
+  background: rgba(17, 17, 17, 0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  box-shadow:
+    0 10px 35px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.glass-ea-card {
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.glass-ea-card:hover {
+  background: rgba(25, 25, 25, 0.9);
+  border-color: rgba(0, 212, 255, 0.3);
+  transform: translateY(-3px);
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.7),
+    0 0 25px rgba(0, 212, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.glass-news-panel {
+  background: rgba(17, 17, 17, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.glass-command-center {
+  background: rgba(17, 17, 17, 0.92);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  box-shadow:
+    0 15px 45px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  position: relative;
+}
+
+.glass-command-center::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 50% 0%,
+      rgba(211, 47, 47, 0.05) 0%,
+      transparent 50%);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.glass-ticker-bar {
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.8),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.glass-ticker-item {
+  background: rgba(10, 10, 10, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: all 0.2s ease;
+}
+
+.glass-ticker-item:hover {
+  background: rgba(15, 15, 15, 0.95);
+  border-color: rgba(0, 212, 255, 0.3);
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.6),
+    0 0 10px rgba(0, 212, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.glass-connection-status {
+  background: linear-gradient(135deg,
+      rgba(27, 94, 32, 0.9) 0%,
+      rgba(46, 125, 50, 0.9) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid rgba(56, 142, 60, 0.4);
+  border-radius: 8px;
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.7),
+    0 0 20px rgba(76, 175, 80, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.glass-connection-status.disconnected {
+  background: linear-gradient(135deg,
+      rgba(183, 28, 28, 0.9) 0%,
+      rgba(211, 47, 47, 0.9) 100%);
+  border-color: rgba(229, 57, 53, 0.4);
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.7),
+    0 0 20px rgba(244, 67, 54, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.glass-system-status {
+  background: rgba(17, 17, 17, 0.95);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.glass-floating-button {
+  background: linear-gradient(135deg,
+      rgba(0, 212, 255, 0.9) 0%,
+      rgba(0, 153, 204, 0.9) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  box-shadow:
+    0 12px 35px rgba(0, 212, 255, 0.4),
+    0 0 25px rgba(0, 212, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-floating-button:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow:
+    0 20px 50px rgba(0, 212, 255, 0.5),
+    0 0 35px rgba(0, 212, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* Glass Effects for Ant Design Components Override */
+.ant-card.glass-card {
+  background: rgba(17, 17, 17, 0.9) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.7) !important,
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+.ant-card.glass-card .ant-card-head {
+  background: rgba(26, 26, 26, 0.8) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px 16px 0 0 !important;
+}
+
+.ant-card.glass-card .ant-card-body {
+  background: transparent !important;
+}
+
+.ant-statistic.glass-statistic {
+  background: rgba(20, 20, 20, 0.6) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.5) !important,
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  transition: all 0.3s ease !important;
+}
+
+.ant-statistic.glass-statistic:hover {
+  background: rgba(25, 25, 25, 0.8) !important;
+  border-color: rgba(0, 212, 255, 0.3) !important;
+  transform: translateY(-2px) !important;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.7) !important,
+    0 0 20px rgba(0, 212, 255, 0.1) !important,
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+.ant-progress.glass-progress .ant-progress-outer {
+  background: rgba(26, 26, 26, 0.6) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+.ant-list.glass-list {
+  background: transparent !important;
+}
+
+.ant-list.glass-list .ant-list-item {
+  background: rgba(20, 20, 20, 0.6) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 8px !important;
+  margin-bottom: 8px !important;
+  transition: all 0.3s ease !important;
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.4) !important,
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+.ant-list.glass-list .ant-list-item:hover {
+  background: rgba(25, 25, 25, 0.8) !important;
+  border-color: rgba(0, 212, 255, 0.2) !important;
+  transform: translateY(-1px) !important;
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.6) !important,
+    0 0 15px rgba(0, 212, 255, 0.1) !important,
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.ant-tabs.glass-tabs .ant-tabs-nav {
+  background: rgba(26, 26, 26, 0.8) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+.ant-tabs.glass-tabs .ant-tabs-content-holder {
+  background: rgba(17, 17, 17, 0.6) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-radius: 0 0 12px 12px !important;
+}
+
+/* Glass Modal Overrides */
+.ant-modal.glass-modal .ant-modal-content {
+  background: rgba(20, 20, 20, 0.95) !important;
+  backdrop-filter: blur(30px) !important;
+  -webkit-backdrop-filter: blur(30px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 20px !important;
+  box-shadow:
+    0 25px 80px rgba(0, 0, 0, 0.9) !important,
+    inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+.ant-modal.glass-modal .ant-modal-header {
+  background: rgba(26, 26, 26, 0.8) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 20px 20px 0 0 !important;
+}
+
+.ant-modal.glass-modal .ant-modal-body {
+  background: transparent !important;
+}
+
+/* Glass Form Elements */
+.ant-input.glass-input,
+.ant-select.glass-select .ant-select-selector {
+  background: rgba(26, 26, 26, 0.8) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+  color: #ffffff !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3) !important,
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+.ant-input.glass-input:hover,
+.ant-select.glass-select:hover .ant-select-selector {
+  background: rgba(30, 30, 30, 0.85) !important;
+  border-color: rgba(0, 212, 255, 0.3) !important;
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.4) !important,
+    0 0 15px rgba(0, 212, 255, 0.1) !important,
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.ant-input.glass-input:focus,
+.ant-select.glass-select.ant-select-focused .ant-select-selector {
+  background: rgba(35, 35, 35, 0.9) !important;
+  border-color: rgba(0, 212, 255, 0.5) !important;
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.5) !important,
+    0 0 25px rgba(0, 212, 255, 0.2) !important,
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Glass Dropdown */
+.ant-select-dropdown.glass-dropdown {
+  background: rgba(20, 20, 20, 0.95) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px !important;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.8) !important,
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.ant-select-dropdown.glass-dropdown .ant-select-item {
+  background: transparent !important;
+  color: #ffffff !important;
+  transition: all 0.2s ease !important;
+}
+
+.ant-select-dropdown.glass-dropdown .ant-select-item:hover {
+  background: rgba(0, 212, 255, 0.15) !important;
+  color: #ffffff !important;
+}
+
+/* Glass Tooltip */
+.ant-tooltip.glass-tooltip .ant-tooltip-inner {
+  background: rgba(15, 15, 15, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 8px !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.7) !important,
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Glass Notification */
+.ant-notification.glass-notification .ant-notification-notice {
+  background: rgba(20, 20, 20, 0.92) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.7) !important,
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Responsive Glass Effects */
+@media (max-width: 768px) {
+
+  .glass-card,
+  .glass-panel,
+  .glass-stats-panel,
+  .glass-ea-grid,
+  .glass-news-panel,
+  .glass-command-center {
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border-radius: 12px !important;
+  }
+
+  .glass-modal .ant-modal-content {
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-radius: 16px !important;
+  }
+}
+
+/* Performance Optimizations for Glass Effects */
+.glass-optimized {
+  will-change: backdrop-filter, transform;
+  transform: translateZ(0);
+}
+
+/* Fallback for browsers without backdrop-filter support */
+@supports not (backdrop-filter: blur(10px)) {
+
+  .glass-card,
+  .glass-panel,
+  .glass-stats-panel,
+  .glass-ea-grid,
+  .glass-news-panel,
+  .glass-command-center,
+  .glass-modal,
+  .glass-input,
+  .glass-select,
+  .glass-dropdown,
+  .glass-tooltip,
+  .glass-notification {
+    background: rgba(17, 17, 17, 0.95) !important;
+  }
+
+  .glass-button {
+    background: rgba(26, 26, 26, 0.95) !important;
+  }
+}
+
+/* Enhanced COMMANDER Title Styling */
+.app-title::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #ffffff 0%, #00d4ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: commanderGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes commanderGlow {
+  0% {
+    filter: brightness(1) drop-shadow(0 0 5px rgba(0, 212, 255, 0.3));
+  }
+
+  100% {
+    filter: brightness(1.2) drop-shadow(0 0 15px rgba(0, 212, 255, 0.6));
+  }
+}
+
+.app-title:hover {
+  transform: scale(1.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Fallback for browsers that don't support background-clip */
+@supports not (-webkit-background-clip: text) {
+  .app-title {
+    color: #00d4ff !important;
+    text-shadow:
+      0 0 10px rgba(0, 212, 255, 0.5),
+      0 2px 4px rgba(0, 0, 0, 0.8) !important;
+  }
+
+  .app-title::before {
+    display: none;
+  }
+}
+
+/* Simple COMMANDER hover effect */
+.app-title:hover {
+  transform: translateY(-50%) scale(1.05);
+  transition: all 0.2s ease;
+  color: #40e0ff;
+}
+
+/* Enhanced Glass COMMANDER hover effect */
+.app-title:hover {
+  transform: translateY(-2px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(18, 18, 18, 0.35);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 12px 48px rgba(0, 0, 0, 0.8),
+    0 24px 96px rgba(0, 0, 0, 0.6),
+    0 6px 24px rgba(0, 0, 0, 0.9),
+    0 0 20px rgba(0, 212, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Glass shimmer effect */
+.app-title::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent);
+  transition: left 0.8s ease;
+  border-radius: inherit;
+}
+
+.app-title:hover::after {
+  left: 100%;
+}
+
+/* Enhanced scroll-triggered animations */
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateX(-250px) scale(0.8);
+    opacity: 0;
+    filter: blur(10px);
+  }
+
+  50% {
+    transform: translateX(-50px) scale(0.95);
+    opacity: 0.7;
+    filter: blur(2px);
+  }
+
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes slideOutToLeft {
+  0% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+    filter: blur(0);
+  }
+
+  50% {
+    transform: translateX(-50px) scale(0.95);
+    opacity: 0.7;
+    filter: blur(2px);
+  }
+
+  100% {
+    transform: translateX(-250px) scale(0.8);
+    opacity: 0;
+    filter: blur(10px);
+  }
+}
+
+.app-title.slide-in {
+  animation: slideInFromLeft 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.app-title.slide-out {
+  animation: slideOutToLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Scroll-based blur enhancement */
+.app-title.slide-in {
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  box-shadow:
+    0 12px 48px rgba(0, 0, 0, 0.8),
+    0 24px 96px rgba(0, 0, 0, 0.6),
+    0 6px 24px rgba(0, 0, 0, 0.9),
+    0 0 30px rgba(0, 212, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/*=====ENHANCED GLASS EFFECTS FOR ALL COMPONENTS=====*/
+/* Glass Modal Effects */
+.ant-modal .ant-modal-content {
+  background: rgba(12, 12, 12, 0.25) !important;
+  backdrop-filter: blur(40px) !important;
+  -webkit-backdrop-filter: blur(40px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+  box-shadow:
+    0 15px 50px rgba(0, 0, 0, 0.7),
+    0 8px 25px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  overflow: hidden;
+}
+
+.ant-modal .ant-modal-header {
+  background: rgba(18, 18, 18, 0.4) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px 16px 0 0 !important;
+  padding: 16px 24px !important;
+}
+
+.ant-modal .ant-modal-title {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important;
+}
+
+.ant-modal .ant-modal-body {
+  background: transparent !important;
+  padding: 24px !important;
+  color: #ffffff !important;
+}
+
+.ant-modal .ant-modal-footer {
+  background: rgba(18, 18, 18, 0.4) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 0 0 16px 16px !important;
+  padding: 16px 24px !important;
+}
+
+/* Glass Card Effects */
+.ant-card {
+  background: rgba(12, 12, 12, 0.3) !important;
+  backdrop-filter: blur(35px) !important;
+  -webkit-backdrop-filter: blur(35px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    0 4px 16px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.ant-card:hover {
+  transform: translateY(-4px) !important;
+  background: rgba(18, 18, 18, 0.4) !important;
+  backdrop-filter: blur(45px) !important;
+  -webkit-backdrop-filter: blur(45px) !important;
+  border-color: rgba(0, 212, 255, 0.2) !important;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.7),
+    0 6px 20px rgba(0, 0, 0, 0.8),
+    0 0 20px rgba(0, 212, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+.ant-card .ant-card-head {
+  background: rgba(18, 18, 18, 0.4) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+.ant-card .ant-card-head-title {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
+}
+
+.ant-card .ant-card-body {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+/* Glass Dropdown Effects */
+.ant-select-dropdown {
+  background: rgba(12, 12, 12, 0.3) !important;
+  backdrop-filter: blur(40px) !important;
+  -webkit-backdrop-filter: blur(40px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  box-shadow:
+    0 15px 60px rgba(0, 0, 0, 0.8),
+    0 30px 120px rgba(0, 0, 0, 0.6),
+    0 8px 30px rgba(0, 0, 0, 0.9),
+    0 0 15px rgba(0, 212, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.ant-select-dropdown .ant-select-item {
+  background: transparent !important;
+  color: #ffffff !important;
+  transition: all 0.3s ease !important;
+  border-radius: 6px !important;
+  margin: 2px 4px !important;
+}
+
+.ant-select-dropdown .ant-select-item:hover {
+  background: rgba(0, 212, 255, 0.15) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.2) !important;
+}
+
+/* Glass Tooltip Effects */
+.ant-tooltip .ant-tooltip-inner {
+  background: rgba(12, 12, 12, 0.4) !important;
+  backdrop-filter: blur(30px) !important;
+  -webkit-backdrop-filter: blur(30px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.8),
+    0 16px 64px rgba(0, 0, 0, 0.6),
+    0 4px 16px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Glass Form Elements */
+.ant-input,
+.ant-input-number,
+.ant-select .ant-select-selector,
+.ant-textarea {
+  background: rgba(15, 15, 15, 0.3) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 8px !important;
+  color: #ffffff !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.ant-input:hover,
+.ant-input-number:hover,
+.ant-select:hover .ant-select-selector,
+.ant-textarea:hover {
+  background: rgba(20, 20, 20, 0.4) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border-color: rgba(0, 212, 255, 0.3) !important;
+  box-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(0, 212, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+.ant-input:focus,
+.ant-input-number:focus,
+.ant-select.ant-select-focused .ant-select-selector,
+.ant-textarea:focus {
+  background: rgba(25, 25, 25, 0.5) !important;
+  backdrop-filter: blur(30px) !important;
+  -webkit-backdrop-filter: blur(30px) !important;
+  border-color: rgba(0, 212, 255, 0.5) !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(0, 212, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Glass Button Effects */
+.ant-btn {
+  background: rgba(20, 20, 20, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.03) !important;
+  border-radius: 6px !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.02) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6) !important;
+}
+
+.ant-btn:hover {
+  background: rgba(25, 25, 25, 0.5) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border-color: rgba(0, 212, 255, 0.08) !important;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    0 0 8px rgba(0, 212, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
+}
+
+.ant-btn-primary {
+  background: linear-gradient(135deg,
+      rgba(0, 212, 255, 0.15) 0%,
+      rgba(0, 153, 204, 0.15) 100%) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(0, 212, 255, 0.12) !important;
+  box-shadow:
+    0 3px 12px rgba(0, 212, 255, 0.08),
+    0 0 4px rgba(0, 212, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+.ant-btn-primary:hover {
+  background: linear-gradient(135deg,
+      rgba(0, 212, 255, 0.2) 0%,
+      rgba(0, 153, 204, 0.2) 100%) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-color: rgba(0, 212, 255, 0.18) !important;
+  box-shadow:
+    0 4px 16px rgba(0, 212, 255, 0.12),
+    0 0 8px rgba(0, 212, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Glass List Effects */
+.ant-list {
+  background: transparent !important;
+}
+
+.ant-list-item {
+  background: rgba(15, 15, 15, 0.25) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 8px !important;
+  margin-bottom: 8px !important;
+  padding: 12px 16px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.ant-list-item:hover {
+  background: rgba(20, 20, 20, 0.35) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border-color: rgba(0, 212, 255, 0.2) !important;
+  transform: translateY(-2px) !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(0, 212, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Glass Tab Effects */
+.ant-tabs .ant-tabs-nav {
+  background: rgba(15, 15, 15, 0.3) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+.ant-tabs .ant-tabs-tab {
+  background: transparent !important;
+  border-radius: 8px 8px 0 0 !important;
+  transition: all 0.3s ease !important;
+}
+
+.ant-tabs .ant-tabs-tab:hover {
+  background: rgba(0, 212, 255, 0.1) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+}
+
+.ant-tabs .ant-tabs-tab-active {
+  background: rgba(0, 212, 255, 0.15) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-color: rgba(0, 212, 255, 0.3) !important;
+}
+
+.ant-tabs .ant-tabs-content-holder {
+  background: rgba(12, 12, 12, 0.2) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-radius: 0 0 12px 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-top: none !important;
+}
+
+/* Glass Tag Effects */
+.ant-tag {
+  background: rgba(15, 15, 15, 0.4) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+.ant-tag:hover {
+  background: rgba(20, 20, 20, 0.5) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-color: rgba(0, 212, 255, 0.3) !important;
+  transform: translateY(-1px) !important;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.6),
+    0 0 15px rgba(0, 212, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Glass Notification Effects */
+.ant-notification .ant-notification-notice {
+  background: rgba(12, 12, 12, 0.3) !important;
+  backdrop-filter: blur(35px) !important;
+  -webkit-backdrop-filter: blur(35px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  box-shadow:
+    0 15px 60px rgba(0, 0, 0, 0.8),
+    0 30px 120px rgba(0, 0, 0, 0.6),
+    0 8px 30px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+/* Glass Drawer Effects */
+.ant-drawer .ant-drawer-content {
+  background: rgba(10, 10, 10, 0.4) !important;
+  backdrop-filter: blur(40px) !important;
+  -webkit-backdrop-filter: blur(40px) !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.ant-drawer .ant-drawer-header {
+  background: rgba(15, 15, 15, 0.5) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.ant-drawer .ant-drawer-body {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+/* Subtle shimmer effect - removed for less shine */
+
+/* Enhanced glass effects for specific components */
+.news-event-panel .ant-card {
+  background: rgba(10, 10, 10, 0.25) !important;
+  backdrop-filter: blur(40px) !important;
+  -webkit-backdrop-filter: blur(40px) !important;
+}
+
+.global-stats-panel .ant-card {
+  background: rgba(8, 8, 8, 0.2) !important;
+  backdrop-filter: blur(45px) !important;
+  -webkit-backdrop-filter: blur(45px) !important;
+}
+
+/* Responsive glass effects */
+@media (max-width: 768px) {
+
+  .ant-modal .ant-modal-content,
+  .ant-card,
+  .ant-select-dropdown {
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+  }
+}
+
+/* Performance optimization for glass effects */
+.ant-modal .ant-modal-content,
+.ant-card,
+.ant-btn,
+.ant-input,
+.ant-select-dropdown {
+  will-change: backdrop-filter, transform, box-shadow;
+  transform: translateZ(0);
+}
+
+/* News Event Panel Dark Theme */
+.news-event-panel {
+  background: rgba(12, 12, 12, 0.3) !important;
+  backdrop-filter: blur(35px) !important;
+  -webkit-backdrop-filter: blur(35px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.news-event-panel .ant-card-head {
+  background: rgba(18, 18, 18, 0.4) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.news-event-panel .ant-card-head-title {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.news-event-panel .ant-card-body {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+.news-event-panel .ant-tabs-nav {
+  background: rgba(15, 15, 15, 0.3) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+}
+
+.news-event-panel .ant-tabs-tab {
+  color: #ffffff !important;
+}
+
+.news-event-panel .ant-tabs-tab-active {
+  color: #00d4ff !important;
+}
+
+.news-event-panel .ant-list-item {
+  background: rgba(15, 15, 15, 0.25) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #ffffff !important;
+}
+
+/* Command Center Dark Theme */
+.command-center {
+  background: rgba(12, 12, 12, 0.3) !important;
+  backdrop-filter: blur(35px) !important;
+  -webkit-backdrop-filter: blur(35px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.command-center .ant-card-head {
+  background: rgba(18, 18, 18, 0.4) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.command-center .ant-card-head-title {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.command-center .ant-card-body {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+.command-center .ant-select-selector,
+.command-center .ant-input,
+.command-center .ant-input-number {
+  background: rgba(15, 15, 15, 0.3) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+/* Global Stats Panel Dark Theme */
+.global-stats-panel {
+  background: rgba(12, 12, 12, 0.3) !important;
+  backdrop-filter: blur(35px) !important;
+  -webkit-backdrop-filter: blur(35px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.global-stats-panel .ant-card-head {
+  background: rgba(18, 18, 18, 0.4) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.global-stats-panel .ant-card-head-title {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.global-stats-panel .ant-card-body {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+.global-stats-panel .ant-statistic-title {
+  color: #a6a6a6 !important;
+}
+
+.global-stats-panel .ant-statistic-content {
+  color: #ffffff !important;
+}
+
+.global-stats-panel .ant-progress-text {
+  color: #ffffff !important;
+}
+
+/* Risk Management Interface Dark Theme */
+.risk-adjustment-interface {
+  background: rgba(12, 12, 12, 0.3) !important;
+  backdrop-filter: blur(35px) !important;
+  -webkit-backdrop-filter: blur(35px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.risk-adjustment-interface .ant-card-head {
+  background: rgba(18, 18, 18, 0.4) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.risk-adjustment-interface .ant-card-head-title {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.risk-adjustment-interface .ant-card-body {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+.risk-adjustment-interface .ant-select-selector,
+.risk-adjustment-interface .ant-input,
+.risk-adjustment-interface .ant-input-number {
+  background: rgba(15, 15, 15, 0.3) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.risk-adjustment-interface .ant-select-selector:hover,
+.risk-adjustment-interface .ant-input:hover,
+.risk-adjustment-interface .ant-input-number:hover {
+  background: rgba(20, 20, 20, 0.4) !important;
+  border-color: rgba(0, 212, 255, 0.3) !important;
+}
+
+.risk-adjustment-interface .ant-btn {
+  background: rgba(20, 20, 20, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.03) !important;
+  color: #ffffff !important;
+}
+
+.risk-adjustment-interface .ant-btn:hover {
+  background: rgba(25, 25, 25, 0.5) !important;
+  border-color: rgba(0, 212, 255, 0.08) !important;
+}
+
+.risk-adjustment-interface .ant-btn-primary {
+  background: linear-gradient(135deg,
+      rgba(0, 212, 255, 0.15) 0%,
+      rgba(0, 153, 204, 0.15) 100%) !important;
+  border: 1px solid rgba(0, 212, 255, 0.12) !important;
+}
+
+.risk-adjustment-interface .ant-btn-primary:hover {
+  background: linear-gradient(135deg,
+      rgba(0, 212, 255, 0.2) 0%,
+      rgba(0, 153, 204, 0.2) 100%) !important;
+  border-color: rgba(0, 212, 255, 0.18) !important;
+}
+
+.risk-adjustment-interface .ant-slider-track {
+  background: linear-gradient(90deg, #00d4ff 0%, #52c41a 100%) !important;
+}
+
+.risk-adjustment-interface .ant-slider-handle {
+  border: 2px solid #00d4ff !important;
+  background: #ffffff !important;
+}
+
+.risk-adjustment-interface .ant-switch-checked {
+  background: #00d4ff !important;
+}
+
+.risk-adjustment-interface .ant-tag {
+  background: rgba(15, 15, 15, 0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+/* Dashboard Text Override - Removed to allow natural colors */
+
+/* Backtest Comparison Panel Dark Theme */
+.backtest-comparison-panel {
+  background: rgba(12, 12, 12, 0.3) !important;
+  backdrop-filter: blur(35px) !important;
+  -webkit-backdrop-filter: blur(35px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.backtest-comparison-panel .ant-card {
+  background: rgba(12, 12, 12, 0.3) !important;
+  backdrop-filter: blur(35px) !important;
+  -webkit-backdrop-filter: blur(35px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.backtest-comparison-panel .ant-card-head {
+  background: rgba(18, 18, 18, 0.4) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.backtest-comparison-panel .ant-card-head-title {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.backtest-comparison-panel .ant-card-body {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+.backtest-comparison-panel .ant-table {
+  background: rgba(12, 12, 12, 0.3) !important;
+  color: #ffffff !important;
+}
+
+.backtest-comparison-panel .ant-table-thead > tr > th {
+  background: rgba(18, 18, 18, 0.4) !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.backtest-comparison-panel .ant-table-tbody > tr > td {
+  background: rgba(12, 12, 12, 0.3) !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.backtest-comparison-panel .ant-table-tbody > tr:hover > td {
+  background: rgba(20, 20, 20, 0.4) !important;
+}
+
+.backtest-comparison-panel .ant-statistic-title {
+  color: #a6a6a6 !important;
+}
+
+.backtest-comparison-panel .ant-statistic-content {
+  color: #ffffff !important;
+}
+
+.backtest-comparison-panel .ant-select-selector,
+.backtest-comparison-panel .ant-input {
+  background: rgba(15, 15, 15, 0.3) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.backtest-comparison-panel .ant-btn {
+  background: rgba(20, 20, 20, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.03) !important;
+  color: #ffffff !important;
+}
+
+.backtest-comparison-panel .ant-btn:hover {
+  background: rgba(25, 25, 25, 0.5) !important;
+  border-color: rgba(0, 212, 255, 0.08) !important;
+}
+
+.backtest-comparison-panel .ant-btn-primary {
+  background: linear-gradient(135deg,
+      rgba(0, 212, 255, 0.15) 0%,
+      rgba(0, 153, 204, 0.15) 100%) !important;
+  border: 1px solid rgba(0, 212, 255, 0.12) !important;
+}
+
+.backtest-comparison-panel .ant-btn-primary:hover {
+  background: linear-gradient(135deg,
+      rgba(0, 212, 255, 0.2) 0%,
+      rgba(0, 153, 204, 0.2) 100%) !important;
+  border-color: rgba(0, 212, 255, 0.18) !important;
+}
+
+.backtest-comparison-panel .ant-upload-dragger {
+  background: rgba(15, 15, 15, 0.3) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 2px dashed rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+.backtest-comparison-panel .ant-upload-dragger:hover {
+  border-color: rgba(0, 212, 255, 0.3) !important;
+}
+
+.backtest-comparison-panel .ant-upload-text {
+  color: #ffffff !important;
+}
+
+.backtest-comparison-panel .ant-upload-hint {
+  color: #a6a6a6 !important;
+}
+
+/* Action Queue Panel Dark Theme */
+.action-queue-panel {
+  background: rgba(12, 12, 12, 0.3) !important;
+  backdrop-filter: blur(35px) !important;
+  -webkit-backdrop-filter: blur(35px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.action-queue-panel .ant-card-head {
+  background: rgba(18, 18, 18, 0.4) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.action-queue-panel .ant-card-head-title {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.action-queue-panel .ant-card-body {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+.action-queue-panel .ant-table {
+  background: rgba(12, 12, 12, 0.3) !important;
+  color: #ffffff !important;
+}
+
+.action-queue-panel .ant-table-thead > tr > th {
+  background: rgba(18, 18, 18, 0.4) !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.action-queue-panel .ant-table-tbody > tr > td {
+  background: rgba(12, 12, 12, 0.3) !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.action-queue-panel .ant-table-tbody > tr:hover > td {
+  background: rgba(20, 20, 20, 0.4) !important;
+}
+
+.action-queue-panel .ant-select-selector {
+  background: rgba(15, 15, 15, 0.3) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.action-queue-panel .ant-btn {
+  background: rgba(20, 20, 20, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.03) !important;
+  color: #ffffff !important;
+}
+
+.action-queue-panel .ant-btn:hover {
+  background: rgba(25, 25, 25, 0.5) !important;
+  border-color: rgba(0, 212, 255, 0.08) !important;
+}
+
+.action-queue-panel .ant-btn-primary {
+  background: linear-gradient(135deg,
+      rgba(0, 212, 255, 0.15) 0%,
+      rgba(0, 153, 204, 0.15) 100%) !important;
+  border: 1px solid rgba(0, 212, 255, 0.12) !important;
+}
+
+.action-queue-panel .ant-btn-primary:hover {
+  background: linear-gradient(135deg,
+      rgba(0, 212, 255, 0.2) 0%,
+      rgba(0, 153, 204, 0.2) 100%) !important;
+  border-color: rgba(0, 212, 255, 0.18) !important;
+}
+
+.action-queue-panel .ant-tag {
+  background: rgba(15, 15, 15, 0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.action-queue-panel .ant-progress-text {
+  color: #ffffff !important;
+}
+
+.action-queue-panel .ant-empty-description {
+  color: #a6a6a6 !important;
+}
+
+/* Comprehensive Dark Theme Override for All Dashboard Components */
+.dashboard,
+.dashboard * {
+  /* Removed forced color to allow natural colors */
+}
+
+.dashboard .ant-card,
+.dashboard .ant-list,
+.dashboard .ant-table,
+.dashboard .ant-modal,
+.dashboard .ant-drawer,
+.dashboard .ant-tabs,
+.dashboard .ant-collapse,
+.dashboard .ant-form,
+.dashboard .ant-select,
+.dashboard .ant-input,
+.dashboard .ant-button {
+  background: rgba(12, 12, 12, 0.3) !important;
+  backdrop-filter: blur(35px) !important;
+  -webkit-backdrop-filter: blur(35px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.dashboard .ant-card-head,
+.dashboard .ant-modal-header,
+.dashboard .ant-drawer-header,
+.dashboard .ant-tabs-nav {
+  background: rgba(18, 18, 18, 0.4) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.dashboard .ant-card-head-title,
+.dashboard .ant-modal-title,
+.dashboard .ant-drawer-title,
+.dashboard .ant-tabs-tab {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.dashboard .ant-card-body,
+.dashboard .ant-modal-body,
+.dashboard .ant-drawer-body,
+.dashboard .ant-tabs-content {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+.dashboard .ant-statistic-title {
+  color: #a6a6a6 !important;
+}
+
+.dashboard .ant-statistic-content {
+  color: #ffffff !important;
+}
+
+.dashboard .ant-list-item {
+  background: rgba(15, 15, 15, 0.25) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #ffffff !important;
+}
+
+.dashboard .ant-list-item-meta-title {
+  color: #ffffff !important;
+}
+
+.dashboard .ant-list-item-meta-description {
+  color: #a6a6a6 !important;
+}
+
+.dashboard .ant-table-thead > tr > th {
+  background: rgba(18, 18, 18, 0.4) !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.dashboard .ant-table-tbody > tr > td {
+  background: rgba(12, 12, 12, 0.3) !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.dashboard .ant-table-tbody > tr:hover > td {
+  background: rgba(20, 20, 20, 0.4) !important;
+}
+
+.dashboard .ant-select-selector,
+.dashboard .ant-input,
+.dashboard .ant-input-number,
+.dashboard .ant-textarea {
+  background: rgba(15, 15, 15, 0.3) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.dashboard .ant-select-selector:hover,
+.dashboard .ant-input:hover,
+.dashboard .ant-input-number:hover,
+.dashboard .ant-textarea:hover {
+  background: rgba(20, 20, 20, 0.4) !important;
+  border-color: rgba(0, 212, 255, 0.3) !important;
+}
+
+.dashboard .ant-select-selector:focus,
+.dashboard .ant-input:focus,
+.dashboard .ant-input-number:focus,
+.dashboard .ant-textarea:focus {
+  background: rgba(25, 25, 25, 0.5) !important;
+  border-color: rgba(0, 212, 255, 0.5) !important;
+}
+
+.dashboard .ant-btn {
+  background: rgba(20, 20, 20, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.03) !important;
+  color: #ffffff !important;
+}
+
+.dashboard .ant-btn:hover {
+  background: rgba(25, 25, 25, 0.5) !important;
+  border-color: rgba(0, 212, 255, 0.08) !important;
+}
+
+.dashboard .ant-btn-primary {
+  background: linear-gradient(135deg,
+      rgba(0, 212, 255, 0.15) 0%,
+      rgba(0, 153, 204, 0.15) 100%) !important;
+  border: 1px solid rgba(0, 212, 255, 0.12) !important;
+}
+
+.dashboard .ant-btn-primary:hover {
+  background: linear-gradient(135deg,
+      rgba(0, 212, 255, 0.2) 0%,
+      rgba(0, 153, 204, 0.2) 100%) !important;
+  border-color: rgba(0, 212, 255, 0.18) !important;
+}
+
+.dashboard .ant-tag {
+  background: rgba(15, 15, 15, 0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.dashboard .ant-progress-text {
+  color: #ffffff !important;
+}
+
+.dashboard .ant-empty-description {
+  color: #a6a6a6 !important;
+}
+
+.dashboard .ant-divider {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dashboard .ant-alert {
+  background: rgba(15, 15, 15, 0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.dashboard .ant-spin-text {
+  color: #ffffff !important;
+}
+
+/* Allow natural text colors */
+.dashboard h1,
+.dashboard h2,
+.dashboard h3,
+.dashboard h4,
+.dashboard h5,
+.dashboard h6,
+.dashboard p,
+.dashboard span,
+.dashboard div,
+.dashboard label,
+.dashboard .ant-typography {
+  /* Removed forced white color */
+}
+
+/* Subdued text elements */
+.dashboard .ant-form-item-label > label,
+.dashboard .ant-descriptions-item-label,
+.dashboard .ant-statistic-title,
+.dashboard .ant-list-item-meta-description {
+  color: #a6a6a6 !important;
+}
+
+/* Special handling for inline styles that might override */
+.dashboard [style*="color: #666"],
+.dashboard [style*="color:#666"],
+.dashboard [style*="color: #f5f5f5"],
+.dashboard [style*="color:#f5f5f5"] {
+  color: #a6a6a6 !important;
+}
+
+.dashboard [style*="background: #f"],
+.dashboard [style*="background:#f"],
+.dashboard [style*="backgroundColor: #f"],
+.dashboard [style*="backgroundColor:#f"] {
+  background: #262626 !important;
+}

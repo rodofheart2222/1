@@ -1,0 +1,266 @@
+/* Ticker Bar Container - Fixed positioning for both ticker and header */
+.ticker-bar-container {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 10000 !important;
+  background: #000000 !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+  font-family: 'Arial', 'Helvetica', sans-serif;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity, background-color, box-shadow;
+  transform: translateZ(0);
+  overflow: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Bloomberg-Style Ticker Bar */
+.bloomberg-ticker-bar {
+  height: 28px !important;
+  background: #000000 !important;
+  border-bottom: 1px solid #1a1a1a;
+  overflow: hidden;
+}
+
+/* Advanced Intelligence Header */
+.advanced-intelligence-header {
+  height: 32px;
+  background: #111111;
+  border-bottom: 1px solid #1A1A1A;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Enhanced Sticky Ticker Behavior */
+.ticker-bar-container.scrolled {
+  background: rgba(0, 0, 0, 0.95) !important;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.9),
+    0 0 20px rgba(0, 212, 255, 0.1);
+  transform: translateY(0);
+}
+
+.ticker-bar-container.scrolled .bloomberg-ticker-bar {
+  border-bottom: 1px solid #333333;
+}
+
+.ticker-bar-container.scrolled .advanced-intelligence-header {
+  border-bottom: 1px solid #333333;
+}
+
+/* Add a subtle glow effect when scrolled */
+.ticker-bar-container.scrolled::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(0, 212, 255, 0.3) 25%, 
+    rgba(0, 212, 255, 0.5) 50%, 
+    rgba(0, 212, 255, 0.3) 75%, 
+    transparent 100%);
+  opacity: 0.8;
+  animation: tickerGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes tickerGlow {
+  0% { opacity: 0.3; }
+  100% { opacity: 0.8; }
+}
+
+/* Ticker container */
+.ticker-container {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  white-space: nowrap;
+  position: relative;
+  z-index: 1002;
+  width: max-content;
+}
+
+/* Ticker content animation - water-like flow */
+.ticker-content {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  animation: ticker-scroll 90s linear infinite;
+  white-space: nowrap;
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+  transform: translateZ(0); /* Hardware acceleration */
+}
+
+/* Water-like ticker animation - smooth and continuous */
+@keyframes ticker-scroll {
+  0% { 
+    transform: translateX(100%); 
+  }
+  100% { 
+    transform: translateX(-100%); 
+  }
+}
+
+/* Bloomberg ticker items */
+.bloomberg-ticker-item {
+  background: transparent;
+  transition: background-color 0.2s ease;
+  font-family: 'Arial', 'Helvetica', sans-serif;
+}
+
+.bloomberg-ticker-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Bloomberg-style typography */
+.bloomberg-ticker-item span {
+  text-shadow: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure ticker bar is always visible and properly layered */
+.bloomberg-ticker-bar {
+  pointer-events: auto;
+  user-select: none;
+}
+
+/* Smooth scroll behavior for ticker */
+.bloomberg-ticker-bar {
+  transform: translateZ(0); /* Force hardware acceleration */
+}
+
+/* Ensure ticker content is always visible */
+.ticker-content {
+  position: relative;
+  z-index: 1002;
+}
+
+/* Water-like flow for ticker prices */
+.ticker-price {
+  transition: none !important;
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.ticker-price.price-up {
+  color: #00FF00 !important;
+  text-shadow: 0 0 6px rgba(0, 255, 0, 0.4);
+}
+
+.ticker-price.price-down {
+  color: #FF0000 !important;
+  text-shadow: 0 0 6px rgba(255, 0, 0, 0.4);
+}
+
+/* Smooth ticker content flow */
+.ticker-content {
+  animation: waterFlow 120s linear infinite;
+}
+
+@keyframes waterFlow {
+  0% { 
+    transform: translateX(100%); 
+  }
+  100% { 
+    transform: translateX(-100%); 
+  }
+}
+
+/* Enhanced ticker item hover effects */
+.bloomberg-ticker-item:hover .ticker-price {
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+/* Glowing white button effects */
+.glow-button {
+  transition: all 0.3s ease !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.glow-button:hover {
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.7), inset 0 0 15px rgba(255, 255, 255, 0.3) !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.8) !important;
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.glow-button:active {
+  transform: translateY(0px);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5), inset 0 0 8px rgba(255, 255, 255, 0.2) !important;
+}
+
+.glow-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Ensure all text in ticker bar is bright white */
+.ticker-bar-container * {
+  color: #FFFFFF !important;
+}
+
+/* Override any darker text colors */
+.ticker-bar-container .muted-text {
+  color: #FFFFFF !important;
+  opacity: 0.9;
+}
+
+/* Enhanced glow for active buttons */
+.glow-button[style*="background: rgb(255, 255, 255)"],
+.glow-button[style*="background-color: rgb(255, 255, 255)"] {
+  animation: pulseGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.4);
+  }
+}
+
+/* Responsive ticker bar */
+@media (max-width: 768px) {
+  .bloomberg-ticker-bar {
+    top: 0 !important; /* Always at the very top */
+    height: 24px !important;
+    font-size: 10px;
+  }
+  
+  .bloomberg-ticker-item {
+    padding: 0 8px !important;
+    gap: 4px !important;
+  }
+  
+  .bloomberg-ticker-item span {
+    font-size: 9px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .bloomberg-ticker-bar {
+    top: 0 !important; /* Always at the very top */
+    height: 20px !important;
+  }
+  
+  .bloomberg-ticker-item {
+    padding: 0 6px !important;
+  }
+  
+  .bloomberg-ticker-item span {
+    font-size: 8px !important;
+  }
+}

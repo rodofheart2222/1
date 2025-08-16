@@ -1,0 +1,111 @@
+/* Mini Chart Component Styles */
+
+.mini-chart-container {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mini-chart-container canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: opacity 0.2s ease-in-out;
+  filter: brightness(1.1) contrast(1.05);
+}
+
+.mini-chart-container.updating canvas {
+  opacity: 0.9;
+}
+
+/* Ensure proper sizing in flex containers */
+.mini-chart-responsive {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Fix for Ant Design card body padding issues */
+.ant-card-body .mini-chart-container {
+  margin: 0;
+  padding: 0;
+}
+
+/* Prevent canvas from being draggable */
+.mini-chart-container canvas {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
+}
+
+/* Loading state */
+.mini-chart-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 15, 15, 0.5);
+  border-radius: 4px;
+}
+
+/* Error state */
+.mini-chart-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 77, 79, 0.1);
+  border: 1px dashed rgba(255, 77, 79, 0.3);
+  border-radius: 4px;
+  color: #ff4d4f;
+  font-size: 10px;
+  text-align: center;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 768px) {
+  .mini-chart-container {
+    border-radius: 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mini-chart-container canvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* High DPI display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .mini-chart-container canvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: pixelated;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .mini-chart-container canvas {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .mini-chart-container {
+    background: white !important;
+    border: 1px solid #000 !important;
+  }
+  
+  .mini-chart-container canvas {
+    filter: grayscale(100%) contrast(120%);
+  }
+}

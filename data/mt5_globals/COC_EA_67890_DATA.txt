@@ -1,0 +1,39 @@
+{
+  "magic_number": 67890,
+  "symbol": "GBPUSD",
+  "strategy_tag": "Scalper_v2",
+  "current_profit": -25.3,
+  "open_positions": 1,
+  "trade_status": "active",
+  "sl_value": 0.0,
+  "tp_value": 0.0,
+  "trailing_active": true,
+  "module_status": {
+    "BB": "active",
+    "RSI": "signal",
+    "MA": "trend",
+    "risk_manager": "active"
+  },
+  "performance_metrics": {
+    "pf": 1.1746999999999999,
+    "ep": 25.3,
+    "dd": 2.5300000000000002,
+    "zscore": -0.253
+  },
+  "last_trades": [
+    {
+      "ticket": 12345,
+      "symbol": "GBPUSD",
+      "profit": -25.3,
+      "close_time": "2025-08-16T09:38:50.291171"
+    },
+    {
+      "ticket": 12346,
+      "symbol": "GBPUSD",
+      "profit": -25.3,
+      "close_time": "2025-08-16T08:38:50.291171"
+    }
+  ],
+  "coc_override": false,
+  "last_update": "2025-08-16T09:38:50.291171"
+}

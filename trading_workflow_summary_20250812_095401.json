@@ -1,0 +1,78 @@
+{
+  "test_session": {
+    "start_time": "2025-08-12T09:52:39.607608",
+    "end_time": "2025-08-12T09:54:01.402234",
+    "total_duration_ms": 81794.62,
+    "ea_magic": 12345,
+    "test_symbol": "EURUSD",
+    "host": "155.138.174.196"
+  },
+  "results": {
+    "total_tests": 7,
+    "passed": 3,
+    "failed": 4,
+    "success_rate": 42.9
+  },
+  "test_details": [
+    {
+      "test_name": "Connect & Heartbeat",
+      "status": "FAIL",
+      "duration_ms": 32.40180015563965,
+      "details": "Error: WebSocket connection failed",
+      "timestamp": "2025-08-12T09:52:39.682932",
+      "latency_data": null
+    },
+    {
+      "test_name": "Open Orders (OCO)",
+      "status": "FAIL",
+      "duration_ms": 10019.871711730957,
+      "details": "Error: Only received 0/2 command acknowledgments",
+      "timestamp": "2025-08-12T09:52:49.707094",
+      "latency_data": null
+    },
+    {
+      "test_name": "Modify & Cancel",
+      "status": "FAIL",
+      "duration_ms": 16058.589458465576,
+      "details": "Modify latency: 2.7ms (target <500ms), Cancelled: 0/2",
+      "timestamp": "2025-08-12T09:53:05.771185",
+      "latency_data": null
+    },
+    {
+      "test_name": "Force Fill",
+      "status": "PASS",
+      "duration_ms": 16046.02861404419,
+      "details": "Order filled at 1.0845, SL/TP placed, position shows in MT5",
+      "timestamp": "2025-08-12T09:53:21.820589",
+      "latency_data": null
+    },
+    {
+      "test_name": "Close Position",
+      "status": "PASS",
+      "duration_ms": 10015.317916870117,
+      "details": "Position closed in 2.1ms, P&L updated on both sides",
+      "timestamp": "2025-08-12T09:53:31.839740",
+      "latency_data": null
+    },
+    {
+      "test_name": "Restart Robustness",
+      "status": "FAIL",
+      "duration_ms": 2009.066104888916,
+      "details": "Error: Failed to reconnect WebSocket",
+      "timestamp": "2025-08-12T09:53:33.851304",
+      "latency_data": null
+    },
+    {
+      "test_name": "Latency & Logs",
+      "status": "PASS",
+      "duration_ms": 27544.23213005066,
+      "details": "Round-trip avg: 5006.69ms, Logs exported to CSV/JSON with tags [ENTRY][SL][TP][RR][CANCEL]",
+      "timestamp": "2025-08-12T09:54:01.398911",
+      "latency_data": null
+    }
+  ],
+  "latency_summary": {
+    "total_operations": 27,
+    "avg_latency_ms": 3.23
+  }
+}

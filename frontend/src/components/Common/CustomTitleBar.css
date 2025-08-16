@@ -1,0 +1,241 @@
+/* Ensure body and main containers are not draggable */
+body,
+#root,
+.App {
+  -webkit-app-region: no-drag;
+}
+
+/* Custom Title Bar Styles */
+.custom-title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 32px;
+  background: #000000;
+  /* Pure black background */
+  border-bottom: 1px solid #1a1a1a;
+  /* Slightly lighter border for subtle definition */
+  position: fixed;
+  top: 28px;
+  /* Position below ticker bar (28px height) */
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  user-select: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  /* Darker shadow */
+  /* Only the title bar itself should be draggable, not its contents */
+  -webkit-app-region: no-drag;
+}
+
+.title-bar-drag-region {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding-left: 16px;
+  -webkit-app-region: drag;
+  /* Allow dragging the window */
+  cursor: move;
+  /* Ensure drag region doesn't extend beyond title bar */
+  pointer-events: auto;
+}
+
+.title-bar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #00d4ff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #00d4ff 0%, #e0e0e0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.app-subtitle {
+  font-size: 10px;
+  font-weight: 400;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.title-bar-controls {
+  display: flex;
+  height: 100%;
+  -webkit-app-region: no-drag;
+  /* Prevent dragging on controls */
+  pointer-events: auto;
+}
+
+.title-bar-button {
+  width: 46px;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: #FFFFFF;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.3s ease;
+  position: relative;
+  outline: none;
+}
+
+.title-bar-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+.title-bar-button:active {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(0.95);
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+}
+
+/* Specific button styles with glowing white effects */
+.minimize-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+.maximize-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+.close-button:active {
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Focus styles for accessibility */
+.title-bar-button:focus {
+  outline: 2px solid #00d4ff;
+  outline-offset: -2px;
+}
+
+/* Animation for title */
+.app-name {
+  animation: titlePulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes titlePulse {
+  0% {
+    filter: drop-shadow(0 0 2px rgba(0, 212, 255, 0.3));
+  }
+
+  100% {
+    filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.6));
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .custom-title-bar {
+    top: 24px;
+    /* Position below smaller ticker bar (24px height) */
+    height: 28px;
+  }
+
+  .title-bar-button {
+    width: 40px;
+    font-size: 10px;
+  }
+
+  .app-name {
+    font-size: 10px;
+  }
+
+  .app-subtitle {
+    font-size: 8px;
+  }
+
+  .title-bar-drag-region {
+    padding-left: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .custom-title-bar {
+    top: 20px;
+    /* Position below even smaller ticker bar (20px height) */
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .custom-title-bar {
+    border-bottom: 2px solid #e0e0e0;
+  }
+
+  .title-bar-button {
+    border: 1px solid #e0e0e0;
+  }
+
+  .app-name {
+    color: #e0e0e0;
+    -webkit-text-fill-color: #e0e0e0;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+  .title-bar-button,
+  .app-name {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Platform-specific adjustments */
+.platform-darwin .title-bar-controls {
+  order: -1;
+  /* Move controls to left on macOS */
+}
+
+.platform-darwin .title-bar-drag-region {
+  padding-left: 80px;
+  /* Make room for macOS traffic lights */
+}
+
+/* Windows-specific styling */
+.platform-win32 .title-bar-button {
+  width: 45px;
+}
+
+.platform-win32 .close-button:hover {
+  background: #e81123;
+}
+
+/* Linux-specific styling */
+.platform-linux .title-bar-button {
+  border-radius: 0;
+}
+
+.platform-linux .close-button:hover {
+  background: #cc575d;
+}

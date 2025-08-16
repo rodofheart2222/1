@@ -1,0 +1,45 @@
+{
+  "magic_number": 33333,
+  "symbol": "USDCAD",
+  "strategy_tag": "Grid_v1",
+  "current_profit": -67.89,
+  "open_positions": 5,
+  "trade_status": "active",
+  "sl_value": 0.0,
+  "tp_value": 0.0,
+  "trailing_active": true,
+  "module_status": {
+    "BB": "active",
+    "RSI": "signal",
+    "MA": "trend",
+    "risk_manager": "active"
+  },
+  "performance_metrics": {
+    "pf": 1.13211,
+    "ep": 67.89,
+    "dd": 6.789000000000001,
+    "zscore": -0.6789000000000001
+  },
+  "last_trades": [
+    {
+      "ticket": 12345,
+      "symbol": "USDCAD",
+      "profit": -13.578,
+      "close_time": "2025-08-16T09:38:50.291171"
+    },
+    {
+      "ticket": 12346,
+      "symbol": "USDCAD",
+      "profit": -13.578,
+      "close_time": "2025-08-16T08:38:50.291171"
+    },
+    {
+      "ticket": 12347,
+      "symbol": "USDCAD",
+      "profit": -13.578,
+      "close_time": "2025-08-16T07:38:50.291171"
+    }
+  ],
+  "coc_override": false,
+  "last_update": "2025-08-16T09:38:50.291171"
+}

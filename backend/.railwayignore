@@ -1,0 +1,14 @@
+# Backend Railway ignore
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+data/
+logs/
+test_*
+*_test.py
+tests/
+*.db
+*.sqlite
+*.log

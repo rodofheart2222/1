@@ -1,0 +1,146 @@
+{
+  "name": "mt5-coc-dashboard",
+  "version": "1.0.0",
+  "description": "MT5 Commander-in-Chief + Soldier EA Dashboard System",
+  "main": "build/electron.js",
+  "scripts": {
+    "start": "serve -s build -l $PORT",
+    "dev": "react-scripts start",
+    "dev:electron": "concurrently \"npm run dev:react\" \"wait-on http://155.138.174.196:3000 && electron .\"",
+    "dev:react": "react-scripts start",
+    "build": "react-scripts build",
+    "build:electron": "npm run build && node build-electron.js",
+    "dist": "npm run build:electron && electron-builder",
+    "dist:win": "npm run build:electron && electron-builder --win",
+    "dist:mac": "npm run build:electron && electron-builder --mac",
+    "dist:linux": "npm run build:electron && electron-builder --linux",
+    "pack": "npm run build:electron && electron-builder --dir",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "railway:build": "npm run build",
+    "railway:start": "serve -s build -p $PORT"
+  },
+  "keywords": [
+    "mt5",
+    "trading",
+    "dashboard",
+    "electron",
+    "react"
+  ],
+  "author": "MT5 Dashboard Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.4",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^24.2.1",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "concurrently": "^7.6.0",
+    "electron": "^22.0.0",
+    "electron-builder": "^23.6.0",
+    "typescript": "^5.9.2",
+    "wait-on": "^7.0.1"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.0.0",
+    "antd": "^5.0.0",
+    "electron-is-dev": "^2.0.0",
+    "moment": "^2.30.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "recharts": "^2.5.0",
+    "serve": "^14.2.0",
+    "web-vitals": "^2.1.4",
+    "ws": "^8.13.0"
+  },
+  "homepage": "./",
+  "proxy": "http://155.138.174.196:8000",
+  "build": {
+    "appId": "com.mt5dashboard.app",
+    "productName": "MT5 COC Dashboard",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "build/**/*",
+      "!node_modules/**/*",
+      "node_modules/ws/**/*",
+      "node_modules/electron-is-dev/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../backend/dist/mt5-backend.exe",
+        "to": "backend/mt5-backend.exe",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "../backend/data",
+        "to": "backend/data",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        },
+        {
+          "target": "deb",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "MT5 COC Dashboard",
+      "uninstallDisplayName": "MT5 COC Dashboard",
+      "license": "LICENSE.txt"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-portable.${ext}"
+    }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

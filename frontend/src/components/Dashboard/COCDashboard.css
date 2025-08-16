@@ -1,0 +1,400 @@
+/* COC Dashboard Styles - Modern Black Theme */
+.coc-dashboard {
+  padding: 20px;
+  background: #0a0a0a;
+  min-height: 100vh;
+  /* Ensure all dashboard content is clickable and not draggable */
+  -webkit-app-region: no-drag;
+}
+
+.coc-header {
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  background: linear-gradient(135deg, #141414 0%, #1f1f1f 100%);
+  border: 1px solid #303030;
+  border-radius: 8px;
+  /* Ensure header elements are clickable */
+  -webkit-app-region: no-drag;
+}
+
+.coc-tabs {
+  background: #141414;
+  border: 1px solid #303030;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  /* Ensure tabs are clickable */
+  -webkit-app-region: no-drag;
+}
+
+.coc-tabs .ant-tabs-content-holder {
+  padding: 20px;
+  background: #141414;
+}
+
+.coc-tabs .ant-tabs-tab {
+  color: #a6a6a6 !important;
+  border-color: #303030 !important;
+}
+
+.coc-tabs .ant-tabs-tab-active {
+  color: #00d4ff !important;
+  border-color: #00d4ff !important;
+}
+
+.coc-tabs .ant-tabs-ink-bar {
+  background: #00d4ff !important;
+}
+
+/* Performance Breakdown Panel - Dark Theme */
+.performance-breakdown-panel .performance-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  background: #141414;
+  border: 1px solid #303030;
+  border-radius: 8px;
+}
+
+.performance-breakdown-panel .performance-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+  border-color: #404040;
+}
+
+.performance-breakdown-panel .performance-card.profit {
+  border-left: 4px solid #52c41a;
+  box-shadow: 0 0 20px rgba(82, 196, 26, 0.1);
+}
+
+.performance-breakdown-panel .performance-card.profit:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 30px rgba(82, 196, 26, 0.2);
+}
+
+.performance-breakdown-panel .performance-card.loss {
+  border-left: 4px solid #ff4d4f;
+  box-shadow: 0 0 20px rgba(255, 77, 79, 0.1);
+}
+
+.performance-breakdown-panel .performance-card.loss:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 77, 79, 0.2);
+}
+
+/* Filter Panel */
+.filter-panel .filter-group {
+  margin-bottom: 16px;
+}
+
+.filter-panel .filter-label {
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #666;
+}
+
+.filter-panel .filter-stats {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.filter-panel .filter-stats .ant-card-head-title {
+  color: white;
+}
+
+.filter-panel .stat-item {
+  text-align: center;
+}
+
+.filter-panel .stat-value {
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.filter-panel .stat-label {
+  font-size: 11px;
+  opacity: 0.8;
+  margin-top: 4px;
+}
+
+/* Global Action Controls */
+.global-action-controls .ant-card-body {
+  padding: 16px;
+}
+
+.global-action-controls .ant-select-selection-item {
+  display: flex;
+  align-items: center;
+}
+
+.global-action-controls .ant-btn-danger {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 77, 79, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 77, 79, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 77, 79, 0);
+  }
+}
+
+/* Risk Adjustment Interface */
+.risk-adjustment-interface .ant-slider {
+  margin: 16px 0;
+}
+
+.risk-adjustment-interface .ant-input-number {
+  width: 100%;
+}
+
+.risk-adjustment-interface .ant-card-body {
+  padding: 16px;
+}
+
+/* Action Queue Panel */
+.action-queue-panel .ant-table-tbody > tr:hover > td {
+  background: #f5f5f5;
+}
+
+.action-queue-panel .ant-progress-line {
+  margin: 0;
+}
+
+.action-queue-panel .ant-tag {
+  margin: 0;
+}
+
+/* Global Stats Panel Enhancements - Dark Theme */
+.global-stats-panel {
+  background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+  color: #000000;
+  border: 1px solid #00d4ff;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 212, 255, 0.2);
+}
+
+.global-stats-panel .ant-card-head {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.global-stats-panel .ant-card-head-title {
+  color: #000000;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+.global-stats-panel .ant-statistic-title {
+  color: rgba(0, 0, 0, 0.7) !important;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.global-stats-panel .ant-statistic-content {
+  color: #000000 !important;
+  font-weight: 700;
+}
+
+.global-stats-panel .ant-progress-text {
+  color: #000000 !important;
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .coc-dashboard {
+    padding: 8px;
+  }
+  
+  .coc-tabs .ant-tabs-content-holder {
+    padding: 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .coc-header .ant-col:last-child {
+    margin-top: 8px;
+  }
+  
+  .performance-breakdown-panel .ant-col {
+    margin-bottom: 8px;
+  }
+  
+  .filter-panel .ant-col {
+    margin-bottom: 16px;
+  }
+}
+
+/* Dark Theme Support */
+.dark-theme .coc-dashboard {
+  background: #141414;
+}
+
+.dark-theme .coc-tabs {
+  background: #1f1f1f;
+}
+
+.dark-theme .filter-panel .filter-stats {
+  background: linear-gradient(135deg, #434343 0%, #000000 100%);
+}
+
+/* Animation Classes */
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Status Indicators */
+.status-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.status-indicator.active {
+  background: #52c41a;
+  animation: blink 1s infinite;
+}
+
+.status-indicator.inactive {
+  background: #d9d9d9;
+}
+
+.status-indicator.error {
+  background: #ff4d4f;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0.3;
+  }
+}
+
+/* Card Hover Effects */
+.hover-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.hover-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Loading States */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.loading-spinner {
+  font-size: 24px;
+  color: #1890ff;
+}
+
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.mb-8 {
+  margin-bottom: 8px;
+}
+
+.mb-16 {
+  margin-bottom: 16px;
+}
+
+.mt-8 {
+  margin-top: 8px;
+}
+
+.mt-16 {
+  margin-top: 16px;
+}
+
+.p-8 {
+  padding: 8px;
+}
+
+.p-16 {
+  padding: 16px;
+}
+
+.font-bold {
+  font-weight: bold;
+}
+
+.font-small {
+  font-size: 11px;
+}
+
+.color-success {
+  color: #52c41a;
+}
+
+.color-error {
+  color: #ff4d4f;
+}
+
+.color-warning {
+  color: #faad14;
+}
+
+.color-info {
+  color: #1890ff;
+}
+
+.color-muted {
+  color: #666;
+}

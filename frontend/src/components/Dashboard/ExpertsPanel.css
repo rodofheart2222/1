@@ -1,0 +1,221 @@
+.experts-panel {
+  background: #111111;
+  border: 1px solid #1A1A1A;
+  border-radius: 8px;
+  padding: 20px;
+  color: #E0E0E0;
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+
+.experts-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #1A1A1A;
+}
+
+.panel-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #E0E0E0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+}
+
+.ea-count {
+  font-size: 12px;
+  color: #888;
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  background: rgba(21, 101, 192, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(21, 101, 192, 0.2);
+}
+
+.ea-summary-stats {
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #1A1A1A 0%, #222222 100%);
+  border: 1px solid #333333;
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.stat-card:hover {
+  border-color: #1565C0;
+  box-shadow: 0 4px 12px rgba(21, 101, 192, 0.2);
+}
+
+.stat-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.stat-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #E0E0E0;
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+}
+
+.ea-list {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid #1A1A1A;
+  border-radius: 6px;
+  padding: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.ea-list-item {
+  background: linear-gradient(135deg, #1A1A1A 0%, #222222 100%);
+  border: 1px solid #333333;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  padding: 12px !important;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.ea-list-item:hover {
+  border-color: #1565C0;
+  box-shadow: 0 4px 12px rgba(21, 101, 192, 0.2);
+  transform: translateY(-1px);
+}
+
+.ea-item-content {
+  width: 100%;
+}
+
+.ea-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ea-symbol-magic {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ea-symbol {
+  font-size: 13px;
+  font-weight: 700;
+  color: #E0E0E0;
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+}
+
+.ea-item-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.ea-strategy {
+  flex: 1;
+}
+
+.ea-metrics {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ea-item-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.ea-last-update {
+  font-size: 10px;
+  color: #666;
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+}
+
+.experts-panel-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: #111111;
+  border: 1px solid #1A1A1A;
+  border-radius: 8px;
+}
+
+.experts-panel-loading .ant-spin {
+  color: #1565C0;
+}
+
+/* Badge customization */
+.ant-badge-status-success {
+  background-color: #2E7D32 !important;
+}
+
+.ant-badge-status-warning {
+  background-color: #FF9800 !important;
+}
+
+.ant-badge-status-error {
+  background-color: #D32F2F !important;
+}
+
+.ant-badge-status-text {
+  color: #E0E0E0 !important;
+  font-size: 11px !important;
+  font-weight: 500;
+}
+
+/* Alert customization */
+.experts-panel .ant-alert {
+  background: rgba(255, 193, 7, 0.1) !important;
+  border: 1px solid rgba(255, 193, 7, 0.3) !important;
+  border-radius: 6px;
+}
+
+.experts-panel .ant-alert-message {
+  color: #E0E0E0 !important;
+  font-weight: 600;
+}
+
+.experts-panel .ant-alert-description {
+  color: #CCCCCC !important;
+  font-size: 12px;
+}
+
+.experts-panel .ant-alert-icon {
+  color: #FF9800 !important;
+}

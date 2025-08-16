@@ -1,0 +1,46 @@
+{
+  "magic_number": 12345,
+  "symbol": "EURUSD",
+  "strategy_tag": "Compression_v1",
+  "current_profit": 150.75,
+  "open_positions": 2,
+  "trade_status": "active",
+  "sl_value": 0.0,
+  "tp_value": 0.0,
+  "trailing_active": true,
+  "module_status": {
+    "BB": "active",
+    "RSI": "signal",
+    "MA": "trend",
+    "risk_manager": "active"
+  },
+  "performance_metrics": {
+    "pf": 1.35075,
+    "ep": 150.75,
+    "dd": 0,
+    "zscore": 1.5075
+  },
+  "last_trades": [
+    {
+      "ticket": 12345,
+      "symbol": "EURUSD",
+      "profit": 75.375,
+      "close_time": "2025-08-16T09:38:50.291171"
+    },
+    {
+      "ticket": 12346,
+      "symbol": "EURUSD",
+      "profit": 75.375,
+      "close_time": "2025-08-16T08:38:50.291171"
+    },
+    {
+      "ticket": 12347,
+      "symbol": "EURUSD",
+      "profit": 75.375,
+      "close_time": "2025-08-16T07:38:50.291171"
+    }
+  ],
+  "coc_override": false,
+  "last_update": "2025-08-16T09:38:50.291171",
+  "file_timestamp": "2025-08-16T09:38:50.296762"
+}

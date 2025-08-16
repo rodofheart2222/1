@@ -1,0 +1,58 @@
+{
+  "test_session": {
+    "magic_number": 12345,
+    "test_symbol": "EURUSD",
+    "host": "155.138.174.196",
+    "timestamp": "2025-08-12T10:26:03.711978"
+  },
+  "results": {
+    "total_tests": 7,
+    "passed": 0,
+    "failed": 7,
+    "success_rate": 0.0
+  },
+  "test_details": [
+    {
+      "test": "Dashboard Command Recording",
+      "success": false,
+      "details": "Command failed: {'detail': 'Not Found'}",
+      "timestamp": "2025-08-12T10:25:56.673620"
+    },
+    {
+      "test": "MT5 Fill Recording",
+      "success": false,
+      "details": "Fill update failed: {'detail': \"Failed to record MT5 update: name 'get_trade_recording_service' is not defined\"}",
+      "timestamp": "2025-08-12T10:25:57.677958"
+    },
+    {
+      "test": "Dashboard Display",
+      "success": false,
+      "details": "Failed to get dashboard data: {'detail': \"Failed to get dashboard trade data: name 'get_trade_recording_service' is not defined\"}",
+      "timestamp": "2025-08-12T10:25:58.682903"
+    },
+    {
+      "test": "Trade Journal Format",
+      "success": false,
+      "details": "Failed to get journal: {'detail': \"Failed to get trade journal: name 'get_trade_recording_service' is not defined\"}",
+      "timestamp": "2025-08-12T10:25:59.685891"
+    },
+    {
+      "test": "Trade Close Recording",
+      "success": false,
+      "details": "Close update failed: {'detail': \"Failed to record MT5 update: name 'get_trade_recording_service' is not defined\"}",
+      "timestamp": "2025-08-12T10:26:00.693314"
+    },
+    {
+      "test": "Performance Calculation",
+      "success": false,
+      "details": "Failed to get performance: {'detail': \"Failed to get EA performance: name 'get_trade_recording_service' is not defined\"}",
+      "timestamp": "2025-08-12T10:26:01.707682"
+    },
+    {
+      "test": "MT5 Display Simulation",
+      "success": false,
+      "details": "Failed to get trade data: {'detail': \"Failed to get dashboard trade data: name 'get_trade_recording_service' is not defined\"}",
+      "timestamp": "2025-08-12T10:26:02.711603"
+    }
+  ]
+}

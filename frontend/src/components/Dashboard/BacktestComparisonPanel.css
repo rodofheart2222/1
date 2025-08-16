@@ -1,0 +1,366 @@
+.backtest-comparison-panel {
+  padding: 0;
+}
+
+.panel-header {
+  margin-bottom: 16px;
+  border-radius: 6px;
+}
+
+.panel-header .ant-card-body {
+  padding: 12px 16px;
+}
+
+/* Upload area styling */
+.ant-upload-drag {
+  border: 2px dashed rgba(224, 224, 224, 0.1);
+  border-radius: 6px;
+  background: rgba(15, 15, 15, 0.3);
+  transition: all 0.3s ease;
+  color: var(--text-primary);
+}
+
+.ant-upload-drag:hover {
+  border-color: #00d4ff;
+  background: rgba(0, 212, 255, 0.1);
+}
+
+.ant-upload-drag.ant-upload-drag-hover {
+  border-color: #00d4ff;
+  background: rgba(0, 212, 255, 0.1);
+}
+
+/* Status indicators */
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-good {
+  color: #52c41a;
+}
+
+.status-warning {
+  color: #faad14;
+}
+
+.status-critical {
+  color: #ff4d4f;
+}
+
+/* Deviation progress bars */
+.deviation-progress {
+  margin-top: 4px;
+}
+
+.deviation-progress .ant-progress-bg {
+  transition: all 0.3s ease;
+}
+
+/* Table customizations */
+.backtest-comparison-panel .ant-table-thead>tr>th {
+  background: rgba(18, 18, 18, 0.4) !important;
+  font-weight: 600;
+  border-bottom: 2px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.backtest-comparison-panel .ant-table-tbody>tr:hover>td {
+  background: rgba(20, 20, 20, 0.4) !important;
+}
+
+.backtest-comparison-panel .ant-table-expanded-row>td {
+  background: rgba(15, 15, 15, 0.3) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Alert styling */
+.critical-alert {
+  border-left: 4px solid #ff4d4f;
+  background: rgba(255, 77, 79, 0.1);
+  color: var(--text-primary);
+}
+
+.warning-alert {
+  border-left: 4px solid #faad14;
+  background: rgba(250, 173, 20, 0.1);
+  color: var(--text-primary);
+}
+
+/* Statistics cards */
+.ant-statistic-title {
+  font-size: 12px;
+  color: #a6a6a6 !important;
+  margin-bottom: 4px;
+}
+
+.ant-statistic-content {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary) !important;
+}
+
+/* Modal customizations */
+.ant-modal-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 16px 24px;
+  background: rgba(18, 18, 18, 0.4) !important;
+  color: var(--text-primary) !important;
+}
+
+.ant-modal-body {
+  padding: 24px;
+  background: rgba(12, 12, 12, 0.3) !important;
+  color: #e0e0e0 !important;
+}
+
+/* Chart container */
+.chart-container {
+  padding: 16px;
+  background: rgba(15, 15, 15, 0.3);
+  border-radius: 6px;
+  margin-top: 16px;
+  color: #ffffff;
+}
+
+/* Filter section */
+.filter-section {
+  background: rgba(15, 15, 15, 0.3);
+  padding: 16px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  color: #ffffff;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+
+  .backtest-comparison-panel .ant-table-thead>tr>th,
+  .backtest-comparison-panel .ant-table-tbody>tr>td {
+    padding: 8px 4px;
+    font-size: 12px;
+  }
+
+  .ant-statistic-content {
+    font-size: 16px;
+  }
+
+  .panel-header .ant-card-body {
+    padding: 8px 12px;
+  }
+}
+
+/* Loading states */
+.loading-overlay {
+  position: relative;
+}
+
+.loading-overlay::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 10;
+}
+
+/* Tag customizations */
+.ant-tag {
+  border-radius: 4px;
+  font-size: 11px;
+  padding: 2px 6px;
+}
+
+/* Progress bar customizations */
+.ant-progress-line {
+  margin-bottom: 0;
+}
+
+.ant-progress-success-bg {
+  background-color: #52c41a;
+}
+
+.ant-progress-bg {
+  border-radius: 2px;
+}
+
+/* Button customizations */
+.ant-btn-sm {
+  font-size: 12px;
+  padding: 2px 8px;
+  height: 24px;
+}
+
+/* Tooltip customizations */
+.ant-tooltip-inner {
+  font-size: 12px;
+  max-width: 300px;
+}
+
+/* Expandable row styling */
+.ant-table-expanded-row .ant-table-cell {
+  background: rgba(15, 15, 15, 0.3) !important;
+  color: #ffffff !important;
+}
+
+.expanded-content {
+  padding: 16px;
+  background: rgba(15, 15, 15, 0.3);
+  border-radius: 4px;
+  color: #ffffff;
+}
+
+.expanded-content h4 {
+  margin-bottom: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.expanded-content .ant-alert {
+  margin-bottom: 8px;
+}
+
+/* Performance metrics styling */
+.performance-metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.performance-metric:last-child {
+  border-bottom: none;
+}
+
+.metric-label {
+  color: #a6a6a6;
+  font-size: 12px;
+}
+
+.metric-value {
+  font-weight: 600;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+/* Upload modal styling */
+.upload-modal .ant-select {
+  margin-bottom: 16px;
+}
+
+.upload-modal .ant-upload-drag {
+  margin-top: 16px;
+}
+
+/* Chart modal styling */
+.chart-modal .recharts-wrapper {
+  margin-top: 16px;
+}
+
+.chart-modal .recharts-legend-wrapper {
+  padding-top: 16px;
+}
+
+/* Animation for status changes */
+.status-change {
+  animation: statusPulse 0.5s ease-in-out;
+}
+
+@keyframes statusPulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Deviation value styling */
+.deviation-positive {
+  color: #52c41a;
+  font-weight: 600;
+}
+
+.deviation-negative {
+  color: #ff4d4f;
+  font-weight: 600;
+}
+
+.deviation-neutral {
+  color: #a6a6a6;
+  font-weight: 600;
+}
+
+/* Summary card styling */
+.summary-card .ant-statistic {
+  text-align: center;
+}
+
+.summary-card .ant-statistic-content-prefix {
+  margin-right: 8px;
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.action-buttons .ant-btn {
+  flex: 1;
+  min-width: 80px;
+}
+
+/* Search and filter row */
+.filter-row {
+  background: rgba(15, 15, 15, 0.3);
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  color: #ffffff;
+}
+
+.filter-row .ant-input-search {
+  border-radius: 4px;
+}
+
+.filter-row .ant-select {
+  border-radius: 4px;
+}
+
+/* Table row highlighting based on status */
+.ant-table-tbody>tr.status-critical {
+  background-color: rgba(255, 77, 79, 0.1) !important;
+}
+
+.ant-table-tbody>tr.status-warning {
+  background-color: rgba(250, 173, 20, 0.1) !important;
+}
+
+.ant-table-tbody>tr.status-good {
+  background-color: rgba(82, 196, 26, 0.1) !important;
+}
+
+/* Hover effects */
+.ant-table-tbody>tr.status-critical:hover>td {
+  background-color: rgba(255, 77, 79, 0.15) !important;
+}
+
+.ant-table-tbody>tr.status-warning:hover>td {
+  background-color: rgba(250, 173, 20, 0.15) !important;
+}
+
+.ant-table-tbody>tr.status-good:hover>td {
+  background-color: rgba(82, 196, 26, 0.15) !important;
+}

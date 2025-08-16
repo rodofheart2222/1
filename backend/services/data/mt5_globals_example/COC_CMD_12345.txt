@@ -1,0 +1,1 @@
+{"command_type": "adjust_risk", "parameters": {"risk_percent": 2.0}, "timestamp": "2025-08-08T10:18:53.335565", "magic_number": 12345}

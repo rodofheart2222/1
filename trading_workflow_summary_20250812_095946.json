@@ -1,0 +1,78 @@
+{
+  "test_session": {
+    "start_time": "2025-08-12T09:59:33.992491",
+    "end_time": "2025-08-12T09:59:46.193136",
+    "total_duration_ms": 12200.62,
+    "ea_magic": 12345,
+    "test_symbol": "EURUSD",
+    "host": "155.138.174.196"
+  },
+  "results": {
+    "total_tests": 7,
+    "passed": 0,
+    "failed": 7,
+    "success_rate": 0.0
+  },
+  "test_details": [
+    {
+      "test_name": "Connect & Heartbeat",
+      "status": "FAIL",
+      "duration_ms": 2002.7649402618408,
+      "details": "Error: Cannot connect to host 155.138.174.196:80 ssl:default [The remote computer refused the network connection]",
+      "timestamp": "2025-08-12T09:59:36.000682",
+      "latency_data": null
+    },
+    {
+      "test_name": "Open Orders (OCO)",
+      "status": "FAIL",
+      "duration_ms": 2002.42018699646,
+      "details": "Error: Cannot connect to host 155.138.174.196:80 ssl:default [The remote computer refused the network connection]",
+      "timestamp": "2025-08-12T09:59:38.097225",
+      "latency_data": null
+    },
+    {
+      "test_name": "Modify & Cancel",
+      "status": "FAIL",
+      "duration_ms": 0.0040531158447265625,
+      "details": "Error: No orders to modify/cancel",
+      "timestamp": "2025-08-12T09:59:38.107112",
+      "latency_data": null
+    },
+    {
+      "test_name": "Force Fill",
+      "status": "FAIL",
+      "duration_ms": 2002.6028156280518,
+      "details": "Error: Cannot connect to host 155.138.174.196:80 ssl:default [The remote computer refused the network connection]",
+      "timestamp": "2025-08-12T09:59:40.113791",
+      "latency_data": null
+    },
+    {
+      "test_name": "Close Position",
+      "status": "FAIL",
+      "duration_ms": 2001.6698837280273,
+      "details": "Error: Cannot connect to host 155.138.174.196:80 ssl:default [The remote computer refused the network connection]",
+      "timestamp": "2025-08-12T09:59:42.123636",
+      "latency_data": null
+    },
+    {
+      "test_name": "Restart Robustness",
+      "status": "FAIL",
+      "duration_ms": 4048.0897426605225,
+      "details": "Error: Failed to reconnect WebSocket",
+      "timestamp": "2025-08-12T09:59:46.181940",
+      "latency_data": null
+    },
+    {
+      "test_name": "Latency & Logs",
+      "status": "FAIL",
+      "duration_ms": 2.916097640991211,
+      "details": "Error: 'NoneType' object has no attribute 'recv'",
+      "timestamp": "2025-08-12T09:59:46.188893",
+      "latency_data": null
+    }
+  ],
+  "latency_summary": {
+    "total_operations": 5,
+    "avg_latency_ms": 1601.9
+  }
+}

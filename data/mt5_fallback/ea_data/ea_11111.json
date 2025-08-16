@@ -1,0 +1,34 @@
+{
+  "magic_number": 11111,
+  "symbol": "USDJPY",
+  "strategy_tag": "Trend_v1",
+  "current_profit": 89.45,
+  "open_positions": 0,
+  "trade_status": "active",
+  "sl_value": 0.0,
+  "tp_value": 0.0,
+  "trailing_active": false,
+  "module_status": {
+    "BB": "active",
+    "RSI": "signal",
+    "MA": "trend",
+    "risk_manager": "active"
+  },
+  "performance_metrics": {
+    "pf": 1.28945,
+    "ep": 89.45,
+    "dd": 0,
+    "zscore": 0.8945000000000001
+  },
+  "last_trades": [
+    {
+      "ticket": 12345,
+      "symbol": "USDJPY",
+      "profit": 89.45,
+      "close_time": "2025-08-16T09:38:50.291171"
+    }
+  ],
+  "coc_override": false,
+  "last_update": "2025-08-16T09:38:50.291171",
+  "file_timestamp": "2025-08-16T09:38:50.299343"
+}

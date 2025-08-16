@@ -1,0 +1,46 @@
+{
+  "magic_number": 22222,
+  "symbol": "AUDUSD",
+  "strategy_tag": "Breakout_v1",
+  "current_profit": 234.12,
+  "open_positions": 3,
+  "trade_status": "active",
+  "sl_value": 0.0,
+  "tp_value": 0.0,
+  "trailing_active": true,
+  "module_status": {
+    "BB": "active",
+    "RSI": "signal",
+    "MA": "trend",
+    "risk_manager": "active"
+  },
+  "performance_metrics": {
+    "pf": 1.43412,
+    "ep": 234.12,
+    "dd": 0,
+    "zscore": 2.3412
+  },
+  "last_trades": [
+    {
+      "ticket": 12345,
+      "symbol": "AUDUSD",
+      "profit": 78.04,
+      "close_time": "2025-08-16T09:38:50.291171"
+    },
+    {
+      "ticket": 12346,
+      "symbol": "AUDUSD",
+      "profit": 78.04,
+      "close_time": "2025-08-16T08:38:50.291171"
+    },
+    {
+      "ticket": 12347,
+      "symbol": "AUDUSD",
+      "profit": 78.04,
+      "close_time": "2025-08-16T07:38:50.291171"
+    }
+  ],
+  "coc_override": false,
+  "last_update": "2025-08-16T09:38:50.291171",
+  "file_timestamp": "2025-08-16T09:38:50.300477"
+}

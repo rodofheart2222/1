@@ -1,0 +1,282 @@
+/* Advanced Chart Styles */
+
+.advanced-chart-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%);
+  border: 1px solid #333333;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.advanced-chart-container:hover {
+  box-shadow: 
+    0 12px 48px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 0 20px rgba(0, 255, 136, 0.1);
+  transform: translateY(-2px);
+}
+
+.advanced-chart-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Header Styles */
+.advanced-chart-header {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.advanced-chart-symbol {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.advanced-chart-symbol-icon {
+  color: #00FF88;
+  font-size: 16px;
+  filter: drop-shadow(0 0 4px #00FF88);
+  animation: iconPulse 3s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+  0%, 100% { filter: drop-shadow(0 0 4px #00FF88); }
+  50% { filter: drop-shadow(0 0 8px #00FF88); }
+}
+
+.advanced-chart-symbol-text {
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: "JetBrains Mono", monospace;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.advanced-chart-timeframe-select {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+}
+
+.advanced-chart-timeframe-select:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.advanced-chart-timeframe-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.5);
+}
+
+/* Footer Styles */
+.advanced-chart-footer {
+  position: absolute;
+  bottom: 12px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  z-index: 10;
+  backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.advanced-chart-price-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.advanced-chart-current-price {
+  color: #FFFFFF;
+  font-size: 20px;
+  font-weight: 700;
+  font-family: "JetBrains Mono", monospace;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+  animation: priceGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes priceGlow {
+  0% { text-shadow: 0 0 12px rgba(255, 255, 255, 0.4); }
+  100% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.6); }
+}
+
+.advanced-chart-price-change {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.advanced-chart-price-change.positive {
+  background: rgba(0, 255, 136, 0.2);
+  border: 1px solid rgba(0, 255, 136, 0.4);
+  color: #00FF88;
+}
+
+.advanced-chart-price-change.negative {
+  background: rgba(255, 68, 102, 0.2);
+  border: 1px solid rgba(255, 68, 102, 0.4);
+  color: #FF4466;
+}
+
+.advanced-chart-meta-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.advanced-chart-meta-text {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: "JetBrains Mono", monospace;
+}
+
+.advanced-chart-status-badge {
+  font-size: 10px;
+  font-family: "JetBrains Mono", monospace;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.advanced-chart-status-badge.live {
+  color: #00FF88;
+  background: rgba(0, 255, 136, 0.2);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.advanced-chart-status-badge.demo {
+  color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Loading State */
+.advanced-chart-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%);
+  border-radius: 12px;
+  border: 1px solid #333333;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .advanced-chart-header,
+  .advanced-chart-footer {
+    padding: 8px;
+  }
+  
+  .advanced-chart-symbol-text {
+    font-size: 14px;
+  }
+  
+  .advanced-chart-current-price {
+    font-size: 18px;
+  }
+  
+  .advanced-chart-timeframe-select {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .advanced-chart-header {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  
+  .advanced-chart-footer {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  
+  .advanced-chart-meta-info {
+    align-items: flex-start;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .advanced-chart-container {
+    border: 2px solid #FFFFFF;
+  }
+  
+  .advanced-chart-symbol-text,
+  .advanced-chart-current-price {
+    color: #FFFFFF;
+    text-shadow: none;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .advanced-chart-container,
+  .advanced-chart-price-change,
+  .advanced-chart-timeframe-select {
+    transition: none;
+  }
+  
+  .advanced-chart-symbol-icon,
+  .advanced-chart-current-price {
+    animation: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .advanced-chart-container {
+    background: white !important;
+    border: 2px solid black !important;
+    box-shadow: none !important;
+  }
+  
+  .advanced-chart-canvas {
+    filter: grayscale(100%) contrast(120%);
+  }
+  
+  .advanced-chart-header,
+  .advanced-chart-footer {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: black !important;
+  }
+}
