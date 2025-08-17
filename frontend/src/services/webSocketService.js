@@ -27,7 +27,7 @@ class WebSocketService {
   /**
    * Connect to WebSocket server
    */
-  async connect(url = 'ws://155.138.174.196:8765') {
+  async connect(url = (process.env.REACT_APP_WS_URL || 'ws://127.0.0.1:8765')) {
     if (this.isConnecting || this.isConnected) {
       return Promise.resolve();
     }

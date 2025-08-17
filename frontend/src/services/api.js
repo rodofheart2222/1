@@ -5,11 +5,11 @@
 
 class APIService {
   constructor() {
-    // Use environment variable or fallback to 155.138.174.196:80
+    // Use environment variable or fallback to localhost:8000
     // In development, this will bypass the proxy and go directly to backend
     // In production (Electron), we still need to connect to the local backend server
-    this.baseURL = process.env.REACT_APP_API_URL || 'http://155.138.174.196:80';
-    this.fallbackURL = 'http://155.138.174.196:80'; // Fallback to port 80
+    this.baseURL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000';
+    this.fallbackURL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000';
     this.timeout = 15000; // 15 seconds - increased timeout
   }
 
