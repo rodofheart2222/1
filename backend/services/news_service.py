@@ -254,7 +254,8 @@ class NewsEventFilter:
             blackout_start = event.event_time - timedelta(minutes=event.pre_minutes)
             blackout_end = event.event_time + timedelta(minutes=event.post_minutes)
             return blackout_start <= check_time <= blackout_end
-        except:
+        except (TypeError, AttributeError, ValueError) as e:
+            logger.warning(f"Error calculating blackout period for event {event.id}: {e}")
             return False
     
 

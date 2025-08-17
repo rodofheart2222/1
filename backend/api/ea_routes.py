@@ -96,6 +96,7 @@ def safe_db_operation(operation_func):
                     conn.close()
                 except Exception as close_error:
                     logger.error(f"Failed to close database connection: {close_error}")
+                    # Don't re-raise as this is cleanup code
     return wrapper
 
 

@@ -205,8 +205,11 @@ BROWSER=none
             for line in iter(process.stdout.readline, ''):
                 if line.strip():
                     print(f"[{label}] {line.strip()}")
-        except:
-            pass
+        except (IOError, OSError) as e:
+            # Process may have terminated, which is expected
+            logger.debug(f"Process output monitoring ended for {label}: {e}")
+        except Exception as e:
+            logger.warning(f"Unexpected error monitoring {label} output: {e}")
     
     def stop_processes(self):
         """Stop all processes"""
@@ -216,21 +219,29 @@ BROWSER=none
             try:
                 self.backend_process.terminate()
                 self.backend_process.wait(timeout=5)
-            except:
+            except subprocess.TimeoutExpired:
+                logger.warning("Backend process termination timed out, force killing")
                 try:
                     self.backend_process.kill()
-                except:
-                    pass
+                    self.backend_process.wait()
+                except (OSError, subprocess.TimeoutExpired) as e:
+                    logger.error(f"Failed to force kill backend process: {e}")
+            except (OSError, ValueError) as e:
+                logger.error(f"Error terminating backend process: {e}")
         
         if self.frontend_process:
             try:
                 self.frontend_process.terminate()
                 self.frontend_process.wait(timeout=5)
-            except:
+            except subprocess.TimeoutExpired:
+                logger.warning("Frontend process termination timed out, force killing")
                 try:
                     self.frontend_process.kill()
-                except:
-                    pass
+                    self.frontend_process.wait()
+                except (OSError, subprocess.TimeoutExpired) as e:
+                    logger.error(f"Failed to force kill frontend process: {e}")
+            except (OSError, ValueError) as e:
+                logger.error(f"Error terminating frontend process: {e}")
         
         logger.info("✅ Processes stopped")
     

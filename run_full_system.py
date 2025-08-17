@@ -368,8 +368,10 @@ HOST={self.host}
                     backend_ready = True
                     logger.info("✅ Backend server is ready")
                     break
-            except:
-                pass
+            except (requests.exceptions.RequestException, requests.exceptions.Timeout) as e:
+                logger.debug(f"Backend not ready yet (attempt {i+1}/30): {e}")
+            except Exception as e:
+                logger.warning(f"Unexpected error checking backend health: {e}")
             time.sleep(1)
         
         if not backend_ready:
