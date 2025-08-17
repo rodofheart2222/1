@@ -25,8 +25,10 @@ def check_port(port):
                         tasklist_result = subprocess.run(['tasklist', '/FI', f'PID eq {pid}'], 
                                                        capture_output=True, text=True)
                         print(f"Process details:\n{tasklist_result.stdout}")
-                    except:
-                        pass
+                    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+                        print(f"Could not get process details: {e}")
+                    except Exception as e:
+                        print(f"Unexpected error getting process details: {e}")
                     return True
         
         print(f"Port {port} appears to be free")

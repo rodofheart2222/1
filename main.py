@@ -192,9 +192,13 @@ class MT5DashboardManager:
                 await start_integrated_system(self.host, self.ws_port, "dashboard_token_2024")
             except ImportError:
                 print("⚠️  WebSocket service not available, continuing without it")
-                # Keep running without WebSocket
-                while self._get_running():
+                            # Keep running without WebSocket
+            while self._get_running():
+                try:
                     await asyncio.sleep(1)
+                except asyncio.CancelledError:
+                    logger.info("WebSocket server cancelled")
+                    break
                     
         except Exception as e:
             print(f"❌ WebSocket server error: {e}")
