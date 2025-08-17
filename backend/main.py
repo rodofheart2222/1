@@ -90,7 +90,29 @@ async def startup_event():
         # Initialize database
         init_database()
         print(" Database initialized successfully")
-        
+
+        # --- NEW: ensure SQLAlchemy models and schema fixes are applied ---
+        try:
+            # Create tables defined by SQLAlchemy models (handles new entities like ea_status, performance_history, etc.)
+            try:
+                from backend.models import create_tables as sa_create_tables
+            except ImportError:
+                # Fallback when running from backend dir
+                from models import create_tables as sa_create_tables
+            sa_create_tables()
+            print(" SQLAlchemy tables synchronized")
+        except Exception as e:
+            print(f"⚠️ Failed to sync SQLAlchemy tables: {e}")
+
+        # Run additional schema fixer for legacy/missing columns or tables
+        try:
+            from fix_database_schema import add_missing_tables as fix_schema
+            fix_schema()
+            print(" Additional schema fixes applied")
+        except Exception as e:
+            print(f"⚠️ Schema fixer execution failed or not available: {e}")
+        # --- END NEW ---
+
         # Create necessary directories
         from pathlib import Path
         directories = ["data", "logs", "data/mt5_fallback", "data/mt5_globals"]
