@@ -26,7 +26,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Import services
 from backend.services.websocket_server import WebSocketServer
-from backend.database.base import init_db
+from backend.database import init_database
 from backend.api import ea_api, backtest_api, news_api, trade_api
 
 # Configure logging
@@ -58,7 +58,7 @@ class CompleteServer:
             logger.info("🚀 Starting complete backend server...")
             
             # Initialize database
-            init_db()
+            init_database()
             logger.info("✅ Database initialized")
             
             # Start WebSocket server
