@@ -73,9 +73,24 @@ class MT5DashboardManager:
             self.api_port = api_port or 8000
             self.ws_port = ws_port or 8765
             self.frontend_port = frontend_port or 3000
+        
+        # Thread safety
+        self._lock = threading.Lock()
         self.running = False
         self.fastapi_thread = None
         self.frontend_thread = None
+        self.fastapi_process = None
+        self.frontend_process = None
+        
+    def _set_running(self, value):
+        """Thread-safe way to set running state"""
+        with self._lock:
+            self.running = value
+    
+    def _get_running(self):
+        """Thread-safe way to get running state"""
+        with self._lock:
+            return self.running
         
     def start_fastapi_server(self):
         """Start FastAPI server in separate thread"""
@@ -107,6 +122,7 @@ class MT5DashboardManager:
             
         except Exception as e:
             print(f"❌ FastAPI server error: {e}")
+            self._set_running(False)
     
     def start_frontend_server(self):
         """Start frontend React server in separate thread"""
@@ -132,7 +148,7 @@ class MT5DashboardManager:
                 subprocess.run(["npm", "--version"], capture_output=True, check=True)
             except (subprocess.CalledProcessError, FileNotFoundError):
                 print("⚠️  npm not found. Please install Node.js to run the frontend server")
-                print("   Backend API will still work at http://{self.host}:{self.api_port}")
+                print(f"   Backend API will still work at http://{self.host}:{self.api_port}")
                 print("   You can run the frontend separately with: cd frontend && npm run dev")
                 return
             
@@ -177,11 +193,12 @@ class MT5DashboardManager:
             except ImportError:
                 print("⚠️  WebSocket service not available, continuing without it")
                 # Keep running without WebSocket
-                while self.running:
+                while self._get_running():
                     await asyncio.sleep(1)
                     
         except Exception as e:
             print(f"❌ WebSocket server error: {e}")
+            self._set_running(False)
     
     async def start_all_services(self):
         """Start all services"""
@@ -197,7 +214,7 @@ class MT5DashboardManager:
             # Update frontend configuration
             update_frontend_config(self.host, self.api_port, self.ws_port, self.frontend_port)
             
-            self.running = True
+            self._set_running(True)
             
             # Start FastAPI server in thread
             self.fastapi_thread = threading.Thread(
@@ -233,7 +250,7 @@ class MT5DashboardManager:
     async def stop(self):
         """Stop all services"""
         print("🛑 Stopping all services...")
-        self.running = False
+        self._set_running(False)
         
         try:
             # WebSocket server will stop when running becomes False
