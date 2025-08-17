@@ -27,8 +27,11 @@ def init_database():
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
-        # Create tables
+        # Create base tables
         create_tables(cursor)
+        
+        # Ensure compatibility with current code expectations
+        _ensure_schema_compatibility(cursor)
         
         # Commit changes
         conn.commit()
@@ -283,6 +286,45 @@ def reset_database():
     except Exception as e:
         logger.error(f"Database reset error: {e}")
         return False
+
+
+def _column_exists(cursor, table_name: str, column_name: str) -> bool:
+    cursor.execute(f"PRAGMA table_info({table_name})")
+    columns = [row[1] for row in cursor.fetchall()]
+    return column_name in columns
+
+
+def _ensure_schema_compatibility(cursor):
+    """Ensure tables/columns used by the app exist (idempotent)."""
+    # EAs: ensure strategy_tag and risk_config columns exist
+    try:
+        if not _column_exists(cursor, 'eas', 'strategy_tag'):
+            cursor.execute("ALTER TABLE eas ADD COLUMN strategy_tag TEXT DEFAULT 'Default'")
+        if not _column_exists(cursor, 'eas', 'risk_config'):
+            cursor.execute("ALTER TABLE eas ADD COLUMN risk_config REAL DEFAULT 1.0")
+        # Helpful index
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_eas_strategy_tag ON eas(strategy_tag)")
+    except Exception as e:
+        logger.warning(f"Schema adjust for 'eas' failed or unnecessary: {e}")
+    
+    # News events table required by models
+    try:
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS news_events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                event_time TIMESTAMP NOT NULL,
+                currency TEXT NOT NULL,
+                impact_level TEXT NOT NULL CHECK (impact_level IN ('high', 'medium', 'low')),
+                description TEXT NOT NULL,
+                pre_minutes INTEGER DEFAULT 30,
+                post_minutes INTEGER DEFAULT 30
+            )
+            """
+        )
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_news_events_time ON news_events(event_time)")
+    except Exception as e:
+        logger.warning(f"Schema adjust for 'news_events' failed or unnecessary: {e}")
 
 
 if __name__ == "__main__":

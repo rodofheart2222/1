@@ -231,3 +231,11 @@ Press Ctrl+C to stop all services
 ```
 
 Your browser should automatically open to the dashboard, and you're ready to start trading! 📈
+
+# Quick Start Update
+
+- To run the backend API only without Node.js:
+  - `chmod +x startup.sh`
+  - `./startup.sh`
+
+This installs Python deps (skipping heavy system packages), initializes the database, and starts FastAPI on `0.0.0.0:8000`.

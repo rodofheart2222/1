@@ -12,7 +12,7 @@ numpy==2.1.3
 # HTTP requests and parsing
 requests==2.31.0
 beautifulsoup4==4.13.4
-lxml==4.9.3
+# lxml removed to avoid system libxml2/libxslt requirement
 python-multipart==0.0.6
 
 # Async support
@@ -27,8 +27,8 @@ pydantic-settings==2.8.0
 pytest==8.4.1
 pytest-asyncio==1.1.0
 
-# MT5 Integration
-MetaTrader5==5.0.45
+# MT5 Integration (optional, not required for basic backend)
+# MetaTrader5==5.0.45
 
 # Development
 black==25.1.0

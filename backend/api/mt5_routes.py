@@ -10,7 +10,10 @@ from typing import Dict, List, Optional, Any
 from datetime import datetime
 import logging
 
-from backend.services.mt5_trade_tracker import get_mt5_trade_tracker
+try:
+    from backend.services.mt5_trade_tracker import get_mt5_trade_tracker
+except ImportError:
+    from services.mt5_trade_tracker import get_mt5_trade_tracker
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/mt5", tags=["MT5 Trade Tracking"])
