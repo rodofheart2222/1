@@ -278,7 +278,7 @@ const Dashboard = ({ dashboardMode = 'soldier', isTransitioning = false }) => {
 
   const connectWebSocket = async () => {
     try {
-      await webSocketService.connect('ws://155.138.174.196:8765');
+      await webSocketService.connect(process.env.REACT_APP_WS_URL || 'ws://127.0.0.1:8765');
 
       // Manually check and update connection status after successful connection
       const status = webSocketService.getConnectionStatus();
@@ -356,8 +356,8 @@ const Dashboard = ({ dashboardMode = 'soldier', isTransitioning = false }) => {
               <span></span>
             </div>
             <div style={{ marginTop: '20px', fontSize: '12px', color: '#888' }}>
-              <div>API: http://155.138.174.196:8000</div>
-              <div>WebSocket: ws://155.138.174.196:8765</div>
+              <div>API: {process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000'}</div>
+              <div>WebSocket: {process.env.REACT_APP_WS_URL || 'ws://127.0.0.1:8765'}</div>
               <div style={{ marginTop: '10px' }}>
                 If this takes too long, the dashboard will load with fallback data.
               </div>

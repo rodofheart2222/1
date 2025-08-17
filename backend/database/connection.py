@@ -8,7 +8,7 @@ import os
 import logging
 from contextlib import contextmanager
 from typing import Generator, Optional
-from sqlalchemy import create_engine, Engine
+from sqlalchemy import create_engine, Engine, text
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import StaticPool
 from sqlalchemy.exc import SQLAlchemyError
@@ -147,7 +147,9 @@ class DatabaseManager:
         """Test database connection"""
         try:
             with self.get_session() as session:
+
                 from sqlalchemy import text
+
                 session.execute(text("SELECT 1"))
             logger.info("Database connection test successful")
             return True

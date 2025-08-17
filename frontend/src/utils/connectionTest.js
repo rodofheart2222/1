@@ -100,7 +100,7 @@ export class ConnectionTester {
     
     try {
       // Test chart data API
-      const response = await fetch('http://155.138.174.196:8000/api/ea/chart-data/EURUSD');
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000'}/api/ea/chart-data/EURUSD`);
       
       if (response.ok) {
         const data = await response.json();
