@@ -104,10 +104,14 @@ class MT5DashboardStarter:
         self.log("🔍 Checking dependencies...")
         
         dependencies = {
-            'python3': 'python3 --version',
-            'node': 'node --version',
-            'npm': 'npm --version'
+            'python3': 'python3 --version'
         }
+        # Only require Node/npm when not running backend-only
+        if not self.config.get('backend_only'):
+            dependencies.update({
+                'node': 'node --version',
+                'npm': 'npm --version'
+            })
         
         missing = []
         
@@ -151,11 +155,23 @@ class MT5DashboardStarter:
         self.log("🗄️ Initializing database...")
         
         try:
+            # Prefer using backend's Python initializer to ensure schema consistency
+            try:
+                # Add backend to path and import
+                sys.path.insert(0, str(Path("backend").resolve()))
+                from database.init_db import init_database as backend_init_database
+                if backend_init_database():
+                    self.log("✅ Database initialization completed", "SUCCESS")
+                    return True
+                self.log("⚠️ Backend init_db returned False, falling back to SQL scripts", "WARNING")
+            except Exception as e:
+                self.log(f"⚠️ Backend init_db unavailable ({e}); falling back to SQL scripts", "WARNING")
+            
             # Ensure data directory exists
             data_dir = Path("data")
             data_dir.mkdir(exist_ok=True)
             
-            # Create database with schema
+            # Create database with schema via SQL files
             db_path = "data/mt5_dashboard.db"
             conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
@@ -167,14 +183,17 @@ class MT5DashboardStarter:
                     cursor.executescript(f.read())
                 self.log("✅ Main schema applied", "SUCCESS")
             
-            # Apply migrations
+            # Apply migrations defensively (skip ones that fail)
             migrations_dir = Path("backend/database/migrations")
             if migrations_dir.exists():
                 migration_files = sorted(migrations_dir.glob("*.sql"))
                 for migration_file in migration_files:
-                    with open(migration_file, 'r') as f:
-                        cursor.executescript(f.read())
-                    self.log(f"✅ Applied migration: {migration_file.name}", "SUCCESS")
+                    try:
+                        with open(migration_file, 'r') as f:
+                            cursor.executescript(f.read())
+                        self.log(f"✅ Applied migration: {migration_file.name}", "SUCCESS")
+                    except Exception as me:
+                        self.log(f"⚠️ Skipping migration {migration_file.name}: {me}", "WARNING")
             
             conn.commit()
             conn.close()
@@ -191,14 +210,20 @@ class MT5DashboardStarter:
         self.log("📦 Installing Python dependencies...")
         
         try:
-            # Install backend dependencies
-            cmd = [
-                sys.executable, '-m', 'pip', 'install', '--break-system-packages',
-                'fastapi', 'uvicorn', 'sqlalchemy', 'python-multipart', 
-                'beautifulsoup4', 'requests', 'pandas', 'numpy'
-            ]
+            # Prefer installing from backend requirements if available
+            req_file = Path('backend/requirements.txt')
+            if req_file.exists():
+                cmd = [
+                    sys.executable, '-m', 'pip', 'install', '--break-system-packages', '-r', str(req_file)
+                ]
+            else:
+                cmd = [
+                    sys.executable, '-m', 'pip', 'install', '--break-system-packages',
+                    'fastapi', 'uvicorn', 'sqlalchemy', 'python-multipart', 
+                    'beautifulsoup4', 'requests', 'pandas', 'numpy'
+                ]
             
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
             if result.returncode == 0:
                 self.log("✅ Python dependencies installed", "SUCCESS")
                 return True

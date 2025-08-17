@@ -170,11 +170,11 @@ async def system_health():
 if __name__ == "__main__":
     import os
     
-    # Get port from environment variable (Railway sets this)
-    port = int(os.getenv("PORT", 80))
-    host = os.getenv("HOST", "155.138.174.196")  # Railway requires 0.0.0.0
+    # Determine host and port
+    host = os.getenv("HOST", "0.0.0.0")
+    port = int(os.getenv("PORT") or os.getenv("MT5_API_PORT", "8000"))
     
-    # Disable reload in production
+    # Enable autoreload in development
     reload = os.getenv("ENVIRONMENT", "development") == "development"
     
     print(f" Starting server on {host}:{port}")
