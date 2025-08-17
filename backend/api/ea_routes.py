@@ -61,10 +61,42 @@ router = APIRouter(prefix="/api/ea", tags=["EA Communication"])
 
 
 def get_db_connection():
-    """Get database connection"""
-    db_path = os.getenv("DATABASE_PATH", "data/mt5_dashboard.db")
-    # Enable row factory if needed later
-    return sqlite3.connect(db_path)
+    """Get database connection with proper error handling"""
+    try:
+        db_path = os.getenv("DATABASE_PATH", "data/mt5_dashboard.db")
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        # Enable row factory if needed later
+        return sqlite3.connect(db_path, timeout=30.0)
+    except Exception as e:
+        logger.error(f"Failed to create database connection: {e}")
+        raise
+
+
+def safe_db_operation(operation_func):
+    """Decorator for safe database operations with proper connection handling"""
+    def wrapper(*args, **kwargs):
+        conn = None
+        try:
+            conn = get_db_connection()
+            result = operation_func(conn, *args, **kwargs)
+            conn.commit()
+            return result
+        except Exception as e:
+            if conn:
+                try:
+                    conn.rollback()
+                except Exception as rollback_error:
+                    logger.error(f"Failed to rollback transaction: {rollback_error}")
+            logger.error(f"Database operation failed: {e}")
+            raise
+        finally:
+            if conn:
+                try:
+                    conn.close()
+                except Exception as close_error:
+                    logger.error(f"Failed to close database connection: {close_error}")
+    return wrapper
 
 
 def _get_or_create_ea(cursor: sqlite3.Cursor, magic_number: int, symbol: str, strategy_tag: str) -> int:
@@ -136,7 +168,8 @@ ea_status_cache: Dict[int, EAStatusUpdate] = {}
 
 @router.post("/status")
 async def receive_ea_status(status: EAStatusUpdate):
-    """Receive status update from Soldier EA"""
+    """Receive status update from EA"""
+    conn = None
     try:
         # Store in cache for real-time dashboard updates
         ea_status_cache[status.magic_number] = status
@@ -220,7 +253,6 @@ async def receive_ea_status(status: EAStatusUpdate):
             )
 
         conn.commit()
-        conn.close()
 
         # Broadcast real-time update to WebSocket clients with portfolio analytics theme
         if WEBSOCKET_AVAILABLE:
@@ -238,7 +270,6 @@ async def receive_ea_status(status: EAStatusUpdate):
                     "symbol": status.symbol,
                     "strategyTag": status.strategy_tag,  # Use camelCase for frontend consistency
                     "strategy_tag": status.strategy_tag,  # Keep snake_case for backward compatibility
-                    "status": "paused" if status.is_paused else "active",
                     "currentProfit": status.current_profit,  # Use camelCase for frontend consistency
                     "current_profit": status.current_profit,  # Keep snake_case for backward compatibility
                     "openPositions": status.open_positions,  # Use camelCase for frontend consistency
@@ -249,30 +280,33 @@ async def receive_ea_status(status: EAStatusUpdate):
                     "tp_value": status.tp_value,  # Keep snake_case for backward compatibility
                     "trailingActive": status.trailing_active,  # Use camelCase for frontend consistency
                     "trailing_active": status.trailing_active,  # Keep snake_case for backward compatibility
+                    "isPaused": status.is_paused,  # Use camelCase for frontend consistency
+                    "is_paused": status.is_paused,  # Keep snake_case for backward compatibility
                     "moduleStatus": status.module_status,  # Use camelCase for frontend consistency
                     "module_status": status.module_status,  # Keep snake_case for backward compatibility
                     "performanceMetrics": status.performance_metrics,  # Use camelCase for frontend consistency
                     "performance_metrics": status.performance_metrics,  # Keep snake_case for backward compatibility
                     "lastTrades": status.last_trades,  # Use camelCase for frontend consistency
                     "last_trades": status.last_trades,  # Keep snake_case for backward compatibility
-                    "cocOverride": status.coc_override,  # Use camelCase for frontend consistency
-                    "coc_override": status.coc_override,  # Keep snake_case for backward compatibility
-                    "lastUpdate": status.timestamp,  # Use camelCase for frontend consistency
-                    "last_update": status.timestamp,  # Keep snake_case for backward compatibility
-                    # Portfolio analytics theme data
-                    "themeData": theme_status
+                    "timestamp": datetime.now().isoformat()
                 }
                 
-                # Use asyncio to broadcast without blocking the API response
                 import asyncio
-                asyncio.create_task(websocket_server.broadcast_ea_update(ea_data))
+                asyncio.create_task(websocket_server.broadcast_ea_status(ea_data))
             except Exception as e:
-                print(f"️ WebSocket broadcast failed: {e}")
+                logger.error(f"WebSocket broadcast failed: {e}")
 
-        return {"status": "success", "message": "Status received"}
+        return {"status": "received", "ea_id": ea_id}
 
     except Exception as e:
+        logger.error(f"Failed to process EA status: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to process status: {str(e)}")
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception as e:
+                logger.error(f"Failed to close database connection: {e}")
 
 
 @router.get("/commands/{magic_number}")
@@ -286,9 +320,10 @@ async def get_pending_commands(magic_number: int):
         raise HTTPException(status_code=404, detail="No pending commands")
 
 
-@router.post("/command-ack")
+@router.post("/acknowledge")
 async def acknowledge_command(ack: CommandAcknowledgment):
     """Acknowledge command execution by EA"""
+    conn = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -316,7 +351,6 @@ async def acknowledge_command(ack: CommandAcknowledgment):
         )
 
         conn.commit()
-        conn.close()
 
         # Broadcast command acknowledgment to WebSocket clients
         if WEBSOCKET_AVAILABLE:
@@ -335,19 +369,27 @@ async def acknowledge_command(ack: CommandAcknowledgment):
                 import asyncio
                 asyncio.create_task(websocket_server.broadcast_command_update(command_data))
             except Exception as e:
-                print(f"️ WebSocket broadcast failed: {e}")
+                logger.error(f"WebSocket broadcast failed: {e}")
 
         return {"status": "acknowledged"}
 
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"Failed to acknowledge command: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to acknowledge command: {str(e)}")
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception as e:
+                logger.error(f"Failed to close database connection: {e}")
 
 
 @router.post("/command")
 async def send_command_to_ea(magic_number: int, command: EACommand):
     """Send command to specific EA"""
+    conn = None
     try:
         # Add command to pending queue
         if magic_number not in pending_commands:
@@ -382,20 +424,20 @@ async def send_command_to_ea(magic_number: int, command: EACommand):
         )
 
         conn.commit()
-        conn.close()
 
         # Record trade command if it's a trading command
         if command.command in ["PLACE_ORDER", "MODIFY_ORDER", "CANCEL_ORDER", "CLOSE_POSITION"]:
             try:
-                from services.trade_recording_service import get_trade_recording_service
+                from backend.services.trade_recording_service import get_trade_recording_service
                 trade_service = get_trade_recording_service()
                 
                 command_data_for_trade = {
-                    'magic_number': magic_number,
-                    'command': command.command,
-                    'parameters': command.parameters or {},
-                    'command_id': f"cmd_{int(datetime.now().timestamp())}_{magic_number}",
-                    'timestamp': datetime.now().isoformat()
+                    "ea_id": ea_id,
+                    "magic_number": magic_number,
+                    "command_type": command.command,
+                    "parameters": command.parameters or {},
+                    "timestamp": datetime.now().isoformat(),
+                    "status": "pending"
                 }
                 
                 trade_id = await trade_service.record_dashboard_command(command_data_for_trade)
@@ -408,12 +450,20 @@ async def send_command_to_ea(magic_number: int, command: EACommand):
         return {"status": "command_queued", "message": f"Command sent to EA {magic_number}"}
 
     except Exception as e:
+        logger.error(f"Failed to send command: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to send command: {str(e)}")
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception as e:
+                logger.error(f"Failed to close database connection: {e}")
 
 
 @router.post("/commands/batch")
 async def send_batch_commands(command: EACommand):
     """Send command to multiple EAs"""
+    conn = None
     try:
         results = []
 
@@ -451,12 +501,18 @@ async def send_batch_commands(command: EACommand):
             )
 
         conn.commit()
-        conn.close()
 
         return {"status": "batch_commands_queued", "results": results}
 
     except Exception as e:
+        logger.error(f"Failed to send batch commands: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to send batch commands: {str(e)}")
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception as e:
+                logger.error(f"Failed to close database connection: {e}")
 
 
 @router.get("/status/all")
@@ -796,6 +852,7 @@ async def upload_backtest_report(
     """Upload backtest HTML report for an EA"""
     print(f"🔄 Starting backtest upload for EA {magic_number}")
     
+    conn = None
     try:
         # Validate file type
         if not file.filename.endswith(('.html', '.htm')):
@@ -910,7 +967,11 @@ async def upload_backtest_report(
             conn.rollback()
             raise HTTPException(status_code=500, detail=f"Database error: {str(db_error)}")
         finally:
-            conn.close()
+            if conn:
+                try:
+                    conn.close()
+                except Exception as e:
+                    logger.error(f"Failed to close database connection during backtest upload: {e}")
         
         return {
             "success": True,

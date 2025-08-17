@@ -59,6 +59,9 @@ def main():
     logger.info("🎯 Starting MT5 Dashboard System")
     logger.info("=" * 60)
     
+    backend_process = None
+    frontend_process = None
+    
     try:
         # Start backend
         backend_process = start_backend()
@@ -79,8 +82,11 @@ def main():
         logger.info("=" * 60)
         logger.info("Press Ctrl+C to stop")
         
-        # Monitor processes
-        while True:
+        # Monitor processes with timeout
+        max_wait_time = 300  # 5 minutes
+        start_time = time.time()
+        
+        while time.time() - start_time < max_wait_time:
             if backend_process.poll() is not None:
                 logger.error("❌ Backend process died")
                 break
@@ -88,16 +94,38 @@ def main():
                 logger.error("❌ Frontend process died")
                 break
             time.sleep(1)
+        else:
+            logger.warning("⚠️  Monitoring timeout reached, continuing...")
             
     except KeyboardInterrupt:
         logger.info("🛑 Shutting down...")
-        try:
-            backend_process.terminate()
-            frontend_process.terminate()
-        except:
-            pass
     except Exception as e:
         logger.error(f"❌ Error: {e}")
+    finally:
+        # Cleanup processes
+        if backend_process:
+            try:
+                backend_process.terminate()
+                backend_process.wait(timeout=5)
+                logger.info("✅ Backend process terminated")
+            except subprocess.TimeoutExpired:
+                backend_process.kill()
+                logger.warning("⚠️  Backend process force killed")
+            except Exception as e:
+                logger.error(f"❌ Error terminating backend: {e}")
+        
+        if frontend_process:
+            try:
+                frontend_process.terminate()
+                frontend_process.wait(timeout=5)
+                logger.info("✅ Frontend process terminated")
+            except subprocess.TimeoutExpired:
+                frontend_process.kill()
+                logger.warning("⚠️  Frontend process force killed")
+            except Exception as e:
+                logger.error(f"❌ Error terminating frontend: {e}")
+        
+        logger.info("🛑 System shutdown complete")
 
 if __name__ == "__main__":
     main()

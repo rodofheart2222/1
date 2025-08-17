@@ -7,10 +7,11 @@ Provides database connection management and session handling for the MT5 Dashboa
 import os
 import logging
 from contextlib import contextmanager
-from typing import Generator
+from typing import Generator, Optional
 from sqlalchemy import create_engine, Engine
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import StaticPool
+from sqlalchemy.exc import SQLAlchemyError
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +33,7 @@ class DatabaseManager:
             database_url = f"sqlite:///{db_path}"
         
         self.database_url = database_url
-        self.engine: Engine = None
+        self.engine: Optional[Engine] = None
         self.SessionLocal = None
         
         self._initialize_engine()
@@ -49,7 +50,9 @@ class DatabaseManager:
                         "check_same_thread": False,
                         "timeout": 30
                     },
-                    echo=False  # Set to True for SQL debugging
+                    echo=False,  # Set to True for SQL debugging
+                    pool_pre_ping=True,  # Verify connections before use
+                    pool_recycle=3600  # Recycle connections every hour
                 )
             else:
                 # PostgreSQL or other databases
@@ -57,6 +60,8 @@ class DatabaseManager:
                     self.database_url,
                     pool_pre_ping=True,
                     pool_recycle=300,
+                    pool_size=10,
+                    max_overflow=20,
                     echo=False
                 )
             
@@ -68,8 +73,11 @@ class DatabaseManager:
             
             logger.info(f"Database engine initialized: {self.database_url}")
             
-        except Exception as e:
+        except SQLAlchemyError as e:
             logger.error(f"Failed to initialize database engine: {e}")
+            raise
+        except Exception as e:
+            logger.error(f"Unexpected error initializing database engine: {e}")
             raise
     
     @contextmanager
@@ -89,15 +97,24 @@ class DatabaseManager:
         try:
             yield session
             session.commit()
-        except Exception as e:
+        except SQLAlchemyError as e:
             session.rollback()
             logger.error(f"Database session error: {e}")
             raise
+        except Exception as e:
+            session.rollback()
+            logger.error(f"Unexpected database session error: {e}")
+            raise
         finally:
-            session.close()
+            try:
+                session.close()
+            except Exception as e:
+                logger.error(f"Failed to close database session: {e}")
     
     def get_engine(self) -> Engine:
         """Get SQLAlchemy engine"""
+        if not self.engine:
+            raise RuntimeError("Database engine not initialized")
         return self.engine
     
     def create_tables(self):
@@ -106,8 +123,11 @@ class DatabaseManager:
             from models.base import Base
             Base.metadata.create_all(bind=self.engine)
             logger.info("Database tables created successfully")
-        except Exception as e:
+        except SQLAlchemyError as e:
             logger.error(f"Failed to create database tables: {e}")
+            raise
+        except Exception as e:
+            logger.error(f"Unexpected error creating database tables: {e}")
             raise
     
     def drop_tables(self):
@@ -116,8 +136,11 @@ class DatabaseManager:
             from models.base import Base
             Base.metadata.drop_all(bind=self.engine)
             logger.info("Database tables dropped successfully")
-        except Exception as e:
+        except SQLAlchemyError as e:
             logger.error(f"Failed to drop database tables: {e}")
+            raise
+        except Exception as e:
+            logger.error(f"Unexpected error dropping database tables: {e}")
             raise
     
     def test_connection(self) -> bool:
@@ -127,19 +150,25 @@ class DatabaseManager:
                 session.execute("SELECT 1")
             logger.info("Database connection test successful")
             return True
-        except Exception as e:
+        except SQLAlchemyError as e:
             logger.error(f"Database connection test failed: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"Unexpected error testing database connection: {e}")
             return False
     
     def close(self):
         """Close database connections"""
         if self.engine:
-            self.engine.dispose()
-            logger.info("Database connections closed")
+            try:
+                self.engine.dispose()
+                logger.info("Database connections closed")
+            except Exception as e:
+                logger.error(f"Failed to close database connections: {e}")
 
 
 # Global database manager instance
-_database_manager: DatabaseManager = None
+_database_manager: Optional[DatabaseManager] = None
 
 
 def get_database_manager() -> DatabaseManager:
@@ -153,6 +182,8 @@ def get_database_manager() -> DatabaseManager:
 def initialize_database_manager(database_url: str = None) -> DatabaseManager:
     """Initialize global database manager with custom URL"""
     global _database_manager
+    if _database_manager:
+        _database_manager.close()
     _database_manager = DatabaseManager(database_url)
     return _database_manager
 
