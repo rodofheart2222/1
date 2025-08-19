@@ -3,14 +3,19 @@
  * Handles all HTTP requests to the backend API
  */
 
+import { API_BASE_URL, API_FALLBACK_URL, API_TIMEOUT } from '../config/central-config';
+
 class APIService {
   constructor() {
-    // Use environment variable or fallback to localhost:8000
-    // In development, this will bypass the proxy and go directly to backend
-    // In production (Electron), we still need to connect to the local backend server
-    this.baseURL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000';
-    this.fallbackURL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000';
-    this.timeout = 15000; // 15 seconds - increased timeout
+    // Use centralized configuration for API URLs
+    this.baseURL = API_BASE_URL;
+    this.fallbackURL = API_FALLBACK_URL; 
+    this.timeout = API_TIMEOUT;
+    
+    console.log('🔧 API Service initialized:');
+    console.log(`   Base URL: ${this.baseURL}`);
+    console.log(`   Fallback URL: ${this.fallbackURL}`);
+    console.log(`   Timeout: ${this.timeout}ms`);
   }
 
   /**

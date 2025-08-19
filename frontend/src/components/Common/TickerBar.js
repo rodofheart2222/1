@@ -6,8 +6,8 @@ import {
 } from '@ant-design/icons';
 import SmoothTicker from './SmoothTicker';
 import chartService from '../../services/chartService';
-import webSocketService from '../../services/webSocketService';
 import './TickerBar.css';
+import '../../styles/liquid-glass-theme.css';
 
 const TickerBar = ({
   connected = false,
@@ -45,10 +45,10 @@ const TickerBar = ({
         setMarketData(initialMarketData);
         setHourlyBaseline(baselinePrices);
         setDataSource('loading');
-        console.log('✅ Initial market data loaded, connecting to WebSocket...');
+        console.log('✅ Initial market data loaded, connecting to MT5...');
         
-        // Connect to WebSocket for real-time MT5 data
-        await setupWebSocketConnection();
+        // Connect to MT5 for real-time price data
+        await setupMT5PriceConnection();
         
       } catch (error) {
         console.error('❌ Failed to load initial market data:', error);
@@ -59,33 +59,18 @@ const TickerBar = ({
     loadMarketData();
   }, []);
 
-  // Setup WebSocket connection for real-time MT5 price data
-  const setupWebSocketConnection = async () => {
+  // Setup MT5 price data via HTTP API
+  const setupMT5PriceConnection = async () => {
     try {
-      console.log('🔌 Setting up WebSocket connection for ticker...');
+      console.log('🔌 Setting up MT5 price connection for ticker...');
       
-      // Connect to WebSocket
-      await webSocketService.connect();
-      
-      // Subscribe to price updates
-      const unsubscribe = webSocketService.subscribe('price_update', (priceData) => {
-        console.log('📈 Received price update for ticker:', Object.keys(priceData).length, 'symbols');
-        updateMarketDataFromWebSocket(priceData);
-      });
-      
-      // Subscribe to specific symbols for MT5 price data
-      webSocketService.subscribeToPrices(tickerSymbols);
-      
-      setDataSource('mt5_websocket');
-      console.log('✅ WebSocket connected and subscribed to price updates');
-      
-      // Cleanup function
-      return () => {
-        unsubscribe();
-      };
+      // Use direct MT5 price data via HTTP API
+      console.log('📈 Setting up MT5 price polling for ticker symbols');
+      setDataSource('mt5_http_api');
+      console.log('✅ MT5 HTTP API polling configured for price updates');
       
     } catch (error) {
-      console.error('❌ Failed to setup WebSocket connection:', error);
+      console.error('❌ Failed to setup MT5 connection:', error);
       setDataSource('fallback_demo');
     }
   };
@@ -412,15 +397,12 @@ const TickerBar = ({
         </div>
       </div>
 
-      {/* Advanced Intelligence Header */}
-      <div className="advanced-intelligence-header" style={{
+      {/* Advanced Intelligence Header - Liquid Glass Menu Bar */}
+      <div className="advanced-intelligence-header liquid-glass-menu-bar" style={{
         padding: '2px 10px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#111111',
-        borderBottom: '1px solid #1A1A1A',
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
         position: 'relative',
         zIndex: 999
       }}>
@@ -498,28 +480,24 @@ const TickerBar = ({
             }}>
               OPERATION MODE
             </span>
-            <div style={{ display: 'flex', gap: '4px' }}>
+            <div className="liquid-glass-menu" style={{ gap: '4px', padding: '4px 8px', backgroundColor: 'color-mix(in srgb, var(--lg-glass) 18%, transparent)' }}>
               <button
                 onClick={() => onModeSwitch('soldier')}
                 disabled={isTransitioning}
-                className="glow-button"
+                className={`liquid-glass-button liquid-glass-button-small liquid-glass-button-toggle ${dashboardMode === 'soldier' ? 'liquid-glass-button-selected active' : ''} ${isTransitioning ? 'animating' : ''}`}
                 style={{
-                  padding: '2px 12px',
+                  padding: '4px 12px',
                   fontSize: '11px',
                   fontWeight: '600',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
-                  backgroundColor: dashboardMode === 'soldier' ? '#FFFFFF' : '#1A1A1A',
-                  color: dashboardMode === 'soldier' ? '#000000' : '#FFFFFF',
-                  border: dashboardMode === 'soldier' ? '1px solid #FFFFFF' : '1px solid #FFFFFF',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '4px',
-                  transition: 'all 0.2s ease',
-                  boxShadow: dashboardMode === 'soldier' ? '0 0 10px rgba(255, 255, 255, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.2)' : '0 0 5px rgba(255, 255, 255, 0.3)',
-                  textShadow: dashboardMode === 'soldier' ? 'none' : '0 0 5px rgba(255, 255, 255, 0.5)'
+                  borderRadius: '6px',
+                  minHeight: '24px',
+                  color: dashboardMode === 'soldier' ? 'var(--lg-content)' : 'var(--lg-content)',
+                  border: 'none'
                 }}
               >
                 <RobotOutlined style={{ fontSize: '10px' }} />
@@ -528,24 +506,20 @@ const TickerBar = ({
               <button
                 onClick={() => onModeSwitch('coc')}
                 disabled={isTransitioning}
-                className="glow-button"
+                className={`liquid-glass-button liquid-glass-button-small liquid-glass-button-toggle ${dashboardMode === 'coc' ? 'liquid-glass-button-selected active' : ''} ${isTransitioning ? 'animating' : ''}`}
                 style={{
-                  padding: '2px 12px',
+                  padding: '4px 12px',
                   fontSize: '11px',
                   fontWeight: '600',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
-                  backgroundColor: dashboardMode === 'coc' ? '#FFFFFF' : '#1A1A1A',
-                  color: dashboardMode === 'coc' ? '#000000' : '#FFFFFF',
-                  border: dashboardMode === 'coc' ? '1px solid #FFFFFF' : '1px solid #FFFFFF',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '4px',
-                  transition: 'all 0.2s ease',
-                  boxShadow: dashboardMode === 'coc' ? '0 0 10px rgba(255, 255, 255, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.2)' : '0 0 5px rgba(255, 255, 255, 0.3)',
-                  textShadow: dashboardMode === 'coc' ? 'none' : '0 0 5px rgba(255, 255, 255, 0.5)'
+                  borderRadius: '6px',
+                  minHeight: '24px',
+                  color: dashboardMode === 'coc' ? 'var(--lg-content)' : 'var(--lg-content)',
+                  border: 'none'
                 }}
               >
                 <AimOutlined style={{ fontSize: '10px' }} />

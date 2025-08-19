@@ -19,6 +19,7 @@ import {
   Space,
   Divider
 } from 'antd';
+import '../../styles/liquid-glass-theme.css';
 import {
   CalendarOutlined,
   ExclamationCircleOutlined,
@@ -411,18 +412,34 @@ const NewsEventPanel = ({ events = [], onRefresh }) => {
           <span>News Events</span>
           <Space>
             <Badge count={todayEvents.length} showZero color="#1890ff" />
-            <Button
-              size="small"
-              icon={<ReloadOutlined />}
+            <button
+              className="liquid-glass-button liquid-glass-button-small"
               onClick={handleRefresh}
-              className="glass-button"
-            />
-            <Button
-              size="small"
-              icon={<SettingOutlined />}
+              style={{
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '4px 8px'
+              }}
+            >
+              <ReloadOutlined />
+            </button>
+            <button
+              className="liquid-glass-button liquid-glass-button-small"
               onClick={() => setConfigModalVisible(true)}
-              className="glass-button"
-            />
+              style={{
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '4px 8px'
+              }}
+            >
+              <SettingOutlined />
+            </button>
           </Space>
         </div>
       }
@@ -443,14 +460,16 @@ const NewsEventPanel = ({ events = [], onRefresh }) => {
             <Option value="medium">Medium</Option>
             <Option value="low">Low</Option>
           </Select>
-          <Button
-            size="small"
-            type="primary"
-            ghost
+          <button
+            className="liquid-glass-button liquid-glass-button-small liquid-glass-button-primary"
             onClick={() => setOverrideModalVisible(true)}
+            style={{
+              border: 'none',
+              cursor: 'pointer'
+            }}
           >
             Manual Override
-          </Button>
+          </button>
         </Space>
       </div>
 

@@ -6,7 +6,7 @@ This script simulates an EA (Expert Advisor) responding to dashboard commands.
 It polls for commands and sends appropriate responses to test the complete workflow.
 
 Usage:
-    python simulate_ea_responses.py [--magic 12345] [--symbol EURUSD] [--host 155.138.174.196]
+    python simulate_ea_responses.py [--magic 12345] [--symbol EURUSD] [--host 127.0.0.1]
 """
 
 import asyncio
@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 class EASimulator:
     """Simulates an EA responding to dashboard commands"""
     
-    def __init__(self, magic_number: int, symbol: str, host: str = "155.138.174.196", port: int = 80):
+    def __init__(self, magic_number: int, symbol: str, host: str = "127.0.0.1", port: int = 80):
         self.magic_number = magic_number
         self.symbol = symbol
         self.host = host
@@ -547,7 +547,7 @@ async def main():
     parser = argparse.ArgumentParser(description='EA Response Simulator')
     parser.add_argument('--magic', type=int, default=12345, help='EA Magic Number')
     parser.add_argument('--symbol', default='EURUSD', help='Trading Symbol')
-    parser.add_argument('--host', default='155.138.174.196', help='Server Host')
+    parser.add_argument('--host', default='127.0.0.1', help='Server Host')
     parser.add_argument('--port', type=int, default=80, help='Server Port')
     
     args = parser.parse_args()

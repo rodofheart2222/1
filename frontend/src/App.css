@@ -1,11 +1,14 @@
-/* Bloomberg-Style Terminal Theme - Main App Layout */
+/* Import Liquid Glass Theme */
+@import './styles/liquid-glass-theme.css';
+
+/* Liquid Glass Theme - Main App Layout */
 .app-layout {
   min-height: 100vh;
-  background: #000000; /* Pure black like Bloomberg Terminal */
+  background: var(--lg-bg);
   overflow-x: hidden;
-  font-family: 'Arial', 'Helvetica', sans-serif; /* Bloomberg uses Arial */
-  color: #ff8c00;
-  letter-spacing: 0.3px; /* Slightly tighter letter spacing */
+  font-family: 'Arial', 'Helvetica', sans-serif;
+  color: var(--lg-content);
+  letter-spacing: 0.3px;
   /* Ensure main layout is not draggable */
   -webkit-app-region: no-drag;
 }
@@ -280,19 +283,53 @@ body {
   border-bottom: 1px solid #262626;
 }
 
-.command-center {
-  background: #141414;
-  border: 1px solid #303030;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+/* Command Center - Liquid Glass Theme */
+.command-center.ant-card {
+  background: color-mix(in srgb, var(--lg-glass) 2%, transparent) !important;
+  backdrop-filter: blur(12px) saturate(var(--lg-saturation)) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(var(--lg-saturation)) !important;
+  border: 1px solid color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 8%), transparent) !important;
+  border-radius: 8px !important;
+  box-shadow: 
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 5%), transparent),
+    0 4px 12px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 12%), transparent), 
+    0 12px 32px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 8%), transparent) !important;
+  color: var(--lg-content) !important;
+}
+
+.command-center.ant-card .ant-card-head {
+  background: color-mix(in srgb, var(--lg-glass) 1%, transparent) !important;
+  backdrop-filter: blur(8px) saturate(var(--lg-saturation)) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(var(--lg-saturation)) !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 6%), transparent) !important;
+  border-radius: 8px 8px 0 0 !important;
+  box-shadow: 
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 3%), transparent),
+    0 2px 8px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 8%), transparent) !important;
+}
+
+.command-center.ant-card .ant-card-head-title {
+  color: var(--lg-content) !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 3px color-mix(in srgb, var(--lg-dark) 50%, transparent) !important;
+}
+
+.command-center.ant-card .ant-card-body {
+  background: transparent !important;
+  color: var(--lg-content) !important;
 }
 
 .command-center .ant-select,
 .command-center .ant-input {
   font-size: 12px;
-  background: #262626 !important;
-  border-color: #404040 !important;
-  color: #ffffff !important;
+  background: color-mix(in srgb, var(--lg-glass) 1%, transparent) !important;
+  backdrop-filter: blur(8px) saturate(var(--lg-saturation)) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(var(--lg-saturation)) !important;
+  border: 1px solid color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 6%), transparent) !important;
+  color: var(--lg-content) !important;
+  box-shadow: 
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 3%), transparent),
+    0 2px 8px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 8%), transparent) !important;
 }
 
 /* Mobile optimizations */
@@ -1778,18 +1815,18 @@ body {
     inset 0 -1px 0 rgba(255, 255, 255, 0.05);
 }
 
-/*=====ENHANCED GLASS EFFECTS FOR ALL COMPONENTS=====*/
-/* Glass Modal Effects */
+/*=====ENHANCED LIQUID GLASS EFFECTS FOR ALL COMPONENTS=====*/
+/* Global Liquid Glass Modal Effects */
 .ant-modal .ant-modal-content {
-  background: rgba(12, 12, 12, 0.25) !important;
-  backdrop-filter: blur(40px) !important;
-  -webkit-backdrop-filter: blur(40px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: color-mix(in srgb, var(--lg-glass) 2%, transparent) !important;
+  backdrop-filter: blur(40px) saturate(var(--lg-saturation)) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(var(--lg-saturation)) !important;
+  border: 1px solid color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 8%), transparent) !important;
   border-radius: 16px !important;
   box-shadow:
-    0 15px 50px rgba(0, 0, 0, 0.7),
-    0 8px 25px rgba(0, 0, 0, 0.8),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 5%), transparent),
+    0 25px 80px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 25%), transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 15%), transparent) !important;
   overflow: hidden;
 }
 
@@ -1823,8 +1860,8 @@ body {
   padding: 16px 24px !important;
 }
 
-/* Glass Card Effects */
-.ant-card {
+/* Glass Card Effects - Excluding Command Center and COC Dashboard */
+.ant-card:not(.command-center):not(.coc-header):not(.coc-tabs) {
   background: rgba(12, 12, 12, 0.3) !important;
   backdrop-filter: blur(35px) !important;
   -webkit-backdrop-filter: blur(35px) !important;
@@ -1837,7 +1874,7 @@ body {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-.ant-card:hover {
+.ant-card:not(.command-center):not(.coc-header):not(.coc-tabs):hover {
   transform: translateY(-4px) !important;
   background: rgba(18, 18, 18, 0.4) !important;
   backdrop-filter: blur(45px) !important;
@@ -1850,7 +1887,7 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
 }
 
-.ant-card .ant-card-head {
+.ant-card:not(.command-center):not(.coc-header):not(.coc-tabs) .ant-card-head {
   background: rgba(18, 18, 18, 0.4) !important;
   backdrop-filter: blur(25px) !important;
   -webkit-backdrop-filter: blur(25px) !important;
@@ -1858,13 +1895,13 @@ body {
   border-radius: 12px 12px 0 0 !important;
 }
 
-.ant-card .ant-card-head-title {
+.ant-card:not(.command-center):not(.coc-header):not(.coc-tabs) .ant-card-head-title {
   color: #ffffff !important;
   font-weight: 700 !important;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
 }
 
-.ant-card .ant-card-body {
+.ant-card:not(.command-center):not(.coc-header):not(.coc-tabs) .ant-card-body {
   background: transparent !important;
   color: #ffffff !important;
 }
@@ -2228,41 +2265,98 @@ body {
   color: #ffffff !important;
 }
 
-/* Command Center Dark Theme */
-.command-center {
-  background: rgba(12, 12, 12, 0.3) !important;
-  backdrop-filter: blur(35px) !important;
-  -webkit-backdrop-filter: blur(35px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  color: #ffffff !important;
+/* COC Dashboard - ULTRA AGGRESSIVE Liquid Glass Theme */
+.coc-dashboard {
+  background: #0a0a0a !important;
+  color: #b0b0b0 !important;
 }
 
-.command-center .ant-card-head {
-  background: rgba(18, 18, 18, 0.4) !important;
-  backdrop-filter: blur(25px) !important;
-  -webkit-backdrop-filter: blur(25px) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+.coc-dashboard * {
+  color: #b0b0b0 !important;
 }
 
-.command-center .ant-card-head-title {
-  color: #ffffff !important;
-  font-weight: 700 !important;
+.coc-header.ant-card,
+.coc-header,
+[class*="coc-header"] {
+  background: rgba(68, 68, 72, 0.02) !important;
+  backdrop-filter: blur(12px) saturate(110%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(110%) !important;
+  border: 1px solid rgba(102, 102, 102, 0.1) !important;
+  border-radius: 8px !important;
+  box-shadow: 
+    inset 0 0 0 1px rgba(102, 102, 102, 0.01),
+    0 4px 12px rgba(0, 0, 0, 0.24), 
+    0 12px 32px rgba(0, 0, 0, 0.16) !important;
 }
 
-.command-center .ant-card-body {
+.coc-header.ant-card .ant-card-head {
+  background: color-mix(in srgb, var(--lg-glass) 1%, transparent) !important;
+  backdrop-filter: blur(8px) saturate(var(--lg-saturation)) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(var(--lg-saturation)) !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 6%), transparent) !important;
+  border-radius: 8px 8px 0 0 !important;
+}
+
+.coc-header.ant-card .ant-card-body {
   background: transparent !important;
-  color: #ffffff !important;
+  color: var(--lg-content) !important;
 }
 
-.command-center .ant-select-selector,
-.command-center .ant-input,
-.command-center .ant-input-number {
-  background: rgba(15, 15, 15, 0.3) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  color: #ffffff !important;
+.coc-tabs.ant-tabs,
+.coc-tabs,
+[class*="coc-tabs"] {
+  background: rgba(68, 68, 72, 0.02) !important;
+  backdrop-filter: blur(12px) saturate(110%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(110%) !important;
+  border: 1px solid rgba(102, 102, 102, 0.1) !important;
+  border-radius: 12px !important;
+  box-shadow: 
+    inset 0 0 0 1px rgba(102, 102, 102, 0.01),
+    0 8px 24px rgba(0, 0, 0, 0.3), 
+    0 24px 48px rgba(0, 0, 0, 0.24) !important;
 }
+
+.coc-tabs.ant-tabs .ant-tabs-content-holder {
+  background: transparent !important;
+  color: var(--lg-content) !important;
+}
+
+/* ULTRA AGGRESSIVE COC Dashboard Anti-White Theme */
+.coc-dashboard .ant-card,
+.coc-dashboard .ant-tabs,
+.coc-dashboard .ant-tabs-content,
+.coc-dashboard .ant-tabs-content-holder,
+.coc-dashboard .ant-tabs-tabpane,
+.coc-dashboard .ant-card-body,
+.coc-dashboard .ant-card-head,
+.coc-dashboard .ant-select,
+.coc-dashboard .ant-input,
+.coc-dashboard .ant-button,
+.coc-dashboard .ant-space,
+.coc-dashboard .ant-row,
+.coc-dashboard .ant-col {
+  background: rgba(68, 68, 72, 0.02) !important;
+  backdrop-filter: blur(12px) saturate(110%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(110%) !important;
+  border: 1px solid rgba(102, 102, 102, 0.1) !important;
+  color: #b0b0b0 !important;
+  box-shadow: 
+    inset 0 0 0 1px rgba(102, 102, 102, 0.01),
+    0 4px 12px rgba(0, 0, 0, 0.24) !important;
+}
+
+/* Force all white backgrounds to be dark */
+.coc-dashboard [style*="background: white"],
+.coc-dashboard [style*="background: #fff"],
+.coc-dashboard [style*="background: #ffffff"],
+.coc-dashboard [style*="background-color: white"],
+.coc-dashboard [style*="background-color: #fff"],
+.coc-dashboard [style*="background-color: #ffffff"] {
+  background: rgba(68, 68, 72, 0.02) !important;
+  background-color: rgba(68, 68, 72, 0.02) !important;
+}
+
+/* Command Center - Using Liquid Glass Theme (removed conflicting rules) */
 
 /* Global Stats Panel Dark Theme */
 .global-stats-panel {

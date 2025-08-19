@@ -12,7 +12,6 @@ import {
 } from '@ant-design/icons';
 import MiniChart from '../Charts/MiniChart';
 import chartService from '../../services/chartService';
-import webSocketService from '../../services/webSocketService';
 
 const EACardWithChart = ({ 
   ea, 
@@ -36,66 +35,8 @@ const EACardWithChart = ({
 
     const subscribeToPrice = async () => {
       try {
-        // Wait for WebSocket connection if not connected
-        if (!webSocketService.isConnected) {
-          console.log(`⏳ Waiting for WebSocket connection to subscribe to ${ea.symbol} prices...`);
-          // Try to connect if not connected
-          try {
-            await webSocketService.connect();
-          } catch (error) {
-            console.warn('WebSocket connection failed, using API fallback for price updates');
-            return;
-          }
-        }
-
-        // Subscribe to WebSocket price updates
-        unsubscribe = webSocketService.subscribe('price_update', (priceUpdates) => {
-          console.log('📊 Received price updates for', ea.symbol, ':', priceUpdates);
-          
-          if (priceUpdates && priceUpdates[ea.symbol]) {
-            const priceData = priceUpdates[ea.symbol];
-            console.log('📈 Processing price data for', ea.symbol, ':', priceData);
-            
-            setRealTimePrice(priceData);
-            setCurrentPrice(priceData.price);
-            
-            // Calculate price change from previous price
-            const newPriceChange = currentPrice ? priceData.price - currentPrice : 0;
-            setPriceChange(newPriceChange);
-            
-            // Update chart data with new price point
-            setChartData(prevData => {
-              const newData = [...prevData];
-              if (newData.length > 0 && typeof priceData.price === 'number' && !isNaN(priceData.price)) {
-                // Add new price point and remove oldest if we have too many
-                newData.push({
-                  price: priceData.price,
-                  timestamp: priceData.timestamp || new Date().toISOString()
-                });
-                
-                // Keep only last 50 points for performance
-                if (newData.length > 50) {
-                  newData.shift();
-                }
-              }
-              return newData;
-            });
-          } else {
-            console.warn('📊 No price data found for symbol', ea.symbol, 'in update:', priceUpdates);
-          }
-        });
-
-        // Subscribe to price_updates channel first (if not already done)
-        webSocketService.sendMessage({
-          type: 'subscribe',
-          data: {
-            channels: ['price_updates']
-          }
-        });
-
-        // Request price subscription after successful WebSocket subscription
-        console.log(`📈 Subscribing to price updates for ${ea.symbol}`);
-        webSocketService.subscribeToPrices([ea.symbol]);
+        // Use direct MT5 price data via HTTP API polling
+        console.log(`📈 Setting up MT5 price polling for ${ea.symbol}`);
 
       } catch (error) {
         console.error('Error subscribing to price updates:', error);

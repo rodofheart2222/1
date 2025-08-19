@@ -12,6 +12,7 @@ import {
   CalendarOutlined
 } from '@ant-design/icons';
 import moment from 'moment';
+import apiService from '../../services/api';
 
 const { Option } = Select;
 const { confirm } = Modal;
@@ -192,14 +193,136 @@ const ActionQueuePanel = ({ commandQueue = [], onCommandUpdate, onQueueClear }) 
 
   const executeCommand = async (command) => {
     try {
+      // Update status to executing
       await onCommandUpdate({
         ...command,
         status: 'executing',
         execution_started: new Date().toISOString()
       });
+
+      let successCount = 0;
+      let failCount = 0;
+      const results = [];
+
+      // Handle different command types
+      if (command.type === 'global_action') {
+        // Global action - execute on targets
+        const targets = command.targets || [];
+        const actionCommand = command.action;
+        
+        // Convert action to command
+        const commandMap = {
+          'pause_all': 'pause',
+          'resume_all': 'resume',
+          'close_all_positions': 'close_positions',
+          'emergency_stop': 'emergency_stop'
+        };
+        
+        const apiCommand = commandMap[actionCommand];
+        if (!apiCommand) {
+          throw new Error(`Unknown action: ${actionCommand}`);
+        }
+
+        // Use detailed EA data if available for UUID targeting
+        const easToTarget = command.affectedEAs || targets.map(t => ({ magic_number: t }));
+        
+        for (const ea of easToTarget) {
+          const target = ea.magic_number || ea;
+          try {
+            await apiService.sendEACommand(target, {
+              command: apiCommand,
+              parameters: command.parameters || {},
+              instance_uuid: ea.instance_uuid
+            });
+            successCount++;
+            results.push({ target, status: 'success' });
+          } catch (error) {
+            failCount++;
+            results.push({ target, status: 'failed', error: error.message });
+          }
+        }
+      } else if (command.type === 'individual_command') {
+        // Individual EA command
+        try {
+          await apiService.sendEACommand(command.magic_number, {
+            command: command.command,
+            parameters: command.parameters || {},
+            instance_uuid: command.instance_uuid
+          });
+          successCount++;
+          results.push({ target: command.magic_number, status: 'success' });
+        } catch (error) {
+          failCount++;
+          results.push({ target: command.magic_number, status: 'failed', error: error.message });
+        }
+      } else if (command.type === 'batch_command') {
+        // Batch command (deprecated - Command Center removed)
+        const easToTarget = command.affectedEAs || command.targets.map(t => ({ magic_number: t }));
+        
+        for (const ea of easToTarget) {
+          const target = ea.magic_number || ea;
+          try {
+            await apiService.sendEACommand(target, {
+              command: command.command,
+              parameters: command.parameters || {},
+              instance_uuid: ea.instance_uuid
+            });
+            successCount++;
+            results.push({ target, status: 'success' });
+          } catch (error) {
+            failCount++;
+            results.push({ target, status: 'failed', error: error.message });
+          }
+        }
+      } else {
+        // Generic command - try to execute based on available data
+        const target = command.magic_number || command.targets?.[0];
+        if (target) {
+          try {
+            await apiService.sendEACommand(target, {
+              command: command.command || command.action,
+              parameters: command.parameters || {},
+              instance_uuid: command.instance_uuid
+            });
+            successCount++;
+            results.push({ target, status: 'success' });
+          } catch (error) {
+            failCount++;
+            results.push({ target, status: 'failed', error: error.message });
+          }
+        }
+      }
+
+      // Update final status
+      const finalStatus = failCount === 0 ? 'completed' : (successCount === 0 ? 'failed' : 'completed');
+      await onCommandUpdate({
+        ...command,
+        status: finalStatus,
+        execution_completed: new Date().toISOString(),
+        results: results,
+        success_count: successCount,
+        fail_count: failCount
+      });
+
+      if (failCount === 0) {
+        message.success(`Command "${command.type}" executed successfully on ${successCount} target(s)`);
+      } else if (successCount === 0) {
+        message.error(`Command "${command.type}" failed on all ${failCount} target(s)`);
+      } else {
+        message.warning(`Command "${command.type}" executed on ${successCount} target(s), failed on ${failCount} target(s)`);
+      }
       
-      message.success(`Command "${command.type}" is now executing`);
     } catch (error) {
+      console.error('Failed to execute command:', error);
+      
+      // Update status to failed
+      await onCommandUpdate({
+        ...command,
+        status: 'failed',
+        execution_completed: new Date().toISOString(),
+        error: error.message
+      });
+      
       message.error('Failed to execute command: ' + error.message);
     }
   };

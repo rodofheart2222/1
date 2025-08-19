@@ -5,6 +5,7 @@ import { NotificationProvider } from './components/Common/NotificationSystem';
 import CustomTitleBar from './components/Common/CustomTitleBar';
 import TickerBar from './components/Common/TickerBar';
 import Dashboard from './components/Dashboard/Dashboard';
+import { initializeTheme } from './config/theme-config';
 import './App.css';
 import './theme.css';
 
@@ -199,6 +200,11 @@ const AppContent = () => {
 
 function App() {
   const commanderRef = useRef(null);
+
+  // Initialize liquid glass theme
+  useEffect(() => {
+    initializeTheme();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {

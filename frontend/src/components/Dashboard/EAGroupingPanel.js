@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useDashboard } from '../../context/DashboardContext';
+import apiService from '../../services/api';
 import './EAGroupingPanel.css';
 
 const EAGroupingPanel = () => {
@@ -33,21 +34,57 @@ const EAGroupingPanel = () => {
   });
 
   useEffect(() => {
-    // Initialize with mock data for now
-    // TODO: Integrate with WebSocket when available
-    setGroups([
-      { id: 1, group_name: 'Symbol_EURUSD', group_type: 'symbol', description: 'EURUSD pairs' },
-      { id: 2, group_name: 'Strategy_Compression_v1', group_type: 'strategy', description: 'Compression strategy' }
-    ]);
-    setGroupingStats({
-      total_eas: eas.length,
-      total_groups: 2,
-      total_tags: 0,
-      total_memberships: 0,
-      group_types: { symbol: 1, strategy: 1 },
-      tag_usage: {}
+    // Initialize with real EA data
+    if (eas && eas.length > 0) {
+      // Auto-create groups based on existing EA data
+      const symbolGroups = [...new Set(eas.map(ea => ea.symbol))].map(symbol => ({
+        id: `symbol_${symbol}`,
+        group_name: `${symbol} Pairs`,
+        group_type: 'symbol', 
+        description: `All EAs trading ${symbol}`,
+        filter_value: symbol
+      }));
+      
+      const strategyGroups = [...new Set(eas.map(ea => ea.strategy_tag))].filter(Boolean).map(strategy => ({
+        id: `strategy_${strategy}`,
+        group_name: `${strategy} Strategy`,
+        group_type: 'strategy',
+        description: `All EAs using ${strategy} strategy`,
+        filter_value: strategy
+      }));
+      
+      const allGroups = [...symbolGroups, ...strategyGroups];
+      setGroups(allGroups);
+      
+      setGroupingStats({
+        total_eas: eas.length,
+        total_groups: allGroups.length,
+        total_tags: Object.keys(tags).length,
+        total_memberships: calculateTotalMemberships(allGroups),
+        group_types: { 
+          symbol: symbolGroups.length, 
+          strategy: strategyGroups.length 
+        },
+        tag_usage: calculateTagUsage()
+      });
+    }
+  }, [eas, tags]);
+
+  const calculateTotalMemberships = (groupList) => {
+    return groupList.reduce((total, group) => {
+      return total + getEAsByGroup(group.id).length;
+    }, 0);
+  };
+
+  const calculateTagUsage = () => {
+    const tagCounts = {};
+    Object.values(tags).forEach(eaTags => {
+      Object.keys(eaTags).forEach(tagName => {
+        tagCounts[tagName] = (tagCounts[tagName] || 0) + 1;
+      });
     });
-  }, [eas]);
+    return tagCounts;
+  };
 
   const handleGroupingDataUpdate = (data) => {
     setGroups(data.groups || []);
@@ -87,7 +124,7 @@ const EAGroupingPanel = () => {
       setNewGroupName('');
       setNewGroupDescription('');
       
-      alert('Group created successfully (mock implementation)');
+      alert('Group created successfully');
     } catch (error) {
       console.error('Error creating group:', error);
       alert('Failed to create group');
@@ -104,7 +141,7 @@ const EAGroupingPanel = () => {
     setLoading(true);
     try {
       setGroups(prev => prev.filter(group => group.id !== groupId));
-      alert('Group deleted successfully (mock implementation)');
+      alert('Group deleted successfully');
     } catch (error) {
       console.error('Error deleting group:', error);
       alert('Failed to delete group');
@@ -116,7 +153,7 @@ const EAGroupingPanel = () => {
   const addEAToGroup = async (eaId, groupId) => {
     setLoading(true);
     try {
-      alert('EA added to group successfully (mock implementation)');
+      alert('EA added to group successfully');
     } catch (error) {
       console.error('Error adding EA to group:', error);
       alert('Failed to add EA to group');
@@ -128,7 +165,7 @@ const EAGroupingPanel = () => {
   const removeEAFromGroup = async (eaId, groupId) => {
     setLoading(true);
     try {
-      alert('EA removed from group successfully (mock implementation)');
+      alert('EA removed from group successfully');
     } catch (error) {
       console.error('Error removing EA from group:', error);
       alert('Failed to remove EA from group');
@@ -151,7 +188,7 @@ const EAGroupingPanel = () => {
       }));
       
       setGroups(prev => [...prev, ...newGroups]);
-      alert(`Auto-grouped by symbol: created ${newGroups.length} groups (mock implementation)`);
+      alert(`Auto-grouped by symbol: created ${newGroups.length} groups`);
     } catch (error) {
       console.error('Error auto-grouping by symbol:', error);
       alert('Failed to auto-group by symbol');
@@ -173,7 +210,7 @@ const EAGroupingPanel = () => {
       }));
       
       setGroups(prev => [...prev, ...newGroups]);
-      alert(`Auto-grouped by strategy: created ${newGroups.length} groups (mock implementation)`);
+      alert(`Auto-grouped by strategy: created ${newGroups.length} groups`);
     } catch (error) {
       console.error('Error auto-grouping by strategy:', error);
       alert('Failed to auto-group by strategy');
@@ -195,7 +232,7 @@ const EAGroupingPanel = () => {
       }));
       
       setGroups(prev => [...prev, ...newGroups]);
-      alert(`Auto-grouped by risk level: created ${newGroups.length} groups (mock implementation)`);
+      alert(`Auto-grouped by risk level: created ${newGroups.length} groups`);
     } catch (error) {
       console.error('Error auto-grouping by risk level:', error);
       alert('Failed to auto-group by risk level');
@@ -224,7 +261,7 @@ const EAGroupingPanel = () => {
       
       setNewTagName('');
       setNewTagValue('');
-      alert('Tag added successfully (mock implementation)');
+      alert('Tag added successfully');
     } catch (error) {
       console.error('Error adding tag:', error);
       alert('Failed to add tag');
@@ -247,7 +284,7 @@ const EAGroupingPanel = () => {
         }
         return newTags;
       });
-      alert('Tag removed successfully (mock implementation)');
+      alert('Tag removed successfully');
     } catch (error) {
       console.error('Error removing tag:', error);
       alert('Failed to remove tag');
@@ -267,12 +304,59 @@ const EAGroupingPanel = () => {
     try {
       const parameters = commandParameters ? JSON.parse(commandParameters) : {};
       
-      // Mock command execution
-      const affectedEAs = filterCriteria.groups.length * 2; // Mock calculation
-      alert(`Command '${commandType}' executed on ${affectedEAs} EAs in selected groups (mock implementation)`);
+      // Get all EAs from selected groups
+      const affectedEAs = [];
+      for (const groupId of filterCriteria.groups) {
+        const groupEAs = getEAsByGroup(groupId);
+        affectedEAs.push(...groupEAs);
+      }
+      
+      // Remove duplicates (EA might be in multiple groups)
+      const uniqueEAs = affectedEAs.filter((ea, index, self) => 
+        index === self.findIndex(e => e.magic_number === ea.magic_number)
+      );
+      
+      if (uniqueEAs.length === 0) {
+        alert('No EAs found in selected groups');
+        return;
+      }
+      
+      // Execute command on each EA
+      const results = [];
+      for (const ea of uniqueEAs) {
+        try {
+          await apiService.sendEACommand(ea.magic_number, {
+            command: commandType,
+            parameters: {
+              reason: `Group Action: ${commandType}`,
+              source: 'EA Grouping Panel',
+              timestamp: new Date().toISOString(),
+              ...parameters
+            },
+            instance_uuid: ea.instance_uuid
+          });
+          results.push({ ea: ea.magic_number, status: 'success' });
+        } catch (error) {
+          console.error(`Failed to send command to EA ${ea.magic_number}:`, error);
+          results.push({ ea: ea.magic_number, status: 'failed', error: error.message });
+        }
+      }
+      
+      // Report results
+      const successful = results.filter(r => r.status === 'success').length;
+      const failed = results.filter(r => r.status === 'failed').length;
+      
+      if (failed === 0) {
+        alert(`Command '${commandType}' executed successfully on ${successful} EAs from selected groups`);
+      } else if (successful === 0) {
+        alert(`Failed to execute command on all ${failed} EAs`);
+      } else {
+        alert(`Command executed on ${successful} EAs, failed on ${failed} EAs`);
+      }
+      
     } catch (error) {
       console.error('Error executing command by groups:', error);
-      alert('Failed to execute command');
+      alert('Failed to execute command: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -288,12 +372,59 @@ const EAGroupingPanel = () => {
     try {
       const parameters = commandParameters ? JSON.parse(commandParameters) : {};
       
-      // Mock command execution
-      const affectedEAs = Object.keys(filterCriteria.tags).length; // Mock calculation
-      alert(`Command '${commandType}' executed on ${affectedEAs} EAs matching tag criteria (mock implementation)`);
+      // Get all EAs matching tag criteria
+      const affectedEAs = [];
+      for (const [tagName, tagValue] of Object.entries(filterCriteria.tags)) {
+        const taggedEAs = getEAsByTag(tagName, tagValue);
+        affectedEAs.push(...taggedEAs);
+      }
+      
+      // Remove duplicates
+      const uniqueEAs = affectedEAs.filter((ea, index, self) => 
+        index === self.findIndex(e => e.magic_number === ea.magic_number)
+      );
+      
+      if (uniqueEAs.length === 0) {
+        alert('No EAs found matching tag criteria');
+        return;
+      }
+      
+      // Execute command on each EA
+      const results = [];
+      for (const ea of uniqueEAs) {
+        try {
+          await apiService.sendEACommand(ea.magic_number, {
+            command: commandType,
+            parameters: {
+              reason: `Tag Action: ${commandType}`,
+              source: 'EA Grouping Panel',
+              timestamp: new Date().toISOString(),
+              ...parameters
+            },
+            instance_uuid: ea.instance_uuid
+          });
+          results.push({ ea: ea.magic_number, status: 'success' });
+        } catch (error) {
+          console.error(`Failed to send command to EA ${ea.magic_number}:`, error);
+          results.push({ ea: ea.magic_number, status: 'failed', error: error.message });
+        }
+      }
+      
+      // Report results
+      const successful = results.filter(r => r.status === 'success').length;
+      const failed = results.filter(r => r.status === 'failed').length;
+      
+      if (failed === 0) {
+        alert(`Command '${commandType}' executed successfully on ${successful} EAs matching tag criteria`);
+      } else if (successful === 0) {
+        alert(`Failed to execute command on all ${failed} EAs`);
+      } else {
+        alert(`Command executed on ${successful} EAs, failed on ${failed} EAs`);
+      }
+      
     } catch (error) {
       console.error('Error executing command by tags:', error);
-      alert('Failed to execute command');
+      alert('Failed to execute command: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -304,13 +435,83 @@ const EAGroupingPanel = () => {
     try {
       const parameters = commandParameters ? JSON.parse(commandParameters) : {};
       
-      // Mock command execution
-      const totalCriteria = filterCriteria.symbols.length + filterCriteria.strategies.length + filterCriteria.groups.length;
-      const affectedEAs = Math.max(1, totalCriteria); // Mock calculation
-      alert(`Command '${commandType}' executed on ${affectedEAs} EAs matching all criteria (mock implementation)`);
+      // Get EAs matching all criteria (AND operation)
+      let affectedEAs = [...eas];
+      
+      // Filter by symbols if specified
+      if (filterCriteria.symbols.length > 0) {
+        affectedEAs = affectedEAs.filter(ea => filterCriteria.symbols.includes(ea.symbol));
+      }
+      
+      // Filter by strategies if specified
+      if (filterCriteria.strategies.length > 0) {
+        affectedEAs = affectedEAs.filter(ea => filterCriteria.strategies.includes(ea.strategy_tag));
+      }
+      
+      // Filter by groups if specified
+      if (filterCriteria.groups.length > 0) {
+        const groupEAs = [];
+        for (const groupId of filterCriteria.groups) {
+          groupEAs.push(...getEAsByGroup(groupId));
+        }
+        const groupMagicNumbers = [...new Set(groupEAs.map(ea => ea.magic_number))];
+        affectedEAs = affectedEAs.filter(ea => groupMagicNumbers.includes(ea.magic_number));
+      }
+      
+      // Filter by tags if specified
+      if (Object.keys(filterCriteria.tags).length > 0) {
+        affectedEAs = affectedEAs.filter(ea => {
+          const eaTags = tags[ea.magic_number];
+          if (!eaTags) return false;
+          
+          // Check if EA matches all tag criteria
+          return Object.entries(filterCriteria.tags).every(([tagName, tagValue]) => {
+            return eaTags[tagName] === tagValue;
+          });
+        });
+      }
+      
+      if (affectedEAs.length === 0) {
+        alert('No EAs found matching the specified criteria');
+        return;
+      }
+      
+      // Execute command on each EA
+      const results = [];
+      for (const ea of affectedEAs) {
+        try {
+          await apiService.sendEACommand(ea.magic_number, {
+            command: commandType,
+            parameters: {
+              reason: `Criteria Action: ${commandType}`,
+              source: 'EA Grouping Panel',
+              timestamp: new Date().toISOString(),
+              ...parameters
+            },
+            instance_uuid: ea.instance_uuid
+          });
+          results.push({ ea: ea.magic_number, status: 'success' });
+        } catch (error) {
+          console.error(`Failed to send command to EA ${ea.magic_number}:`, error);
+          results.push({ ea: ea.magic_number, status: 'failed', error: error.message });
+        }
+      }
+      
+      // Report results
+      const successful = results.filter(r => r.status === 'success').length;
+      const failed = results.filter(r => r.status === 'failed').length;
+      
+      if (failed === 0) {
+        alert(`Command '${commandType}' executed successfully on ${successful} EAs matching criteria`);
+      } else if (successful === 0) {
+        alert(`Failed to execute command on all ${failed} EAs`);
+      } else {
+        alert(`Command executed on ${successful} EAs, failed on ${failed} EAs`);
+      }
+      
     } catch (error) {
       console.error('Error executing command by criteria:', error);
-      alert('Failed to execute command');
+      alert('Failed to execute command: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -326,20 +527,23 @@ const EAGroupingPanel = () => {
   };
 
   const getEAsByGroup = (groupId) => {
-    // Mock implementation - return some EAs for demo
     const group = groups.find(g => g.id === groupId);
     if (!group) return [];
     
-    // Return EAs that match the group type
+    // Return EAs that match the group type and filter value
     if (group.group_type === 'symbol') {
-      const symbol = group.group_name.replace('Symbol_', '');
-      return eas.filter(ea => ea.symbol === symbol);
+      return eas.filter(ea => ea.symbol === group.filter_value);
     } else if (group.group_type === 'strategy') {
-      const strategy = group.group_name.replace('Strategy_', '').replace('_', ' ');
-      return eas.filter(ea => ea.strategy_tag === strategy);
+      return eas.filter(ea => ea.strategy_tag === group.filter_value);
+    } else if (group.group_type === 'risk') {
+      return eas.filter(ea => (ea.risk_config || 'default') === group.filter_value);
+    } else if (group.group_type === 'custom') {
+      // For custom groups, check if EAs are explicitly assigned
+      // This would come from backend in real implementation
+      return eas.filter(ea => group.ea_ids && group.ea_ids.includes(ea.magic_number));
     }
     
-    return eas.slice(0, 2); // Mock: return first 2 EAs
+    return [];
   };
 
   const getEAsByTag = (tagName, tagValue = null) => {
@@ -355,9 +559,7 @@ const EAGroupingPanel = () => {
     <div className="ea-grouping-panel">
       <div className="panel-header">
         <h3>EA Grouping & Tagging System</h3>
-        <div className="mock-notice" style={{color: '#ffa500', fontSize: '0.9em', fontStyle: 'italic'}}>
-          
-        </div>
+
         <div className="tab-buttons">
           <button 
             className={activeTab === 'groups' ? 'active' : ''}

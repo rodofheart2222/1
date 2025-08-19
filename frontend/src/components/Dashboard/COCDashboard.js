@@ -22,6 +22,7 @@ import ActionQueuePanel from './ActionQueuePanel';
 import EAGroupingPanel from './EAGroupingPanel';
 import BacktestComparisonPanel from './BacktestComparisonPanel';
 import './COCDashboard.css';
+import '../../styles/liquid-glass-theme.css';
 
 const { Option } = Select;
 
@@ -107,9 +108,20 @@ const COCDashboard = () => {
   };
 
   return (
-    <div className="coc-dashboard">
+    <div className="coc-dashboard" style={{
+      background: '#0a0a0a !important',
+      minHeight: '100vh',
+      padding: '20px'
+    }}>
       {/* Header Controls */}
-      <Card size="small" className="coc-header">
+      <Card size="small" className="coc-header" style={{
+        background: 'rgba(68, 68, 72, 0.02) !important',
+        backdropFilter: 'blur(12px) saturate(110%) !important',
+        WebkitBackdropFilter: 'blur(12px) saturate(110%) !important',
+        border: '1px solid rgba(102, 102, 102, 0.1) !important',
+        borderRadius: '8px !important',
+        boxShadow: 'inset 0 0 0 1px rgba(102, 102, 102, 0.01), 0 4px 12px rgba(0, 0, 0, 0.24), 0 12px 32px rgba(0, 0, 0, 0.16) !important'
+      }}>
         <Row justify="space-between" align="middle">
           <Col>
             <Space>
@@ -152,6 +164,14 @@ const COCDashboard = () => {
         onChange={handleTabChange}
         className="coc-tabs"
         tabBarStyle={{ marginBottom: 16 }}
+        style={{
+          background: 'rgba(68, 68, 72, 0.02) !important',
+          backdropFilter: 'blur(12px) saturate(110%) !important',
+          WebkitBackdropFilter: 'blur(12px) saturate(110%) !important',
+          border: '1px solid rgba(102, 102, 102, 0.1) !important',
+          borderRadius: '12px !important',
+          boxShadow: 'inset 0 0 0 1px rgba(102, 102, 102, 0.01), 0 8px 24px rgba(0, 0, 0, 0.3), 0 24px 48px rgba(0, 0, 0, 0.24) !important'
+        }}
       >
         {/* Overview Tab */}
         <TabPane

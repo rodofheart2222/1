@@ -21,7 +21,7 @@ DATABASE_PATH=data/mt5_dashboard.db  # For SQLite
 
 # Server Configuration
 ENVIRONMENT=production
-MT5_API_PORT=8000
+MT5_API_PORT=80
 MT5_WS_PORT=8765
 
 # Security
@@ -62,7 +62,7 @@ The frontend `.env` file has been created with proper API endpoints:
 
 ```bash
 # Frontend .env
-REACT_APP_API_URL=http://127.0.0.1:8000
+REACT_APP_API_URL=http://127.0.0.1:80
 REACT_APP_WS_URL=ws://127.0.0.1:8765
 ```
 

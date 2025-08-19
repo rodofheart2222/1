@@ -87,7 +87,7 @@ from websocket_server import WebSocketServer
 
 # Create and start server
 server = WebSocketServer(
-    host="155.138.174.196",
+    host="127.0.0.1",
     port=8765,
     auth_token="your_auth_token"
 )
@@ -114,7 +114,7 @@ python start_websocket_server.py --integrated
 from websocket_client import WebSocketClient
 
 # Create client
-client = WebSocketClient("ws://155.138.174.196:8765", "your_auth_token")
+client = WebSocketClient("ws://127.0.0.1:8765", "your_auth_token")
 
 # Register message handler
 async def handle_ea_update(data):
@@ -160,7 +160,7 @@ await server.broadcast_alert({
 
 ### Server Configuration
 
-- `host`: Server host address (default: "155.138.174.196")
+- `host`: Server host address (default: "127.0.0.1")
 - `port`: Server port (default: 8765)
 - `auth_token`: Authentication token for clients
 - `heartbeat_interval`: Heartbeat check interval in seconds (default: 30)
@@ -171,7 +171,7 @@ await server.broadcast_alert({
 You can configure the server using environment variables:
 
 ```bash
-export WEBSOCKET_HOST=155.138.174.196
+export WEBSOCKET_HOST=127.0.0.1
 export WEBSOCKET_PORT=8765
 export WEBSOCKET_AUTH_TOKEN=your_secure_token
 ```
@@ -207,7 +207,7 @@ Test the server manually using the provided test scripts:
 python test_websocket_manual.py
 
 # Test with WebSocket client tools
-wscat -c ws://155.138.174.196:8765
+wscat -c ws://127.0.0.1:8765
 ```
 
 ## Integration with Frontend
@@ -217,7 +217,7 @@ The WebSocket server is designed to work with Electron-based frontend applicatio
 ### JavaScript/TypeScript Client
 
 ```javascript
-const ws = new WebSocket('ws://155.138.174.196:8765');
+const ws = new WebSocket('ws://127.0.0.1:8765');
 
 // Authenticate
 ws.onopen = () => {

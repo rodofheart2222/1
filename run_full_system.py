@@ -9,7 +9,7 @@ This script:
 4. Manages both processes together
 
 Usage:
-    python run_full_system.py [--host 155.138.174.196] [--backend-port 8000] [--frontend-port 3000]
+    python run_full_system.py [--host 127.0.0.1] [--backend-port 80] [--frontend-port 3000]
 """
 
 import asyncio
@@ -35,11 +35,20 @@ logger = logging.getLogger(__name__)
 class FullSystemRunner:
     """Manages complete system startup and shutdown"""
     
-    def __init__(self, host="155.138.174.196", backend_port=8000, frontend_port=3000, ws_port=8765):
-        self.host = host
-        self.backend_port = backend_port
-        self.frontend_port = frontend_port
-        self.ws_port = ws_port
+    def __init__(self, host=None, backend_port=None, frontend_port=None, ws_port=None):
+        # Load from central configuration if not provided
+        try:
+            import json
+            with open('frontend/src/config.json', 'r') as f:
+                config_data = json.load(f)
+        except:
+            config_data = {}
+        
+        self.host = host or config_data.get('backend', {}).get('host', '127.0.0.1')
+        self.backend_port = backend_port or config_data.get('backend', {}).get('port', 80)
+        frontend_config = config_data.get('frontend', {}).get('dev', {})
+        self.frontend_port = frontend_port or frontend_config.get('port', 3000)
+        self.ws_port = ws_port or config_data.get('websocket', {}).get('port', 8765)
         
         # Process tracking
         self.backend_process = None
@@ -492,8 +501,8 @@ def signal_handler(signum, frame):
 async def main():
     """Main entry point"""
     parser = argparse.ArgumentParser(description='Complete MT5 Dashboard System Runner')
-    parser.add_argument('--host', default='155.138.174.196', help='Server host')
-    parser.add_argument('--backend-port', type=int, default=8000, help='Backend port')
+    parser.add_argument('--host', default='127.0.0.1', help='Server host')
+    parser.add_argument('--backend-port', type=int, default=80, help='Backend port')
     parser.add_argument('--frontend-port', type=int, default=3000, help='Frontend port')
     parser.add_argument('--ws-port', type=int, default=8765, help='WebSocket port')
     

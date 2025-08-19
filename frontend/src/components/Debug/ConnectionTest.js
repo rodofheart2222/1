@@ -8,7 +8,8 @@ import {
   CloseCircleOutlined,
   LoadingOutlined
 } from '@ant-design/icons';
-import webSocketService from '../../services/webSocketService';
+import { quickAPITest } from '../../utils/connectionTest';
+import { API_BASE_URL, API_ENDPOINTS } from '../../config/api';
 
 const { Text, Paragraph } = Typography;
 
@@ -19,38 +20,33 @@ const ConnectionTest = () => {
   const [testResults, setTestResults] = useState({});
 
   useEffect(() => {
-    // Set up WebSocket event handlers
-    webSocketService.onConnectionChange = (connected) => {
-      setConnectionStatus(connected ? 'connected' : 'disconnected');
-      addMessage(`Connection ${connected ? 'established' : 'lost'}`, connected ? 'success' : 'error');
-    };
-
-    webSocketService.onMessage = (message) => {
-      addMessage(`Received: ${message.type}`, 'info');
-      
-      if (message.type === 'price_update') {
-        setPriceUpdates(prev => ({
-          ...prev,
-          ...message.data
-        }));
-      }
-    };
-
-    webSocketService.onError = (error) => {
-      addMessage(`Error: ${error.message}`, 'error');
-    };
-
-    return () => {
-      // Cleanup
-      webSocketService.onConnectionChange = null;
-      webSocketService.onMessage = null;
-      webSocketService.onError = null;
-    };
+    // Initial API connection test
+    testAPIConnection();
   }, []);
 
   const addMessage = (text, type = 'info') => {
     const timestamp = new Date().toLocaleTimeString();
     setMessages(prev => [...prev.slice(-9), { text, type, timestamp }]);
+  };
+
+  const testAPIConnection = async () => {
+    setConnectionStatus('connecting');
+    addMessage('Testing backend API connection...', 'info');
+    
+    try {
+      const result = await quickAPITest();
+      if (result.success) {
+        setConnectionStatus('connected');
+        setTestResults(prev => ({ ...prev, connection: 'success' }));
+        addMessage('✅ Backend API connected successfully', 'success');
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      setConnectionStatus('error');
+      setTestResults(prev => ({ ...prev, connection: 'error' }));
+      addMessage(`❌ API connection failed: ${error.message}`, 'error');
+    }
   };
 
   const testConnection = async () => {
@@ -61,52 +57,51 @@ const ConnectionTest = () => {
     try {
       addMessage('Starting connection test...', 'info');
       
-      // Test 1: WebSocket Connection
-      addMessage('Testing WebSocket connection...', 'info');
-      await webSocketService.connect();
-      setTestResults(prev => ({ ...prev, connection: 'success' }));
-      addMessage('✅ WebSocket connected successfully', 'success');
+      // Test 1: Backend API Connection
+      addMessage('Testing backend API...', 'info');
+      const apiResult = await quickAPITest();
+      if (apiResult.success) {
+        setTestResults(prev => ({ ...prev, api: 'success' }));
+        addMessage('✅ Backend API connected successfully', 'success');
+      } else {
+        throw new Error(apiResult.message);
+      }
       
-      // Wait a moment for connection to stabilize
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Test 2: EA List
+      addMessage('Testing EA data retrieval...', 'info');
+      const eaResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.eaList}`);
+      if (eaResponse.ok) {
+        const eaData = await eaResponse.json();
+        setTestResults(prev => ({ ...prev, eaData: 'success' }));
+        addMessage(`✅ Found ${eaData.length} EAs in system`, 'success');
+      } else {
+        setTestResults(prev => ({ ...prev, eaData: 'warning' }));
+        addMessage('⚠️ No EA data available', 'warning');
+      }
       
-      // Test 2: Authentication
-      addMessage('Testing authentication...', 'info');
-      // Authentication is handled automatically in connect()
-      setTestResults(prev => ({ ...prev, auth: 'success' }));
-      addMessage('✅ Authentication successful', 'success');
+      // Test 3: MT5 Integration
+      addMessage('Testing MT5 integration...', 'info');
+      const mt5Response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.mt5Status}`);
+      if (mt5Response.ok) {
+        const mt5Data = await mt5Response.json();
+        setTestResults(prev => ({ ...prev, mt5: 'success' }));
+        addMessage('✅ MT5 integration working', 'success');
+      } else {
+        setTestResults(prev => ({ ...prev, mt5: 'warning' }));
+        addMessage('⚠️ MT5 integration not available', 'warning');
+      }
       
-      // Test 3: Price Subscription
-      addMessage('Testing price subscription...', 'info');
-      const testSymbols = ['EURUSD', 'GBPUSD', 'XAUUSD'];
-      webSocketService.subscribeToPrices(testSymbols);
-      setTestResults(prev => ({ ...prev, subscription: 'success' }));
-      addMessage(`✅ Subscribed to ${testSymbols.join(', ')}`, 'success');
-      
-      // Test 4: Wait for price updates
-      addMessage('Waiting for price updates...', 'info');
-      setTimeout(() => {
-        if (Object.keys(priceUpdates).length > 0) {
-          setTestResults(prev => ({ ...prev, priceUpdates: 'success' }));
-          addMessage(`✅ Received price updates for ${Object.keys(priceUpdates).length} symbols`, 'success');
-        } else {
-          setTestResults(prev => ({ ...prev, priceUpdates: 'warning' }));
-          addMessage('⚠️ No price updates received yet', 'warning');
-        }
-      }, 3000);
+      setConnectionStatus('connected');
       
     } catch (error) {
       setTestResults(prev => ({ ...prev, connection: 'error' }));
-      addMessage(`❌ Connection failed: ${error.message}`, 'error');
+      addMessage(`❌ Connection test failed: ${error.message}`, 'error');
       setConnectionStatus('error');
     }
   };
 
-  const disconnect = () => {
-    webSocketService.disconnect();
-    setConnectionStatus('disconnected');
-    setPriceUpdates({});
-    addMessage('Disconnected from WebSocket', 'info');
+  const refreshTest = () => {
+    testAPIConnection();
   };
 
   const clearMessages = () => {
@@ -135,11 +130,11 @@ const ConnectionTest = () => {
 
   return (
     <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-      <Card title="WebSocket Connection Test" style={{ marginBottom: '20px' }}>
+      <Card title="Backend API Connection Test" style={{ marginBottom: '20px' }}>
         <Space direction="vertical" style={{ width: '100%' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <Text strong>Connection Status: </Text>
+              <Text strong>API Status: </Text>
               <Tag color={getStatusColor(connectionStatus)}>
                 {connectionStatus.toUpperCase()}
               </Tag>
@@ -151,14 +146,14 @@ const ConnectionTest = () => {
                 onClick={testConnection}
                 disabled={connectionStatus === 'connecting'}
               >
-                Test Connection
+                Test API
               </Button>
               <Button 
-                icon={<StopOutlined />}
-                onClick={disconnect}
-                disabled={connectionStatus === 'disconnected'}
+                icon={<ReloadOutlined />}
+                onClick={refreshTest}
+                disabled={connectionStatus === 'connecting'}
               >
-                Disconnect
+                Refresh
               </Button>
               <Button 
                 icon={<ReloadOutlined />}
@@ -176,48 +171,23 @@ const ConnectionTest = () => {
             <Text strong>Test Results:</Text>
             <div style={{ marginTop: '10px' }}>
               <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
-                {getTestResultIcon(testResults.connection)}
-                <Text style={{ marginLeft: '8px' }}>WebSocket Connection</Text>
+                {getTestResultIcon(testResults.api)}
+                <Text style={{ marginLeft: '8px' }}>Backend API Connection</Text>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
-                {getTestResultIcon(testResults.auth)}
-                <Text style={{ marginLeft: '8px' }}>Authentication</Text>
+                {getTestResultIcon(testResults.eaData)}
+                <Text style={{ marginLeft: '8px' }}>EA Data Retrieval</Text>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
-                {getTestResultIcon(testResults.subscription)}
-                <Text style={{ marginLeft: '8px' }}>Price Subscription</Text>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
-                {getTestResultIcon(testResults.priceUpdates)}
-                <Text style={{ marginLeft: '8px' }}>Price Updates</Text>
+                {getTestResultIcon(testResults.mt5)}
+                <Text style={{ marginLeft: '8px' }}>MT5 Integration</Text>
               </div>
             </div>
           </div>
 
           <Divider />
 
-          {/* Price Updates */}
-          {Object.keys(priceUpdates).length > 0 && (
-            <div>
-              <Text strong>Live Price Updates:</Text>
-              <div style={{ marginTop: '10px' }}>
-                {Object.entries(priceUpdates).map(([symbol, data]) => (
-                  <div key={symbol} style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    padding: '5px 0',
-                    borderBottom: '1px solid #f0f0f0'
-                  }}>
-                    <Text strong>{symbol}</Text>
-                    <Text>{data.price?.toFixed(symbol === 'XAUUSD' ? 2 : 5)}</Text>
-                    <Text type="secondary">{new Date(data.timestamp).toLocaleTimeString()}</Text>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
-          <Divider />
 
           {/* Message Log */}
           <div>

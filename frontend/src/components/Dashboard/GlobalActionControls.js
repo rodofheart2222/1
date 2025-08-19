@@ -9,6 +9,8 @@ import {
   ExclamationCircleOutlined,
   ControlOutlined
 } from '@ant-design/icons';
+import '../../styles/liquid-glass-theme.css';
+import apiService from '../../services/api';
 
 const { Option } = Select;
 const { confirm } = Modal;
@@ -133,6 +135,27 @@ const GlobalActionControls = ({ eaData = [], onCommandExecute }) => {
     return 0;
   };
 
+  const getAffectedEAs = () => {
+    if (targetScope === 'all') return eaData;
+    
+    const [type, value] = targetScope.split(':');
+    
+    switch (type) {
+      case 'symbol':
+        return eaData.filter(ea => ea.symbol === value);
+      case 'strategy':
+        return eaData.filter(ea => ea.strategy_tag === value);
+      case 'status':
+        if (value === 'active') return eaData.filter(ea => ea.open_positions > 0);
+        if (value === 'profitable') return eaData.filter(ea => (ea.current_profit || 0) > 0);
+        if (value === 'losing') return eaData.filter(ea => (ea.current_profit || 0) < 0);
+        break;
+      default:
+        return [];
+    }
+    return [];
+  };
+
   const executeGlobalAction = () => {
     const selectedActionData = actionTypes.find(action => action.key === selectedAction);
     const affectedCount = getAffectedEACount();
@@ -170,22 +193,84 @@ const GlobalActionControls = ({ eaData = [], onCommandExecute }) => {
       onOk: async () => {
         setLoading(true);
         try {
-          const command = {
-            type: 'global_action',
-            action: selectedAction,
-            target_scope: targetScope,
-            execution_mode: executionMode,
-            affected_count: affectedCount,
-            timestamp: new Date().toISOString()
-          };
-
-          await onCommandExecute(command);
+          // Get affected EAs
+          const affectedEAs = getAffectedEAs();
           
-          message.success(`${selectedActionData.label} command queued for ${affectedCount} EAs`);
+          // Convert action key to command
+          const commandMap = {
+            'pause_all': 'pause',
+            'resume_all': 'resume',
+            'close_all_positions': 'close_positions',
+            'emergency_stop': 'emergency_stop'
+          };
+          
+          const command = commandMap[selectedAction];
+          if (!command) {
+            throw new Error(`Unknown action: ${selectedAction}`);
+          }
+          
+          // Execute command immediately on each affected EA
+          const results = [];
+          for (const ea of affectedEAs) {
+            try {
+              await apiService.sendEACommand(ea.magic_number, {
+                command: command,
+                parameters: {
+                  reason: `Global Action: ${selectedActionData.label}`,
+                  scope: targetScope,
+                  execution_mode: executionMode,
+                  timestamp: new Date().toISOString()
+                },
+                instance_uuid: ea.instance_uuid
+              });
+              results.push({ ea: ea.magic_number, status: 'success' });
+            } catch (error) {
+              console.error(`Failed to send command to EA ${ea.magic_number}:`, error);
+              results.push({ ea: ea.magic_number, status: 'failed', error: error.message });
+            }
+          }
+          
+          // Report results
+          const successful = results.filter(r => r.status === 'success').length;
+          const failed = results.filter(r => r.status === 'failed').length;
+          
+          if (failed === 0) {
+            message.success(`${selectedActionData.label} executed successfully on ${successful} EA(s)`);
+          } else if (successful === 0) {
+            message.error(`Failed to execute ${selectedActionData.label} on all ${failed} EA(s)`);
+          } else {
+            message.warning(`${selectedActionData.label} executed on ${successful} EA(s), failed on ${failed} EA(s)`);
+          }
+          
+          // Also add to queue for tracking
+          if (onCommandExecute) {
+            const queueCommand = {
+              type: 'global_action',
+              action: selectedAction,
+              command: command,
+              targets: affectedEAs.map(ea => ea.magic_number),
+              target_scope: targetScope,
+              execution_mode: executionMode,
+              affected_count: affectedCount,
+              status: 'completed',
+              timestamp: new Date().toISOString(),
+              description: `${selectedActionData.label} on ${affectedCount} EA(s)`,
+              results: results,
+              parameters: {
+                reason: `Global Action: ${selectedActionData.label}`,
+                scope: targetScope,
+                execution_mode: executionMode
+              },
+              affectedEAs: affectedEAs
+            };
+            await onCommandExecute(queueCommand);
+          }
           
           // Reset form
           setSelectedAction('');
           setTargetScope('all');
+          setTargetValue('');
+          setExecutionMode('immediate');
           
         } catch (error) {
           message.error('Failed to execute command: ' + error.message);
@@ -321,17 +406,24 @@ const GlobalActionControls = ({ eaData = [], onCommandExecute }) => {
         )}
 
         {/* Execute Button */}
-        <Button
-          type="primary"
-          danger={selectedActionData?.color === 'red'}
-          icon={selectedActionData?.icon}
+        <button
+          className={`liquid-glass-button liquid-glass-button-medium ${selectedActionData?.color === 'red' ? 'liquid-glass-button-primary' : 'liquid-glass-button-primary'} ${loading ? 'liquid-glass-loading' : ''}`}
           onClick={executeGlobalAction}
           disabled={!selectedAction || affectedCount === 0}
-          loading={loading}
-          style={{ width: '100%' }}
+          style={{ 
+            width: '100%',
+            '--lg-action': selectedActionData?.color === 'red' ? '#F44336' : '#52c41a',
+            border: 'none',
+            cursor: !selectedAction || affectedCount === 0 ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px'
+          }}
         >
+          {selectedActionData?.icon}
           Execute {selectedActionData?.label || 'Action'}
-        </Button>
+        </button>
 
         {/* Quick Actions */}
         <Divider style={{ margin: '12px 0' }}>Quick Actions</Divider>

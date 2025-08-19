@@ -53,7 +53,14 @@ async def cleanup():
     loop.stop()
 
 
-async def start_websocket_server_only(host: str = "155.138.174.196", port: int = 8765, auth_token: str = "dashboard_token"):
+async def start_websocket_server_only(host: str = None, port: int = None, auth_token: str = "dashboard_token"):
+    try:
+        from backend.config.urls import WS_HOST, WS_PORT
+    except ImportError:
+        from config.urls import WS_HOST, WS_PORT
+    
+    host = host or WS_HOST
+    port = port or WS_PORT
     """Start only the WebSocket server without integration services"""
     global server_instance
     
@@ -79,7 +86,14 @@ async def start_websocket_server_only(host: str = "155.138.174.196", port: int =
         await cleanup()
 
 
-async def start_integrated_system(host: str = "155.138.174.196", port: int = 8765, auth_token: str = "dashboard_token"):
+async def start_integrated_system(host: str = None, port: int = None, auth_token: str = "dashboard_token"):
+    try:
+        from backend.config.urls import WS_HOST, WS_PORT
+    except ImportError:
+        from config.urls import WS_HOST, WS_PORT
+    
+    host = host or WS_HOST  
+    port = port or WS_PORT
     """Start WebSocket server with full integration services"""
     global server_instance, integration_service
     
@@ -120,8 +134,18 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description="Start WebSocket server for MT5 Dashboard")
-    parser.add_argument("--host", default="155.138.174.196", help="Server host (default: 155.138.174.196)")
-    parser.add_argument("--port", type=int, default=8765, help="Server port (default: 8765)")
+    try:
+        from backend.config.urls import WS_HOST
+    except ImportError:
+        from config.urls import WS_HOST
+    
+    parser.add_argument("--host", default=WS_HOST, help=f"Server host (default: {WS_HOST})")
+    try:
+        from backend.config.urls import WS_PORT
+    except ImportError:
+        from config.urls import WS_PORT
+    
+    parser.add_argument("--port", type=int, default=WS_PORT, help=f"Server port (default: {WS_PORT})")
     parser.add_argument("--auth-token", default="dashboard_token", help="Authentication token")
     parser.add_argument("--integrated", action="store_true", help="Start with full integration services")
     parser.add_argument("--log-level", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"], 

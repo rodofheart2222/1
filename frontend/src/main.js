@@ -89,7 +89,7 @@ function createWindow() {
 
     // Load the app
     const startUrl = isDev
-      ? 'http://155.138.174.196:3000'
+      ? 'http://127.0.0.1:3000'
       : `file://${path.join(__dirname, '../build/index.html')}`;
 
     mainWindow.loadURL(startUrl);

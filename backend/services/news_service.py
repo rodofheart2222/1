@@ -24,7 +24,12 @@ class NewsAPIClient:
     
     def __init__(self, api_key: str = None, base_url: str = None):
         self.api_key = api_key
-        self.base_url = base_url or "https://api.forexfactory.com"  # Example API
+        # Import central URL configuration
+        try:
+            from backend.config.urls import NEWS_API_BASE_URL
+        except ImportError:
+            from config.urls import NEWS_API_BASE_URL
+        self.base_url = base_url or NEWS_API_BASE_URL
         self.session = requests.Session()
         
         if api_key:

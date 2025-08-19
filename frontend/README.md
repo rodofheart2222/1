@@ -102,7 +102,7 @@ npm test
 
 ## WebSocket Communication
 
-The frontend connects to the Python backend via WebSocket on `ws://155.138.174.196:8765`.
+The frontend connects to the Python backend via WebSocket on `ws://127.0.0.1:8765`.
 
 ### Message Types Handled:
 - `ea_update`: Individual EA status updates
@@ -218,7 +218,7 @@ The built application will be in the `dist/` directory.
 - DevTools: Available in development mode
 
 ### WebSocket Configuration
-- Default URL: `ws://155.138.174.196:8765`
+- Default URL: `ws://127.0.0.1:8765`
 - Auto-reconnect: Enabled with exponential backoff
 - Max reconnect attempts: 10
 

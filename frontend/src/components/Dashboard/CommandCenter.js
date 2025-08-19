@@ -5,13 +5,16 @@ import {
   PauseCircleOutlined, 
   StopOutlined,
   SettingOutlined,
-  SendOutlined
+  SendOutlined,
+  ClockCircleOutlined
 } from '@ant-design/icons';
+import '../../styles/liquid-glass-theme.css';
+import apiService from '../../services/api';
 
 const { Option } = Select;
 const { TextArea } = Input;
 
-const CommandCenter = ({ eaData = [] }) => {
+const CommandCenter = ({ eaData = [], onCommandExecute }) => {
   const [selectedCommand, setSelectedCommand] = useState('');
   const [selectedEAs, setSelectedEAs] = useState([]);
   const [commandParams, setCommandParams] = useState('');
@@ -116,27 +119,55 @@ const CommandCenter = ({ eaData = [] }) => {
     return true;
   };
 
-  const executeCommand = async () => {
+  const executeCommandNow = async () => {
     if (!validateCommand()) return;
     
     setLoading(true);
     
     try {
-      const command = {
-        type: selectedCommand,
-        targets: selectedEAs,
-        parameters: commandParams ? JSON.parse(commandParams) : {},
-        timestamp: new Date().toISOString()
-      };
+      const parameters = commandParams ? JSON.parse(commandParams) : {};
       
-      // Here we would send the command to the backend
-      // For now, we'll simulate the command execution
-      console.log('Executing command:', command);
+      // Get target EAs with full data
+      const targetEAs = selectedEAs.map(eaId => 
+        eaData.find(ea => ea.magic_number === eaId)
+      ).filter(Boolean);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (targetEAs.length === 0) {
+        message.error('No valid EAs selected');
+        return;
+      }
       
-      message.success(`Command "${selectedCommand}" sent successfully to ${selectedEAs.length} target(s)`);
+      // Send command immediately to each selected EA
+      const results = [];
+      for (const ea of targetEAs) {
+        try {
+          await apiService.sendEACommand(ea.magic_number, {
+            command: selectedCommand,
+            parameters: {
+              ...parameters,
+              reason: `Command Center: ${selectedCommand}`,
+              timestamp: new Date().toISOString()
+            },
+            instance_uuid: ea.instance_uuid
+          });
+          results.push({ ea: ea.magic_number, status: 'success' });
+        } catch (error) {
+          console.error(`Failed to send command to EA ${ea.magic_number}:`, error);
+          results.push({ ea: ea.magic_number, status: 'failed', error: error.message });
+        }
+      }
+      
+      // Report results
+      const successful = results.filter(r => r.status === 'success').length;
+      const failed = results.filter(r => r.status === 'failed').length;
+      
+      if (failed === 0) {
+        message.success(`Command "${selectedCommand}" executed successfully on ${successful} EA(s)`);
+      } else if (successful === 0) {
+        message.error(`Failed to execute command on all ${failed} EA(s)`);
+      } else {
+        message.warning(`Command executed on ${successful} EA(s), failed on ${failed} EA(s)`);
+      }
       
       // Reset form
       setSelectedCommand('');
@@ -148,6 +179,56 @@ const CommandCenter = ({ eaData = [] }) => {
       message.error('Failed to execute command: ' + error.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const queueCommand = async () => {
+    if (!validateCommand()) return;
+    
+    try {
+      const parameters = commandParams ? JSON.parse(commandParams) : {};
+      
+      // Get target EAs with full data
+      const targetEAs = selectedEAs.map(eaId => 
+        eaData.find(ea => ea.magic_number === eaId)
+      ).filter(Boolean);
+      
+      if (targetEAs.length === 0) {
+        message.error('No valid EAs selected');
+        return;
+      }
+      
+      // Queue command for execution in Action Queue
+      if (onCommandExecute) {
+        const queueCommand = {
+          type: 'batch_command',
+          command: selectedCommand,
+          targets: targetEAs.map(ea => ea.magic_number),
+          status: 'pending',
+          timestamp: new Date().toISOString(),
+          description: `${selectedCommand} on ${targetEAs.length} EA(s)`,
+          parameters: {
+            ...parameters,
+            reason: `Command Center: ${selectedCommand}`,
+            timestamp: new Date().toISOString()
+          },
+          // Include full EA data for UUID targeting
+          affectedEAs: targetEAs
+        };
+        
+        await onCommandExecute(queueCommand);
+        message.success(`Command "${selectedCommand}" queued for ${targetEAs.length} EA(s). Check Action Queue to execute.`);
+      } else {
+        message.error('Command queue not available');
+      }
+      
+      // Reset form
+      setSelectedCommand('');
+      setSelectedEAs([]);
+      setCommandParams('');
+      
+    } catch (error) {
+      message.error('Failed to queue command: ' + error.message);
     }
   };
 
@@ -220,18 +301,56 @@ const CommandCenter = ({ eaData = [] }) => {
         )}
 
         {/* Execute Button */}
-        <Button
-          type="primary"
-          icon={<SendOutlined />}
-          onClick={showConfirmModal}
-          disabled={!selectedCommand || selectedEAs.length === 0}
-          style={{ width: '100%' }}
-        >
-          Execute Command
-        </Button>
+        {/* Command Execution Buttons */}
+        <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+          <button
+            className="liquid-glass-button liquid-glass-button-primary liquid-glass-button-medium"
+            onClick={showConfirmModal}
+            disabled={!selectedCommand || selectedEAs.length === 0}
+            style={{ 
+              flex: 1,
+              border: 'none',
+              cursor: !selectedCommand || selectedEAs.length === 0 ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px'
+            }}
+          >
+            <SendOutlined />
+            Execute Now
+          </button>
+          
+          <button
+            className="liquid-glass-button liquid-glass-button-secondary liquid-glass-button-medium"
+            onClick={queueCommand}
+            disabled={!selectedCommand || selectedEAs.length === 0}
+            style={{ 
+              flex: 1,
+              border: 'none',
+              cursor: !selectedCommand || selectedEAs.length === 0 ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px'
+            }}
+          >
+            <ClockCircleOutlined />
+            Add to Queue
+          </button>
+        </div>
 
         {/* Active EAs Summary */}
-        <div style={{ marginTop: 16, padding: 8, background: '#262626', borderRadius: 4 }}>
+        <div style={{ 
+          marginTop: 16, 
+          padding: 8, 
+          background: 'color-mix(in srgb, var(--lg-glass) 1%, transparent)', 
+          backdropFilter: 'blur(6px) saturate(var(--lg-saturation))',
+          WebkitBackdropFilter: 'blur(6px) saturate(var(--lg-saturation))',
+          border: '1px solid color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 6%), transparent)',
+          borderRadius: 4,
+          boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 3%), transparent), 0 2px 8px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 8%), transparent)'
+        }}>
           <div style={{ fontSize: '11px', color: '#a6a6a6', marginBottom: 4 }}>
             Connected EAs:
           </div>
@@ -252,7 +371,7 @@ const CommandCenter = ({ eaData = [] }) => {
       <Modal
         title="Confirm Command Execution"
         open={modalVisible}
-        onOk={executeCommand}
+        onOk={executeCommandNow}
         onCancel={() => setModalVisible(false)}
         confirmLoading={loading}
         okText="Execute"
@@ -267,12 +386,16 @@ const CommandCenter = ({ eaData = [] }) => {
           )}
           {commandParams && (
             <pre style={{ 
-              background: '#262626', 
+              background: 'color-mix(in srgb, var(--lg-glass) 1%, transparent)', 
+              backdropFilter: 'blur(6px) saturate(var(--lg-saturation))',
+              WebkitBackdropFilter: 'blur(6px) saturate(var(--lg-saturation))',
+              border: '1px solid color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 6%), transparent)',
               padding: 8, 
               borderRadius: 4,
               fontSize: '11px',
               whiteSpace: 'pre-wrap',
-              color: '#e0e0e0'
+              color: 'var(--lg-content)',
+              boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 3%), transparent), 0 2px 8px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 8%), transparent)'
             }}>
               {commandParams}
             </pre>

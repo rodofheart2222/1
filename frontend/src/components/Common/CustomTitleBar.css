@@ -1,3 +1,6 @@
+/* Import Liquid Glass Theme */
+@import '../../styles/liquid-glass-theme.css';
+
 /* Ensure body and main containers are not draggable */
 body,
 #root,
@@ -5,16 +8,16 @@ body,
   -webkit-app-region: no-drag;
 }
 
-/* Custom Title Bar Styles */
+/* Custom Title Bar Styles with Liquid Glass Effect */
 .custom-title-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 32px;
-  background: #000000;
-  /* Pure black background */
-  border-bottom: 1px solid #1a1a1a;
-  /* Slightly lighter border for subtle definition */
+  background-color: color-mix(in srgb, var(--lg-glass) 2%, transparent);
+  backdrop-filter: blur(12px) saturate(var(--lg-saturation));
+  -webkit-backdrop-filter: blur(12px) saturate(var(--lg-saturation));
+  border-bottom: 1px solid color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 8%), transparent);
   position: fixed;
   top: 28px;
   /* Position below ticker bar (28px height) */
@@ -22,8 +25,13 @@ body,
   right: 0;
   z-index: 9999;
   user-select: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
-  /* Darker shadow */
+  box-shadow: 
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 5%), transparent),
+    0px 2px 8px 0px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 15%), transparent),
+    0px 4px 16px 0px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 10%), transparent);
+  transition: 
+    background-color var(--lg-transition),
+    box-shadow var(--lg-transition);
   /* Only the title bar itself should be draggable, not its contents */
   -webkit-app-region: no-drag;
 }
@@ -79,62 +87,90 @@ body,
   width: 46px;
   height: 100%;
   border: none;
-  background: transparent;
-  color: #FFFFFF;
+  background-color: color-mix(in srgb, var(--lg-glass) 2%, transparent);
+  backdrop-filter: blur(6px) saturate(var(--lg-saturation));
+  -webkit-backdrop-filter: blur(6px) saturate(var(--lg-saturation));
+  color: var(--lg-content);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 12px;
-  transition: all 0.3s ease;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
   position: relative;
   outline: none;
+  transition: 
+    background-color var(--lg-transition),
+    box-shadow var(--lg-transition),
+    color var(--lg-transition-fast),
+    transform var(--lg-transition-fast);
+  
+  box-shadow: 
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 5%), transparent),
+    inset 1px 1px 0px -1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 50%), transparent), 
+    inset -1px -1px 0px -1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 40%), transparent), 
+    inset -1px -2px 1px -2px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 30%), transparent), 
+    inset -0.5px 1px 2px -1px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 15%), transparent), 
+    inset 0px -2px 1px -1px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 8%), transparent);
 }
 
 .title-bar-button:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #FFFFFF;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+  color: var(--lg-action);
+  background-color: color-mix(in srgb, var(--lg-glass) 4%, transparent);
+  box-shadow: 
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 8%), transparent),
+    inset 1px 1px 0px -1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 60%), transparent), 
+    inset -1px -1px 0px -1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 50%), transparent), 
+    inset -1px -2px 1px -2px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 40%), transparent), 
+    inset -0.5px 1px 2px -1px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 20%), transparent), 
+    inset 0px -2px 1px -1px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 12%), transparent),
+    0px 2px 6px 0px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 8%), transparent);
 }
 
 .title-bar-button:active {
-  background: rgba(255, 255, 255, 0.2);
   transform: scale(0.95);
-  box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+  background-color: color-mix(in srgb, var(--lg-glass) 20%, transparent);
+  box-shadow: 
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 3%), transparent),
+    inset 1px 0px 0px -1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 30%), transparent), 
+    inset -1px 0px 0px -1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 25%), transparent), 
+    inset -1px -1px 1px -1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 20%), transparent), 
+    inset -0.5px 1px 2px -1px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 25%), transparent), 
+    inset 0px -1px 1px -1px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 15%), transparent),
+    0px 1px 3px 0px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 5%), transparent);
 }
 
-/* Specific button styles with glowing white effects */
+/* Specific button styles with liquid glass variations */
 .minimize-button:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #FFFFFF;
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+  --lg-action: #4CAF50; /* Green for minimize */
 }
 
 .maximize-button:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #FFFFFF;
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+  --lg-action: #2196F3; /* Blue for maximize */
 }
 
 .close-button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: #FFFFFF;
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  --lg-action: #F44336; /* Red for close */
+  background-color: color-mix(in srgb, #F44336 15%, transparent);
 }
 
 .close-button:active {
-  background: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  background-color: color-mix(in srgb, #F44336 25%, transparent);
 }
 
-/* Focus styles for accessibility */
+/* Focus styles for accessibility with liquid glass */
 .title-bar-button:focus {
-  outline: 2px solid #00d4ff;
+  outline: 2px solid var(--lg-action);
   outline-offset: -2px;
+  box-shadow: 
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-action) 30%, transparent),
+    inset 1px 1px 0px -1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 60%), transparent), 
+    inset -1px -1px 0px -1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 50%), transparent), 
+    inset -1px -2px 1px -2px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 40%), transparent), 
+    inset -0.5px 1px 2px -1px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 20%), transparent), 
+    inset 0px -2px 1px -1px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 12%), transparent),
+    0px 0px 12px 0px color-mix(in srgb, var(--lg-action) 40%, transparent);
 }
 
 /* Animation for title */

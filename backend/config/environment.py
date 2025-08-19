@@ -8,15 +8,31 @@ All hardcoded values should be moved here and made configurable via environment 
 import os
 from typing import Optional
 
+# Import centralized configuration
+try:
+    from .central_config import (
+        DEFAULT_HOST, 
+        DEFAULT_API_PORT, 
+        DEFAULT_WS_PORT, 
+        DEFAULT_FRONTEND_PORT
+    )
+except ImportError:
+    from central_config import (
+        DEFAULT_HOST, 
+        DEFAULT_API_PORT, 
+        DEFAULT_WS_PORT, 
+        DEFAULT_FRONTEND_PORT
+    )
+
 
 class Config:
     """Configuration class for MT5 Dashboard system"""
     
-    # Server Configuration
-    DEFAULT_HOST: str = "0.0.0.0"  # Bind to all interfaces by default
-    DEFAULT_API_PORT: int = 8000
-    DEFAULT_WS_PORT: int = 8765
-    DEFAULT_FRONTEND_PORT: int = 3000
+    # Server Configuration - now uses centralized config
+    DEFAULT_HOST: str = DEFAULT_HOST
+    DEFAULT_API_PORT: int = DEFAULT_API_PORT
+    DEFAULT_WS_PORT: int = DEFAULT_WS_PORT
+    DEFAULT_FRONTEND_PORT: int = DEFAULT_FRONTEND_PORT
     
     # Production overrides (for backward compatibility)
     PRODUCTION_API_PORT: int = 80
@@ -103,14 +119,13 @@ class Config:
             api_port = cls.get_api_port()
             frontend_port = cls.get_frontend_port()
             
-            return [
-                f"http://{host}:{frontend_port}",
-                f"http://{host}:{api_port}",
-                "http://localhost:3000",
-                "http://localhost:8000",
-                "http://127.0.0.1:3000",
-                "http://127.0.0.1:8000",
-            ]
+            # Import central URL configuration
+            try:
+                from backend.config.urls import DEFAULT_CORS_ORIGINS
+            except ImportError:
+                from config.urls import DEFAULT_CORS_ORIGINS
+            
+            return DEFAULT_CORS_ORIGINS
         
         return []
     

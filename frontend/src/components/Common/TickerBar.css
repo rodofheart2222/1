@@ -1,16 +1,25 @@
-/* Ticker Bar Container - Fixed positioning for both ticker and header */
+/* Import Liquid Glass Theme */
+@import '../../styles/liquid-glass-theme.css';
+
+/* Ticker Bar Container - Fixed positioning with Liquid Glass */
 .ticker-bar-container {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
   z-index: 10000 !important;
-  background: #000000 !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
-  font-family: 'Arial', 'Helvetica', sans-serif;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: color-mix(in srgb, var(--lg-glass) 2%, transparent) !important;
+  backdrop-filter: blur(12px) saturate(var(--lg-saturation));
+  -webkit-backdrop-filter: blur(12px) saturate(var(--lg-saturation));
+  box-shadow: 
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 6%), transparent),
+    0px 4px 12px 0px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 15%), transparent),
+    0px 8px 24px 0px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 10%), transparent);
+  font-family: "DM Sans", 'Arial', 'Helvetica', sans-serif;
+  transition: 
+    all var(--lg-transition),
+    background-color var(--lg-transition),
+    box-shadow var(--lg-transition);
   will-change: transform, opacity, background-color, box-shadow;
   transform: translateZ(0);
   overflow: hidden;
@@ -18,57 +27,135 @@
   padding: 0 !important;
 }
 
-/* Bloomberg-Style Ticker Bar */
+/* Bloomberg-Style Ticker Bar with Liquid Glass */
 .bloomberg-ticker-bar {
   height: 28px !important;
-  background: #000000 !important;
-  border-bottom: 1px solid #1a1a1a;
+  background: color-mix(in srgb, var(--lg-glass) 1%, transparent) !important;
+  backdrop-filter: blur(8px) saturate(var(--lg-saturation));
+  -webkit-backdrop-filter: blur(8px) saturate(var(--lg-saturation));
+  border-bottom: 1px solid color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 8%), transparent);
+  overflow: hidden;
+  box-shadow: 
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 4%), transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 15%), transparent);
+}
+
+/* Advanced Intelligence Header with Liquid Glass Effect */
+.advanced-intelligence-header {
+  height: 32px;
+  background-color: color-mix(in srgb, var(--lg-glass) 3%, transparent);
+  backdrop-filter: blur(16px) saturate(var(--lg-saturation));
+  -webkit-backdrop-filter: blur(16px) saturate(var(--lg-saturation));
+  border-bottom: 1px solid color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 12%), transparent);
+  box-shadow: 
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 8%), transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 25%), transparent),
+    0px 2px 8px 0px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 20%), transparent),
+    0px 4px 16px 0px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 15%), transparent),
+    0px 8px 32px 0px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 10%), transparent);
+  transition: 
+    background-color var(--lg-transition),
+    box-shadow var(--lg-transition),
+    border-color var(--lg-transition);
+}
+
+/* Enhanced Liquid Glass Menu Bar Class */
+.liquid-glass-menu-bar {
+  position: relative;
   overflow: hidden;
 }
 
-/* Advanced Intelligence Header */
-.advanced-intelligence-header {
-  height: 32px;
-  background: #111111;
-  border-bottom: 1px solid #1A1A1A;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+.liquid-glass-menu-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 8%), transparent) 0%,
+      transparent 50%,
+      color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 4%), transparent) 100%
+    );
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* Enhanced Sticky Ticker Behavior */
-.ticker-bar-container.scrolled {
-  background: rgba(0, 0, 0, 0.95) !important;
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
+.liquid-glass-menu-bar > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Enhanced hover effect for menu bar */
+.liquid-glass-menu-bar:hover {
+  background-color: color-mix(in srgb, var(--lg-glass) 6%, transparent);
   box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.9),
-    0 0 20px rgba(0, 212, 255, 0.1);
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 12%), transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 35%), transparent),
+    0px 3px 12px 0px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 25%), transparent),
+    0px 6px 24px 0px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 18%), transparent),
+    0px 12px 48px 0px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 12%), transparent),
+    0px 0px 20px 0px color-mix(in srgb, var(--lg-action) 20%, transparent);
+}
+
+/* Enhanced Sticky Ticker Behavior with Liquid Glass */
+.ticker-bar-container.scrolled {
+  background: color-mix(in srgb, var(--lg-glass) 4%, transparent) !important;
+  backdrop-filter: blur(20px) saturate(calc(var(--lg-saturation) * 1.2));
+  -webkit-backdrop-filter: blur(20px) saturate(calc(var(--lg-saturation) * 1.2));
+  box-shadow: 
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 15%), transparent),
+    0px 4px 12px 0px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 30%), transparent),
+    0px 8px 24px 0px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 20%), transparent),
+    0px 0px 40px 0px color-mix(in srgb, var(--lg-action) 15%, transparent);
   transform: translateY(0);
 }
 
 .ticker-bar-container.scrolled .bloomberg-ticker-bar {
-  border-bottom: 1px solid #333333;
+  border-bottom: 1px solid color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 15%), transparent);
+  background-color: color-mix(in srgb, var(--lg-glass) 2%, transparent);
 }
 
 .ticker-bar-container.scrolled .advanced-intelligence-header {
-  border-bottom: 1px solid #333333;
+  border-bottom: 1px solid color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 18%), transparent);
+  background-color: color-mix(in srgb, var(--lg-glass) 5%, transparent);
+  box-shadow: 
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 12%), transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 35%), transparent),
+    0px 2px 12px 0px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 25%), transparent),
+    0px 6px 20px 0px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 18%), transparent);
 }
 
-/* Add a subtle glow effect when scrolled */
+/* Add a subtle liquid glass glow effect when scrolled */
 .ticker-bar-container.scrolled::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 1px;
+  height: 2px;
   background: linear-gradient(90deg, 
     transparent 0%, 
-    rgba(0, 212, 255, 0.3) 25%, 
-    rgba(0, 212, 255, 0.5) 50%, 
-    rgba(0, 212, 255, 0.3) 75%, 
+    color-mix(in srgb, var(--lg-action) 30%, transparent) 25%, 
+    color-mix(in srgb, var(--lg-action) 50%, transparent) 50%, 
+    color-mix(in srgb, var(--lg-action) 30%, transparent) 75%, 
     transparent 100%);
-  opacity: 0.8;
-  animation: tickerGlow 3s ease-in-out infinite alternate;
+  opacity: 0.9;
+  animation: liquidGlassGlow 4s ease-in-out infinite alternate;
+  filter: blur(0.5px);
+}
+
+@keyframes liquidGlassGlow {
+  0% { 
+    opacity: 0.4; 
+    transform: scaleX(0.8);
+  }
+  100% { 
+    opacity: 0.9; 
+    transform: scaleX(1.1);
+  }
 }
 
 @keyframes tickerGlow {

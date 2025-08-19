@@ -2,11 +2,11 @@
 """
 Complete Backend Server Startup Script
 
-This script starts both the FastAPI backend server and the WebSocket server
-together in a single process, making it easier to manage.
+This script starts the FastAPI backend server with HTTP API only.
+Real-time updates are handled via HTTP polling.
 
 Usage:
-    python start_complete_server.py [--host 0.0.0.0] [--port 8000] [--ws-port 8765]
+    python start_complete_server.py [--host 0.0.0.0] [--port 80]
 """
 
 import asyncio
@@ -25,7 +25,6 @@ from fastapi.middleware.cors import CORSMiddleware
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Import services
-from backend.services.websocket_server import WebSocketServer
 from backend.database import init_database
 from backend.api import ea_api, backtest_api, news_api, trade_api
 
@@ -38,13 +37,11 @@ logger = logging.getLogger(__name__)
 
 
 class CompleteServer:
-    """Manages both FastAPI and WebSocket server"""
+    """Manages FastAPI backend server"""
     
-    def __init__(self, host="0.0.0.0", port=8000, ws_port=8765):
+    def __init__(self, host="0.0.0.0", port=80):
         self.host = host
         self.port = port
-        self.ws_port = ws_port
-        self.websocket_server = None
         self.app = None
         self.running = False
         
@@ -61,17 +58,13 @@ class CompleteServer:
             init_database()
             logger.info("✅ Database initialized")
             
-            # Start WebSocket server
-            self.websocket_server = WebSocketServer(port=self.ws_port)
-            asyncio.create_task(self.websocket_server.start())
-            logger.info(f"✅ WebSocket server started on port {self.ws_port}")
+            # WebSocket removed - using HTTP API polling for real-time updates
+            logger.info("✅ Backend API ready - real-time updates via HTTP polling")
             
             yield
             
             # Shutdown
-            logger.info("🛑 Shutting down complete backend server...")
-            if self.websocket_server:
-                await self.websocket_server.stop()
+            logger.info("🛑 Shutting down backend server...")
             logger.info("✅ Server shutdown complete")
         
         # Create FastAPI app with lifespan
@@ -175,8 +168,7 @@ async def main():
     """Main entry point"""
     parser = argparse.ArgumentParser(description='Complete MT5 Dashboard Backend Server')
     parser.add_argument('--host', default='0.0.0.0', help='Server host')
-    parser.add_argument('--port', type=int, default=8000, help='API server port')
-    parser.add_argument('--ws-port', type=int, default=8765, help='WebSocket server port')
+    parser.add_argument('--port', type=int, default=80, help='API server port')
     
     args = parser.parse_args()
     
@@ -185,7 +177,7 @@ async def main():
     signal.signal(signal.SIGTERM, signal_handler)
     
     # Create and run server
-    server = CompleteServer(args.host, args.port, args.ws_port)
+    server = CompleteServer(args.host, args.port)
     
     try:
         await server.run()

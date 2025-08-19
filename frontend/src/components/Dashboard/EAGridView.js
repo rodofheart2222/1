@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Card, Row, Col, Input, Select, Tag, Empty, Switch } from 'antd';
+import { Card, Row, Col, Input, Select, Tag, Empty, Switch, message, Modal } from 'antd';
 import { SearchOutlined, LineChartOutlined } from '@ant-design/icons';
 import SoldierEAPanel from './SoldierEAPanel';
 import EACardWithChart from './EACardWithChart';
 import ModernSkeleton from '../Common/ModernSkeleton';
+import apiService from '../../services/api';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -50,6 +51,83 @@ const EAGridView = ({ eaData = [] }) => {
     border: '1px solid rgba(255, 255, 255, 0.08)',
     borderRadius: '14px',
     boxShadow: '0 10px 35px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+  };
+
+  // Command handlers for EA actions
+  const handlePauseEA = async (ea) => {
+    try {
+      console.log('Pausing EA:', ea.magic_number);
+      message.loading('Pausing EA...', 0.5);
+      
+      await apiService.sendEACommand(ea.magic_number, {
+        command: 'pause',
+        parameters: { reason: 'Dashboard pause request' },
+        instance_uuid: ea.instance_uuid
+      });
+      
+      message.success(`EA ${ea.magic_number} paused successfully`);
+    } catch (error) {
+      console.error('Failed to pause EA:', error);
+      message.error(`Failed to pause EA: ${error.message}`);
+    }
+  };
+
+  const handleResumeEA = async (ea) => {
+    try {
+      console.log('Resuming EA:', ea.magic_number);
+      message.loading('Resuming EA...', 0.5);
+      
+      await apiService.sendEACommand(ea.magic_number, {
+        command: 'resume',
+        parameters: { reason: 'Dashboard resume request' },
+        instance_uuid: ea.instance_uuid
+      });
+      
+      message.success(`EA ${ea.magic_number} resumed successfully`);
+    } catch (error) {
+      console.error('Failed to resume EA:', error);
+      message.error(`Failed to resume EA: ${error.message}`);
+    }
+  };
+
+  const handleConfigureEA = (ea) => {
+    console.log('Configure EA:', ea.magic_number);
+    
+    Modal.info({
+      title: `Configure EA ${ea.magic_number}`,
+      width: 700,
+      content: (
+        <div>
+          <p><strong>EA Information:</strong></p>
+          <ul>
+            <li><strong>Magic Number:</strong> {ea.magic_number}</li>
+            <li><strong>Symbol:</strong> {ea.symbol}</li>
+            <li><strong>Strategy:</strong> {ea.strategy_tag}</li>
+            <li><strong>Status:</strong> {ea.status}</li>
+            <li><strong>Instance UUID:</strong> {ea.instance_uuid}</li>
+          </ul>
+          
+          <p><strong>Current Settings:</strong></p>
+          <ul>
+            <li><strong>Is Paused:</strong> {ea.is_paused ? 'Yes' : 'No'}</li>
+            <li><strong>Open Positions:</strong> {ea.open_positions || 0}</li>
+            <li><strong>Current Profit:</strong> ${(ea.current_profit || 0).toFixed(2)}</li>
+            <li><strong>Stop Loss:</strong> {ea.sl_value || 'Not set'}</li>
+            <li><strong>Take Profit:</strong> {ea.tp_value || 'Not set'}</li>
+          </ul>
+          
+          <p><strong>Available Actions:</strong></p>
+          <ul>
+            <li>Use pause/resume buttons for EA control</li>
+            <li>Use Global Actions for advanced commands</li>
+            <li>Use Global Actions for multiple EA operations</li>
+          </ul>
+          
+          <p><em>Advanced EA configuration panel with risk settings, strategy parameters, and real-time adjustments coming soon...</em></p>
+        </div>
+      ),
+      onOk() {}
+    });
   };
 
   return (
@@ -347,9 +425,9 @@ const EAGridView = ({ eaData = [] }) => {
                       ea={ea}
                       showChart={true}
                       chartHeight={60}
-                      onPause={(ea) => console.log('Pause EA:', ea.magic_number)}
-                      onResume={(ea) => console.log('Resume EA:', ea.magic_number)}
-                      onConfigure={(ea) => console.log('Configure EA:', ea.magic_number)}
+                      onPause={handlePauseEA}
+                      onResume={handleResumeEA}
+                      onConfigure={handleConfigureEA}
                     />
                   ) : (
                     <SoldierEAPanel eaData={ea} />

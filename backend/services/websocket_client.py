@@ -171,7 +171,11 @@ class WebSocketClient:
 
 async def test_client_connection():
     """Test basic client connection and authentication"""
-    client = WebSocketClient("ws://155.138.174.196:8765")
+    try:
+        from backend.config.urls import WS_URL
+    except ImportError:
+        from config.urls import WS_URL
+    client = WebSocketClient(WS_URL)
     
     try:
         await client.connect()
@@ -195,7 +199,11 @@ async def test_client_connection():
 
 async def test_message_handling():
     """Test message handling with custom handlers"""
-    client = WebSocketClient("ws://155.138.174.196:8765")
+    try:
+        from backend.config.urls import WS_URL
+    except ImportError:
+        from config.urls import WS_URL
+    client = WebSocketClient(WS_URL)
     
     # Register message handlers
     async def handle_ea_update(data):

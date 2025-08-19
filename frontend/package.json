@@ -6,7 +6,7 @@
   "scripts": {
     "start": "serve -s build -l $PORT",
     "dev": "react-scripts start",
-    "dev:electron": "concurrently \"npm run dev:react\" \"wait-on http://155.138.174.196:3000 && electron .\"",
+    "dev:electron": "concurrently \"npm run dev:react\" \"wait-on http://127.0.0.1:3000 && electron .\"",
     "dev:react": "react-scripts start",
     "build": "react-scripts build",
     "build:electron": "npm run build && node build-electron.js",
@@ -56,7 +56,7 @@
     "ws": "^8.13.0"
   },
   "homepage": "./",
-  "proxy": "http://155.138.174.196:8000",
+  "proxy": "http://127.0.0.1:80",
   "build": {
     "appId": "com.mt5dashboard.app",
     "productName": "MT5 COC Dashboard",

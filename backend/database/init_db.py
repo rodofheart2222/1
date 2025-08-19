@@ -70,6 +70,22 @@ def create_tables(cursor):
         )
     """)
     
+    # EA Status table (real-time status updates)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS ea_status (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ea_id INTEGER NOT NULL,
+            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            current_profit REAL DEFAULT 0.0,
+            open_positions INTEGER DEFAULT 0,
+            sl_value REAL,
+            tp_value REAL,
+            trailing_active BOOLEAN DEFAULT FALSE,
+            module_status TEXT,
+            FOREIGN KEY (ea_id) REFERENCES eas(id) ON DELETE CASCADE
+        )
+    """)
+    
     # Trades table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS trades (
@@ -119,16 +135,16 @@ def create_tables(cursor):
         )
     """)
     
-    # News table
+    # News Events table
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS news (
+        CREATE TABLE IF NOT EXISTS news_events (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            content TEXT,
-            impact TEXT,
-            currency TEXT,
-            event_time TIMESTAMP,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            event_time TIMESTAMP NOT NULL,
+            currency TEXT NOT NULL,
+            impact_level TEXT NOT NULL CHECK (impact_level IN ('high', 'medium', 'low')),
+            description TEXT NOT NULL,
+            pre_minutes INTEGER DEFAULT 30,
+            post_minutes INTEGER DEFAULT 30
         )
     """)
     
@@ -164,8 +180,11 @@ def create_tables(cursor):
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_trades_symbol ON trades (symbol)")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_eas_magic_number ON eas (magic_number)")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_eas_status ON eas (status)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_ea_status_ea_id ON ea_status (ea_id)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_ea_status_timestamp ON ea_status (timestamp)")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_commands_magic_number ON commands (magic_number)")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_commands_status ON commands (status)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_news_events_time ON news_events (event_time)")
     
     logger.info("Database tables created successfully")
 
@@ -183,7 +202,7 @@ def verify_database_integrity() -> bool:
         cursor = conn.cursor()
         
         # Check if required tables exist
-        required_tables = ['eas', 'trades', 'commands', 'news', 'backtests']
+        required_tables = ['eas', 'ea_status', 'trades', 'commands', 'news_events', 'backtests']
         
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
         existing_tables = [row[0] for row in cursor.fetchall()]
@@ -226,7 +245,7 @@ def get_database_stats() -> Dict[str, Any]:
         stats = {}
         
         # Count records in each table
-        tables = ['eas', 'trades', 'commands', 'news', 'backtests']
+        tables = ['eas', 'ea_status', 'trades', 'commands', 'news_events', 'backtests']
         
         for table in tables:
             try:

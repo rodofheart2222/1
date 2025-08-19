@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Row, Col, Spin, Alert, Switch, Space } from 'antd';
+import { Layout, Row, Col, Spin, Alert, Switch, Space, Modal } from 'antd';
 import {
   DashboardOutlined,
   ControlOutlined,
@@ -28,18 +28,19 @@ import {
   FallOutlined
 } from '@ant-design/icons';
 import { useDashboard } from '../../context/DashboardContext';
+import { API_BASE_URL } from '../../config/api';
 import dashboardService from '../../services/dashboardService';
-import webSocketService from '../../services/webSocketService';
 import GlobalStatsPanel from './GlobalStatsPanel';
 import EAGridView from './EAGridView';
 import NewsEventPanel from './NewsEventPanel';
-import CommandCenter from './CommandCenter';
+
 import COCDashboard from './COCDashboard';
 import ExpertsPanel from './ExpertsPanel';
 import ConnectionStatus from '../Common/ConnectionStatus';
 import FloatingActionButton from '../Common/FloatingActionButton';
 import PerformanceMonitor from '../Common/PerformanceMonitor';
 import './Dashboard.css';
+import '../../styles/liquid-glass-theme.css';
 
 const { Content } = Layout;
 
@@ -116,7 +117,7 @@ const Dashboard = ({ dashboardMode = 'soldier', isTransitioning = false }) => {
     return () => {
       clearTimeout(connectingTimeout);
       dashboardService.stopPolling();
-      webSocketService.disconnect();
+      // WebSocket removed - using HTTP polling only
       if (window.electronAPI) {
         window.electronAPI.removeWebSocketListeners();
       }
@@ -129,8 +130,30 @@ const Dashboard = ({ dashboardMode = 'soldier', isTransitioning = false }) => {
   };
 
   const handleSettings = () => {
-    // TODO: Open settings modal
-    console.log('Settings clicked');
+    Modal.info({
+      title: 'Dashboard Settings',
+      width: 600,
+      content: (
+        <div>
+          <p><strong>Dashboard Configuration:</strong></p>
+          <ul>
+            <li>Backend URL: {process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:80'}</li>
+            <li>Polling Interval: 10 seconds</li>
+            <li>Auto-refresh: Enabled</li>
+            <li>Real-time Updates: HTTP Polling</li>
+          </ul>
+          <p><strong>Available Actions:</strong></p>
+          <ul>
+            <li>Individual EA Controls: Pause, Resume, Configure</li>
+            <li>Global Actions: Pause All, Resume All, Emergency Stop</li>
+            <li>Action Queue: Batch Commands</li>
+            <li>News Integration: Economic Calendar</li>
+          </ul>
+          <p><em>Advanced settings panel coming soon...</em></p>
+        </div>
+      ),
+      onOk() {}
+    });
   };
 
   const handleFullscreen = () => {
@@ -209,18 +232,8 @@ const Dashboard = ({ dashboardMode = 'soldier', isTransitioning = false }) => {
         actions.setNewsEvents([]);
       }
 
-      // Set up WebSocket service event handlers
-      setupWebSocketService();
-
-      // Try to connect to WebSocket server for real-time updates
-      try {
-        console.log('🔌 Connecting to WebSocket...');
-        await connectWebSocket();
-        console.log('✅ WebSocket connected successfully');
-      } catch (error) {
-        console.warn('⚠️ WebSocket connection failed:', error.message);
-        // Don't fail initialization due to WebSocket issues
-      }
+      // Using HTTP polling for real-time updates
+      console.log('🔄 Starting HTTP polling for real-time updates');
 
       // Start data polling as fallback/supplement
       const pollingInterval = isConnected ? 10000 : 30000;
@@ -236,89 +249,7 @@ const Dashboard = ({ dashboardMode = 'soldier', isTransitioning = false }) => {
     }
   };
 
-  const setupWebSocketService = () => {
-    // Set up WebSocket service event handlers
-    webSocketService.onConnectionChange = (isConnected) => {
-      console.log(` WebSocket connection change: ${isConnected ? 'Connected' : 'Disconnected'}`);
-      actions.setConnectionStatus(isConnected);
-      if (isConnected) {
-        actions.setConnectionError(null);
-      }
-    };
-
-    webSocketService.onMessage = (message) => {
-      // Use dashboard service to handle message updates
-      dashboardService.handleWebSocketUpdate(message);
-    };
-
-    webSocketService.onError = (error) => {
-      console.error('WebSocket error:', error);
-      const errorMessage = error?.message || 'WebSocket connection failed';
-
-      // Only set connection error if it's a critical error, not just disconnection
-      if (!errorMessage.includes('disconnected') && !errorMessage.includes('closed')) {
-        const helpfulMessage = `${errorMessage}
-
- Troubleshooting Steps:
-1. Ensure the WebSocket server is running:
-   → cd backend && python start_websocket.py
-   
-2. Check if port 8765 is available:
-   → The WebSocket server needs port 8765
-   
-3. Run system diagnostics:
-   → cd backend && python diagnose_system.py
-   
-4. See SYSTEM_STARTUP_GUIDE.md for detailed instructions`;
-
-        actions.setConnectionError(helpfulMessage);
-      }
-    };
-  };
-
-  const connectWebSocket = async () => {
-    try {
-      await webSocketService.connect(process.env.REACT_APP_WS_URL || 'ws://127.0.0.1:8765');
-
-      // Manually check and update connection status after successful connection
-      const status = webSocketService.getConnectionStatus();
-      if (status.isConnected) {
-        actions.setConnectionStatus(true);
-        console.log(' WebSocket connection confirmed and status updated');
-      }
-
-      // Subscribe to relevant message types
-      webSocketService.subscribe('ea_update', (data) => {
-        actions.updateEAData(data);
-      });
-
-      webSocketService.subscribe('portfolio_update', (data) => {
-        actions.setGlobalStats(data);
-      });
-
-      webSocketService.subscribe('news_update', (data) => {
-        actions.setNewsEvents(data);
-      });
-
-      webSocketService.subscribe('command_update', (data) => {
-        actions.updateCommand(data);
-      });
-
-      // Subscribe to price updates channel
-      console.log('📈 Subscribing to price_updates channel...');
-      webSocketService.sendMessage({
-        type: 'subscribe',
-        data: {
-          channels: ['price_updates']
-        }
-      });
-
-    } catch (error) {
-      console.warn('WebSocket connection failed, continuing with HTTP polling only:', error);
-      actions.setConnectionStatus(false);
-      // Don't throw - continue with polling fallback
-    }
-  };
+  // WebSocket functions removed - using HTTP polling for real-time updates
 
   // Debug logging
   console.log('Dashboard render state:', { connecting, connectionError, connected, eaData: eaData?.length });
@@ -356,7 +287,7 @@ const Dashboard = ({ dashboardMode = 'soldier', isTransitioning = false }) => {
               <span></span>
             </div>
             <div style={{ marginTop: '20px', fontSize: '12px', color: '#888' }}>
-              <div>API: {process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000'}</div>
+              <div>API: {API_BASE_URL}</div>
               <div>WebSocket: {process.env.REACT_APP_WS_URL || 'ws://127.0.0.1:8765'}</div>
               <div style={{ marginTop: '10px' }}>
                 If this takes too long, the dashboard will load with fallback data.
@@ -397,8 +328,12 @@ const Dashboard = ({ dashboardMode = 'soldier', isTransitioning = false }) => {
             </pre>
           </div>
           <button
-            className="glass-button-primary"
+            className="liquid-glass-button liquid-glass-button-primary liquid-glass-button-medium"
             onClick={initializeDashboard}
+            style={{
+              border: 'none',
+              cursor: 'pointer'
+            }}
           >
             Retry Connection
           </button>
@@ -586,7 +521,7 @@ const Dashboard = ({ dashboardMode = 'soldier', isTransitioning = false }) => {
                       </div>
                       <NewsEventPanel events={newsEvents || []} />
                     </div>
-                    <ExpertsPanel />
+                    <ExpertsPanel eaData={eaData || []} />
                   </div>
                 </div>
               </div>

@@ -68,7 +68,7 @@ python fix_and_start_system.py
 ```bash
 # Set environment variables
 export MT5_HOST=0.0.0.0
-export MT5_API_PORT=8000
+export MT5_API_PORT=80
 export MT5_WS_PORT=8765
 export MT5_AUTH_TOKEN=your_secure_token
 

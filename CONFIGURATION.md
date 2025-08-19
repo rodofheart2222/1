@@ -24,7 +24,7 @@ Set environment variables directly:
 
 ```bash
 export MT5_HOST=0.0.0.0
-export MT5_API_PORT=8000
+export MT5_API_PORT=80
 export MT5_WS_PORT=8765
 export MT5_AUTH_TOKEN=your_secure_token
 ```
@@ -34,7 +34,7 @@ export MT5_AUTH_TOKEN=your_secure_token
 Override config with command line arguments:
 
 ```bash
-python backend/start_complete_server.py --host 0.0.0.0 --port 8000 --ws-port 8765
+python backend/start_complete_server.py --host 0.0.0.0 --port 80 --ws-port 8765
 ```
 
 ## Configuration Variables
@@ -45,7 +45,7 @@ python backend/start_complete_server.py --host 0.0.0.0 --port 8000 --ws-port 876
 |----------|---------|-------------|
 | `MT5_HOST` | `0.0.0.0` | Server bind address (0.0.0.0 for all interfaces) |
 | `MT5_EXTERNAL_HOST` | `127.0.0.1` | External host for client connections |
-| `MT5_API_PORT` | `8000` (dev) / `80` (prod) | FastAPI server port |
+| `MT5_API_PORT` | `80` (dev) / `80` (prod) | FastAPI server port |
 | `MT5_WS_PORT` | `8765` | WebSocket server port |
 | `MT5_FRONTEND_PORT` | `3000` | Frontend development server port |
 
@@ -83,7 +83,7 @@ python backend/start_complete_server.py --host 0.0.0.0 --port 8000 --ws-port 876
 ENVIRONMENT=development
 MT5_HOST=0.0.0.0
 MT5_EXTERNAL_HOST=127.0.0.1
-MT5_API_PORT=8000
+MT5_API_PORT=80
 MT5_WS_PORT=8765
 MT5_FRONTEND_PORT=3000
 MT5_AUTH_TOKEN=dev_token_change_this
@@ -112,7 +112,7 @@ CORS_ORIGINS=https://your-frontend-domain.com,https://api.your-domain.com
 ENVIRONMENT=production
 MT5_HOST=0.0.0.0
 MT5_EXTERNAL_HOST=localhost
-MT5_API_PORT=8000
+MT5_API_PORT=80
 MT5_WS_PORT=8765
 MT5_AUTH_TOKEN=docker_secure_token
 MT5_DB_PATH=/app/data/mt5_dashboard.db
@@ -123,7 +123,7 @@ MT5_DB_PATH=/app/data/mt5_dashboard.db
 ### Before (Hardcoded)
 ```python
 # Old hardcoded approach
-host = "155.138.174.196"
+host = "127.0.0.1"
 port = 80
 ws_port = 8765
 auth_token = "dashboard_token_2024"
@@ -203,7 +203,7 @@ print(Config.get_all_config())
 
 1. **Check what's using the port**
 ```bash
-netstat -an | grep :8000
+netstat -an | grep :80
 ```
 
 2. **Change port in configuration**
@@ -231,7 +231,7 @@ cat frontend/.env
 2. **Verify API URL matches backend**
 ```bash
 # Should match your backend configuration
-REACT_APP_API_URL=http://127.0.0.1:8000
+REACT_APP_API_URL=http://127.0.0.1:80
 REACT_APP_WS_URL=ws://127.0.0.1:8765
 ```
 

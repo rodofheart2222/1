@@ -6,7 +6,7 @@ The TickerBar component has been updated to receive real-time MT5 price data via
 
 ## How It Works
 
-1. **WebSocket Connection**: The TickerBar connects to the backend WebSocket server at `ws://155.138.174.196:8765`
+1. **WebSocket Connection**: The TickerBar connects to the backend WebSocket server at `ws://127.0.0.1:8765`
 2. **Authentication**: Authenticates with token `dashboard_token`
 3. **Price Subscription**: Subscribes to price updates for major forex symbols
 4. **Real-time Updates**: Receives price updates and displays them with smooth animations
@@ -69,7 +69,7 @@ window.testPriceConsistency()
 
 The WebSocket connection can be configured in the TickerBar component:
 
-- **WebSocket URL**: `ws://155.138.174.196:8765`
+- **WebSocket URL**: `ws://127.0.0.1:8765`
 - **Auth Token**: `dashboard_token`
 - **Symbols**: Major forex pairs + Gold (XAUUSD)
 - **Update Frequency**: Real-time as data arrives

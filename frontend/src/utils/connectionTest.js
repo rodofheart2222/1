@@ -1,10 +1,10 @@
 /**
  * Connection Test Utility
- * Tests WebSocket and API connectivity
+ * Tests HTTP API connectivity for MT5 Dashboard
  */
 
-import webSocketService from '../services/webSocketService';
 import apiService from '../services/api';
+import { API_BASE_URL, API_ENDPOINTS } from '../config/api';
 
 export class ConnectionTester {
   constructor() {
@@ -75,23 +75,24 @@ export class ConnectionTester {
     }
   }
 
-  async testWebSocket() {
-    this.notifyUpdate('Testing WebSocket connection...', 'info');
+  async testMT5Integration() {
+    this.notifyUpdate('Testing MT5 integration...', 'info');
     
     try {
-      // Test connection
-      await webSocketService.connect();
+      // Test MT5 status endpoint
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.mt5Status}`);
       
-      if (webSocketService.isConnected) {
-        this.results.websocket = { status: 'success', message: 'WebSocket connected' };
-        this.notifyUpdate('✅ WebSocket connection successful', 'success');
+      if (response.ok) {
+        const data = await response.json();
+        this.results.mt5 = { status: 'success', message: 'MT5 integration working', data: data };
+        this.notifyUpdate('✅ MT5 integration successful', 'success');
       } else {
-        throw new Error('WebSocket connection failed');
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
     } catch (error) {
-      this.results.websocket = { status: 'error', message: error.message };
-      this.notifyUpdate(`❌ WebSocket test failed: ${error.message}`, 'error');
+      this.results.mt5 = { status: 'error', message: error.message };
+      this.notifyUpdate(`❌ MT5 integration test failed: ${error.message}`, 'error');
     }
   }
 
@@ -100,7 +101,7 @@ export class ConnectionTester {
     
     try {
       // Test chart data API
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000'}/api/ea/chart-data/EURUSD`);
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.chartData}/EURUSD`);
       
       if (response.ok) {
         const data = await response.json();
@@ -120,46 +121,29 @@ export class ConnectionTester {
     }
   }
 
-  async testRealTimeUpdates() {
-    this.notifyUpdate('Testing real-time updates...', 'info');
+  async testEADataUpdates() {
+    this.notifyUpdate('Testing EA data updates...', 'info');
     
-    return new Promise((resolve) => {
-      if (!webSocketService.isConnected) {
-        this.results.realTime = { status: 'error', message: 'WebSocket not connected' };
-        this.notifyUpdate('❌ Real-time test skipped: WebSocket not connected', 'error');
-        resolve();
-        return;
-      }
-
-      let receivedUpdates = false;
+    try {
+      // Test EA list endpoint for real-time data
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.eaList}`);
       
-      // Subscribe to price updates
-      const unsubscribe = webSocketService.subscribe('price_update', (data) => {
-        receivedUpdates = true;
+      if (response.ok) {
+        const data = await response.json();
         this.results.realTime = { 
           status: 'success', 
-          message: `Received updates for ${Object.keys(data).length} symbols`,
+          message: `Found ${data.length} EAs in system`,
           data: data
         };
-        this.notifyUpdate(`✅ Real-time updates working: ${Object.keys(data).length} symbols`, 'success');
-      });
-
-      // Subscribe to test symbols
-      webSocketService.subscribeToPrices(['EURUSD', 'GBPUSD', 'XAUUSD']);
-      this.notifyUpdate('Subscribed to test symbols, waiting for updates...', 'info');
-
-      // Wait for updates with timeout
-      setTimeout(() => {
-        unsubscribe();
-        
-        if (!receivedUpdates) {
-          this.results.realTime = { status: 'warning', message: 'No real-time updates received' };
-          this.notifyUpdate('⚠️ No real-time updates received within timeout', 'warning');
-        }
-        
-        resolve();
-      }, 5000); // 5 second timeout
-    });
+        this.notifyUpdate(`✅ EA data updates working: ${data.length} EAs found`, 'success');
+      } else {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+    } catch (error) {
+      this.results.realTime = { status: 'error', message: error.message };
+      this.notifyUpdate(`❌ EA data updates test failed: ${error.message}`, 'error');
+    }
   }
 
   getResults() {
@@ -188,19 +172,11 @@ export const connectionTester = new ConnectionTester();
 // Quick test functions
 export const quickAPITest = async () => {
   try {
-    await apiService.healthCheck();
-    return { success: true, message: 'API is reachable' };
-  } catch (error) {
-    return { success: false, message: error.message };
-  }
-};
-
-export const quickWebSocketTest = async () => {
-  try {
-    await webSocketService.connect();
+    const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.health}`);
+    const success = response.ok;
     return { 
-      success: webSocketService.isConnected, 
-      message: webSocketService.isConnected ? 'WebSocket connected' : 'WebSocket connection failed'
+      success, 
+      message: success ? 'Backend API connected' : 'Backend API connection failed'
     };
   } catch (error) {
     return { success: false, message: error.message };

@@ -38,7 +38,7 @@ def check_port(port):
 
 def main():
     """Check common ports"""
-    ports_to_check = [80, 8000, 8080, 3000, 8765]
+    ports_to_check = [80, 80, 8080, 3000, 8765]
     
     print("🔍 Checking port usage...")
     print("=" * 50)
@@ -50,7 +50,7 @@ def main():
     print("\n" + "=" * 50)
     print("💡 Recommendations:")
     print("- If port 80 is used by IIS/Apache, you can stop those services")
-    print("- Or use port 8000 for development (type 'Y' when prompted)")
+    print("- Or use port 80 for development (type 'Y' when prompted)")
     print("- Port 8765 should be free for WebSocket server")
 
 if __name__ == "__main__":

@@ -29,7 +29,11 @@ class WebSocketServer:
         except ImportError:
             # Fallback if config not available
             self.host = host or "0.0.0.0"
-            self.port = port or 8765
+            try:
+                from backend.config.urls import WS_PORT
+            except ImportError:
+                from config.urls import WS_PORT
+            self.port = port or WS_PORT
             self.auth_token = auth_token or "dashboard_token_2024"
         
         # Connected clients
@@ -586,7 +590,11 @@ if __name__ == "__main__":
         default_token = Config.get_auth_token()
     except ImportError:
         default_host = "0.0.0.0"
-        default_port = 8765
+        try:
+            from backend.config.urls import WS_PORT
+        except ImportError:
+            from config.urls import WS_PORT
+        default_port = WS_PORT
         default_token = "dashboard_token_2024"
     
     parser = argparse.ArgumentParser(description="WebSocket Server for MT5 Dashboard")

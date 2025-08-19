@@ -121,12 +121,12 @@ python simulate_ea_responses.py --magic 12345 --symbol EURUSD
 After starting the system, you can check:
 
 ### API Documentation
-- http://127.0.0.1:8000/docs (development)
+- http://127.0.0.1:80/docs (development)
 - http://your-server:80/docs (production)
 
 ### Health Endpoints
-- http://127.0.0.1:8000/health (development)
-- http://127.0.0.1:8000/api/system/health (development)
+- http://127.0.0.1:80/health (development)
+- http://127.0.0.1:80/api/system/health (development)
 
 ### WebSocket Connection
 - ws://127.0.0.1:8765 (development)

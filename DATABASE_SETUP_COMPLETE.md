@@ -28,13 +28,13 @@ The MT5 Dashboard system has been successfully configured with a properly workin
 - **Node.js Dependencies**: Installed with `npm install --legacy-peer-deps`
 - **Build Process**: Verified working
 - **Environment Configuration**: `.env` file created pointing to backend
-- **API Service**: Configured to connect to backend at `http://localhost:8000`
+- **API Service**: Configured to connect to backend at `http://localhost:80`
 
 ### 4. Environment Configuration
 - **Root `.env`**: Created from `.env.example` with development settings
-- **Frontend `.env`**: Created with `REACT_APP_API_URL=http://localhost:8000`
+- **Frontend `.env`**: Created with `REACT_APP_API_URL=http://localhost:80`
 - **Database Path**: Configured as `data/mt5_dashboard.db`
-- **Ports**: Backend (8000), Frontend (3000), WebSocket (8765)
+- **Ports**: Backend (80), Frontend (3000), WebSocket (8765)
 
 ## 📊 Database Statistics
 ```
@@ -104,7 +104,7 @@ active_trades: 0
    ```bash
    cd backend
    source ../venv/bin/activate
-   PORT=8000 HOST=0.0.0.0 ENVIRONMENT=development python main.py
+   PORT=80 HOST=0.0.0.0 ENVIRONMENT=development python main.py
    ```
 
 2. **Start Frontend** (in new terminal):
@@ -115,8 +115,8 @@ active_trades: 0
 
 3. **Access Application**:
    - Frontend: http://localhost:3000
-   - Backend API: http://localhost:8000
-   - API Docs: http://localhost:8000/docs
+   - Backend API: http://localhost:80
+   - API Docs: http://localhost:80/docs
 
 ### Option 2: Full System Script
 ```bash

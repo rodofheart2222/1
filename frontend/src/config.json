@@ -1,0 +1,76 @@
+{
+  "backend": {
+    "host": "127.0.0.1",
+    "port": 80,
+    "base_url": "http://127.0.0.1:80"
+  },
+  "frontend": {
+    "dev": {
+      "host": "127.0.0.1", 
+      "port": 3000,
+      "url": "http://127.0.0.1:3000"
+    },
+    "prod": {
+      "host": "127.0.0.1",
+      "port": 80, 
+      "url": "http://127.0.0.1:80"
+    }
+  },
+  "websocket": {
+    "host": "127.0.0.1",
+    "port": 8765,
+    "url": "ws://127.0.0.1:8765"
+  },
+  "cors": {
+    "development": [
+      "http://127.0.0.1:3000",
+      "http://127.0.0.1:3001",
+      "http://127.0.0.1:80",
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://localhost:80", 
+      "file://*",
+      "app://*"
+    ],
+    "production": [
+      "https://*.railway.app",
+      "https://*.up.railway.app"
+    ]
+  },
+  "external_apis": {
+    "news": {
+      "base_url": "https://api.forexfactory.com",
+      "calendar_endpoint": "/calendar",
+      "full_url": "https://api.forexfactory.com/calendar"
+    }
+  },
+  "api": {
+    "timeout": 15000,
+    "endpoints": {
+      "health": "/health",
+      "ea_status": "/api/ea/status/all",
+      "ea_list": "/api/ea/list",
+      "mt5_status": "/api/mt5/status",
+      "news_events": "/api/news/events/upcoming",
+      "chart_data": "/api/ea/chart-data"
+    }
+  },
+  "database": {
+    "path": "data/mt5_dashboard.db",
+    "data_dir": "data",
+    "logs_dir": "logs"
+  },
+  "environment": {
+    "variables": {
+      "REACT_APP_API_URL": "Backend API URL override",
+      "REACT_APP_WS_URL": "WebSocket URL override", 
+      "HOST": "Backend host override",
+      "PORT": "Backend port override",
+      "WS_HOST": "WebSocket host override",
+      "WS_PORT": "WebSocket port override",
+      "CORS_ORIGINS": "CORS origins override (comma-separated)",
+      "NEWS_API_URL": "News API URL override",
+      "DATABASE_PATH": "Database path override"
+    }
+  }
+}

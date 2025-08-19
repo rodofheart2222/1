@@ -130,9 +130,9 @@ This document summarizes the changes made to remove mock data and implement real
 ### Frontend Testing
 ```bash
 # Test real data endpoints
-curl http://155.138.174.196:8000/api/ea/current-prices
-curl http://155.138.174.196:8000/api/news/events/upcoming
-curl http://155.138.174.196:8000/api/ea/status/all
+curl http://127.0.0.1:80/api/ea/current-prices
+curl http://127.0.0.1:80/api/news/events/upcoming
+curl http://155.138.174.196:80/api/ea/status/all
 ```
 
 ### WebSocket Testing

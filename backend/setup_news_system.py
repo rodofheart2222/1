@@ -124,7 +124,12 @@ def test_news_api():
         import requests
         import json
         
-        base_url = "http://155.138.174.196:8000"
+        # Import central URL configuration
+        try:
+            from backend.config.urls import BACKEND_BASE_URL
+        except ImportError:
+            from config.urls import BACKEND_BASE_URL
+        base_url = BACKEND_BASE_URL
         
         endpoints = [
             "/api/news/events/today",

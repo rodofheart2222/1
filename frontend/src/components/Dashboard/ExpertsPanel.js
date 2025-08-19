@@ -1,49 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Spin, Alert, List, Badge, Tag, Statistic, Row, Col, Tooltip } from 'antd';
+import React from 'react';
+import { Alert, List, Badge, Tag, Row, Col, Tooltip } from 'antd';
 import {
   RobotOutlined,
-  PlayCircleOutlined,
-  PauseCircleOutlined,
   DollarOutlined,
-  BarChartOutlined,
-  TrophyOutlined,
-  WarningOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined
+  BarChartOutlined
 } from '@ant-design/icons';
-import apiService from '../../services/api';
 import './ExpertsPanel.css';
 
-const ExpertsPanel = () => {
-  const [eaData, setEaData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    fetchEAData();
-    // Refresh EA data every 15 seconds
-    const interval = setInterval(fetchEAData, 15000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchEAData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await apiService.getAllEAStatus();
-      
-      if (response && response.eas) {
-        setEaData(response.eas);
-      } else {
-        throw new Error('Failed to fetch EA data');
-      }
-    } catch (err) {
-      console.error('Error fetching EA data:', err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+const ExpertsPanel = ({ eaData = [] }) => {
+  // Now uses eaData prop from parent Dashboard component instead of independent API calls
 
   const formatCurrency = (value) => {
     if (value === null || value === undefined) return 'N/A';
@@ -99,28 +64,7 @@ const ExpertsPanel = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="experts-panel-loading">
-        <Spin size="large" />
-        <div style={{ marginTop: '12px', color: '#888', fontSize: '12px' }}>
-          Loading Expert Advisors...
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <Alert
-        message="Expert Advisors Unavailable"
-        description={error}
-        type="warning"
-        showIcon
-        style={{ margin: '16px 0' }}
-      />
-    );
-  }
+  // Loading and error states are now handled by parent Dashboard component
 
   if (!eaData || eaData.length === 0) {
     return (

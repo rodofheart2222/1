@@ -44,33 +44,15 @@ app.include_router(simple_backtest_router)
 app.include_router(trade_router)
 app.include_router(mt5_router)
 
-# Add CORS middleware
+# Add CORS middleware - Configuration loaded from central config.json
 import os
-cors_origins = os.getenv("CORS_ORIGINS", "http://155.138.174.196:3000,http://155.138.174.196:8000,http://127.0.0.1:8000").split(",")
+try:
+    from backend.config.central_config import CORS_ORIGINS, should_allow_all_cors
+except ImportError:
+    from config.central_config import CORS_ORIGINS, should_allow_all_cors
 
-# Add Railway domains if in production
-if os.getenv("RAILWAY_ENVIRONMENT"):
-    cors_origins.extend([
-        "https://*.railway.app",
-        "https://*.up.railway.app"
-    ])
-
-# In development, be more permissive with CORS
-if os.getenv("ENVIRONMENT", "development") == "development":
-    cors_origins.extend([
-        "http://155.138.174.196:3000",
-        "http://155.138.174.196:8000", 
-        "http://155.138.174.196:80",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:8000",
-        "http://localhost:3000",
-        "http://localhost:8000",
-        "file://*",  # For Electron
-        "app://*",   # For Electron
-    ])
-
-# Always allow all origins in development for easier debugging
-allow_all_origins = os.getenv("ENVIRONMENT", "development") == "development"
+cors_origins = CORS_ORIGINS
+allow_all_origins = should_allow_all_cors()
 
 app.add_middleware(
     CORSMiddleware,
@@ -106,23 +88,55 @@ async def startup_event():
         print(" Continuing without database - using mock data")
     
     print(" Backend startup complete")
-    print(f" WebSocket server should be started separately on port {8765}")
-    print(f" API documentation available at: http://155.138.174.196:80/docs")
+    try:
+        from backend.config.central_config import WS_PORT, get_docs_url
+    except ImportError:
+        from config.central_config import WS_PORT, get_docs_url
+    print(f" WebSocket server should be started separately on port {WS_PORT}")
+    print(f" API documentation available at: {get_docs_url()}")
+    print(" All configuration loaded from central config.json")
 
 @app.options("/{path:path}")
 async def options_handler(path: str):
     """Handle all OPTIONS requests explicitly"""
-    return {"message": "OK"}
+    from fastapi import Response
+    response = Response()
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Max-Age"] = "3600"
+    return response
 
 @app.get("/")
 async def root():
     """Health check endpoint"""
     return {"message": "MT5 COC Dashboard Backend is running"}
 
+@app.post("/")
+async def root_post():
+    """Handle POST requests to root endpoint (likely from MT5 EAs)"""
+    return {
+        "message": "MT5 COC Dashboard Backend is running", 
+        "note": "For EA registration, use POST /api/ea/register",
+        "endpoints": {
+            "ea_register": "/api/ea/register",
+            "ea_status": "/api/ea/status",
+            "ea_commands": "/api/ea/commands/{magic_number}"
+        }
+    }
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "service": "mt5-coc-dashboard"}
+
+@app.get("/favicon.ico")
+async def favicon():
+    """Handle favicon requests to prevent 405 errors"""
+    from fastapi import Response
+    # Return empty 204 response for favicon to prevent errors
+    return Response(status_code=204)
 
 @app.get("/api/system/health")
 async def system_health():
@@ -170,9 +184,14 @@ async def system_health():
 if __name__ == "__main__":
     import os
     
-    # Get port from environment variable (Railway sets this)
-    port = int(os.getenv("PORT", 80))
-    host = os.getenv("HOST", "155.138.174.196")  # Railway requires 0.0.0.0
+    # Get host and port from central configuration (config.json)
+    try:
+        from backend.config.central_config import BACKEND_HOST, BACKEND_PORT
+    except ImportError:
+        from config.central_config import BACKEND_HOST, BACKEND_PORT
+    
+    host = BACKEND_HOST
+    port = BACKEND_PORT
     
     # Disable reload in production
     reload = os.getenv("ENVIRONMENT", "development") == "development"

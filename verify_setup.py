@@ -191,7 +191,7 @@ def generate_startup_instructions():
     print("1. Start Backend:")
     print("   cd backend")
     print("   source ../venv/bin/activate")
-    print("   PORT=8000 HOST=0.0.0.0 ENVIRONMENT=development python main.py")
+    print("   PORT=80 HOST=0.0.0.0 ENVIRONMENT=development python main.py")
     print()
     
     print("2. Start Frontend (in a new terminal):")
@@ -201,8 +201,8 @@ def generate_startup_instructions():
     
     print("3. Access the application:")
     print("   Frontend: http://localhost:3000")
-    print("   Backend API: http://localhost:8000")
-    print("   API Docs: http://localhost:8000/docs")
+    print("   Backend API: http://localhost:80")
+    print("   API Docs: http://localhost:80/docs")
     print()
     
     print("4. Alternative: Use the full system script:")

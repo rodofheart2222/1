@@ -159,6 +159,88 @@ async def get_todays_news_events(
         return _get_mock_todays_events(impact_levels)
 
 
+@router.get("/config/impact-levels")
+async def get_impact_levels():
+    """Get available impact levels configuration"""
+    try:
+        return {
+            "success": True,
+            "impact_levels": [
+                {"value": "high", "label": "High Impact", "color": "#ff4d99"},
+                {"value": "medium", "label": "Medium Impact", "color": "#faad14"},
+                {"value": "low", "label": "Low Impact", "color": "#00d4ff"}
+            ],
+            "source": "config"
+        }
+    except Exception as e:
+        logging.error(f"Error fetching impact levels: {e}")
+        return {
+            "success": False,
+            "error": str(e),
+            "impact_levels": []
+        }
+
+
+@router.get("/blackout/status")
+async def get_blackout_status(
+    symbols: Optional[str] = Query(default=None, description="Comma-separated symbols to check")
+):
+    """Get current blackout status for symbols"""
+    try:
+        if not symbols:
+            return {
+                "success": False,
+                "error": "No symbols provided",
+                "blackout_status": {}
+            }
+        
+        symbol_list = symbols.split(',')
+        blackout_status = {}
+        
+        if not NEWS_SERVICE_AVAILABLE or not news_filter:
+            # Mock data fallback
+            now = datetime.now()
+            minutes_since_midnight = (now.hour * 60) + now.minute
+            is_in_blackout = (minutes_since_midnight % 360) < 30  # 30 minutes every 6 hours
+            
+            for symbol in symbol_list:
+                blackout_status[symbol.strip()] = {
+                    "is_blackout": is_in_blackout,
+                    "active_events": 1 if is_in_blackout else 0,
+                    "next_event_time": (now + timedelta(minutes=30)).isoformat() if not is_in_blackout else None,
+                    "current_event": {
+                        "description": "Federal Reserve Rate Decision",
+                        "impact_level": "high",
+                        "currency": "USD"
+                    } if is_in_blackout else None
+                }
+        else:
+            # Use real news service
+            for symbol in symbol_list:
+                trading_status = news_filter.check_trading_allowed(symbol.strip())
+                blackout_status[symbol.strip()] = {
+                    "is_blackout": not trading_status.get("trading_allowed", True),
+                    "active_events": len(trading_status.get("active_restrictions", [])),
+                    "active_restrictions": trading_status.get("active_restrictions", []),
+                    "highest_impact_level": trading_status.get("highest_impact_level")
+                }
+        
+        return {
+            "success": True,
+            "blackout_status": blackout_status,
+            "check_time": datetime.now().isoformat(),
+            "source": "news_service" if NEWS_SERVICE_AVAILABLE else "mock_fallback"
+        }
+        
+    except Exception as e:
+        logging.error(f"Error checking blackout status: {e}")
+        return {
+            "success": False,
+            "error": str(e),
+            "blackout_status": {}
+        }
+
+
 @router.post("/events/refresh")
 async def refresh_news_events():
     """Manually refresh news events from external API"""

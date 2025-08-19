@@ -8,6 +8,7 @@ import {
   BugOutlined,
   QuestionCircleOutlined
 } from '@ant-design/icons';
+import '../../styles/liquid-glass-theme.css';
 
 const FloatingActionButton = ({ onRefresh, onSettings, onFullscreen, onDebug, onHelp }) => {
   const [drawerVisible, setDrawerVisible] = useState(false);
@@ -53,12 +54,8 @@ const FloatingActionButton = ({ onRefresh, onSettings, onFullscreen, onDebug, on
   return (
     <>
       <Tooltip title="Quick Actions" placement="left">
-        <Button
-          type="primary"
-          shape="circle"
-          size="large"
-          icon={<PlusOutlined />}
-          className="floating-action-btn glass-button"
+        <button
+          className="liquid-glass-button liquid-glass-button-primary"
           onClick={() => setDrawerVisible(true)}
           style={{
             position: 'fixed',
@@ -67,17 +64,22 @@ const FloatingActionButton = ({ onRefresh, onSettings, onFullscreen, onDebug, on
             width: 56,
             height: 56,
             zIndex: 1000,
-            background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)',
+            borderRadius: '50%',
+            fontSize: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             border: 'none',
-            boxShadow: '0 8px 24px rgba(0, 212, 255, 0.4)',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+            cursor: 'pointer'
           }}
-        />
+        >
+          <PlusOutlined />
+        </button>
       </Tooltip>
 
       <Drawer
         title={
-          <div style={{ color: '#ffffff', fontWeight: 'bold' }}>
+          <div style={{ color: 'var(--lg-content)', fontWeight: 'bold' }}>
             Quick Actions
           </div>
         }
@@ -85,20 +87,28 @@ const FloatingActionButton = ({ onRefresh, onSettings, onFullscreen, onDebug, on
         width={300}
         onClose={() => setDrawerVisible(false)}
         open={drawerVisible}
-        className="glass-drawer"
-        style={{
-          background: 'rgba(20, 20, 20, 0.95)',
-          backdropFilter: 'blur(20px)'
+        className="liquid-glass-panel"
+        bodyStyle={{
+          padding: '16px',
+          background: 'color-mix(in srgb, var(--lg-glass) 10%, transparent)',
+          backdropFilter: 'blur(12px) saturate(var(--lg-saturation))',
+          WebkitBackdropFilter: 'blur(12px) saturate(var(--lg-saturation))',
+          color: 'var(--lg-content)',
+          border: 'none'
+        }}
+        headerStyle={{
+          background: 'color-mix(in srgb, var(--lg-glass) 15%, transparent)',
+          backdropFilter: 'blur(12px) saturate(var(--lg-saturation))',
+          WebkitBackdropFilter: 'blur(12px) saturate(var(--lg-saturation))',
+          color: 'var(--lg-content)',
+          borderBottom: '1px solid color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 8%), transparent)'
         }}
       >
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           {actions.map(action => (
-            <Button
+            <button
               key={action.key}
-              type="default"
-              size="large"
-              icon={action.icon}
-              className="glass-button"
+              className="liquid-glass-button liquid-glass-button-medium"
               onClick={() => {
                 action.onClick?.();
                 setDrawerVisible(false);
@@ -106,23 +116,20 @@ const FloatingActionButton = ({ onRefresh, onSettings, onFullscreen, onDebug, on
               style={{
                 width: '100%',
                 height: '48px',
+                fontSize: '14px',
+                fontWeight: '500',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'flex-start',
                 gap: '12px',
-                background: `rgba(${action.color === '#52c41a' ? '82, 196, 26' : 
-                  action.color === '#1890ff' ? '24, 144, 255' :
-                  action.color === '#722ed1' ? '114, 46, 209' :
-                  action.color === '#fa8c16' ? '250, 140, 22' :
-                  '19, 194, 194'}, 0.1)`,
-                border: `1px solid ${action.color}40`,
-                color: '#ffffff'
+                '--lg-action': action.color,
+                border: 'none',
+                cursor: 'pointer'
               }}
             >
-              <span style={{ fontSize: '14px', fontWeight: '500' }}>
-                {action.label}
-              </span>
-            </Button>
+              {action.icon}
+              <span>{action.label}</span>
+            </button>
           ))}
         </Space>
       </Drawer>

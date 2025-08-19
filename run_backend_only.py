@@ -39,7 +39,7 @@ class BackendRunner:
         except ImportError:
             # Fallback to defaults
             self.host = host or "127.0.0.1"
-            self.backend_port = backend_port or 8000
+            self.backend_port = backend_port or 80
             self.ws_port = ws_port or 8765
         self.backend_process = None
         self.running = False
@@ -198,7 +198,7 @@ class BackendRunner:
             logger.info(f"🔌 WebSocket: ws://{self.host}:{self.ws_port}")
             logger.info("=" * 80)
             logger.info("💡 To test WebSocket: python test_websocket.py")
-            logger.info("💡 To test API: python quick_test_8000.py")
+            logger.info("💡 To test API: python quick_test_80.py")
             logger.info("Press Ctrl+C to stop")
             logger.info("=" * 80)
             
@@ -231,8 +231,8 @@ class BackendRunner:
 async def main():
     """Main function"""
     parser = argparse.ArgumentParser(description='Backend Only Runner')
-    parser.add_argument('--host', default='155.138.174.196', help='Host')
-    parser.add_argument('--backend-port', type=int, default=8000, help='Backend port')
+    parser.add_argument('--host', default='127.0.0.1', help='Host')
+    parser.add_argument('--backend-port', type=int, default=80, help='Backend port')
     parser.add_argument('--ws-port', type=int, default=8765, help='WebSocket port')
     
     args = parser.parse_args()

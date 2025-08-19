@@ -334,36 +334,7 @@ class DashboardService {
     }
   }
 
-  /**
-   * Handle WebSocket message updates
-   */
-  handleWebSocketUpdate(message) {
-    if (!this.actions) return;
-    
-    // Check if message exists and has a type property
-    if (!message || typeof message !== 'object' || !message.type) {
-      console.warn('Invalid WebSocket message received:', message);
-      return;
-    }
-
-    switch (message.type) {
-      case 'ea_update':
-        this.actions.updateEAData(message.data);
-        break;
-      case 'portfolio_update':
-        this.actions.setGlobalStats(message.data);
-        break;
-      case 'news_update':
-        const newsEvents = message.data?.events || message.data || [];
-        this.actions.setNewsEvents(newsEvents);
-        break;
-      case 'command_update':
-        this.actions.updateCommand(message.data);
-        break;
-      default:
-        console.log('Unknown WebSocket message type:', message.type);
-    }
-  }
+  // WebSocket removed - using HTTP API polling for real-time updates
 
   /**
    * Add update callback

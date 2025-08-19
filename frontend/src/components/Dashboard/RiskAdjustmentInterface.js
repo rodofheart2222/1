@@ -8,6 +8,7 @@ import {
   SaveOutlined,
   ReloadOutlined
 } from '@ant-design/icons';
+import apiService from '../../services/api';
 
 const { Option } = Select;
 const { confirm } = Modal;
@@ -133,6 +134,23 @@ const RiskAdjustmentInterface = ({ eaData = [], onRiskAdjust, viewMode = 'summar
     }
   };
 
+  const getAffectedEAs = () => {
+    if (targetScope === 'all') return eaData;
+    
+    const [type, value] = targetScope.split(':');
+    
+    switch (type) {
+      case 'symbol':
+        return eaData.filter(ea => ea.symbol === value);
+      case 'strategy':
+        return eaData.filter(ea => ea.strategy_tag === value);
+      case 'risk':
+        return eaData.filter(ea => (ea.risk_config || 'default') === value);
+      default:
+        return [];
+    }
+  };
+
   const getCurrentValues = () => {
     if (targetScope === 'all') {
       // Calculate average for all EAs
@@ -204,21 +222,62 @@ const RiskAdjustmentInterface = ({ eaData = [], onRiskAdjust, viewMode = 'summar
       onOk: async () => {
         setLoading(true);
         try {
-          const command = {
-            type: 'risk_adjustment',
-            adjustment_type: adjustmentType,
-            target_scope: targetScope,
-            adjustment_value: adjustmentValue,
-            adjustment_mode: adjustmentMode,
-            final_value: finalValue,
-            apply_immediately: applyImmediately,
-            affected_count: affectedCount,
-            timestamp: new Date().toISOString()
-          };
-
-          await onRiskAdjust(command);
+          // Get affected EAs
+          const affectedEAs = getAffectedEAs();
           
-          message.success(`Risk adjustment queued for ${affectedCount} EAs`);
+          // Execute risk adjustment immediately on each affected EA
+          const results = [];
+          for (const ea of affectedEAs) {
+            try {
+              await apiService.sendEACommand(ea.magic_number, {
+                command: 'adjust_risk',
+                parameters: {
+                  adjustment_type: adjustmentType,
+                  adjustment_value: adjustmentValue,
+                  adjustment_mode: adjustmentMode,
+                  final_value: finalValue,
+                  apply_immediately: applyImmediately,
+                  reason: `Risk Adjustment: ${selectedType.label}`,
+                  timestamp: new Date().toISOString()
+                },
+                instance_uuid: ea.instance_uuid
+              });
+              results.push({ ea: ea.magic_number, status: 'success' });
+            } catch (error) {
+              console.error(`Failed to send risk adjustment to EA ${ea.magic_number}:`, error);
+              results.push({ ea: ea.magic_number, status: 'failed', error: error.message });
+            }
+          }
+          
+          // Report results
+          const successful = results.filter(r => r.status === 'success').length;
+          const failed = results.filter(r => r.status === 'failed').length;
+          
+          if (failed === 0) {
+            message.success(`Risk adjustment executed successfully on ${successful} EA(s)`);
+          } else if (successful === 0) {
+            message.error(`Failed to execute risk adjustment on all ${failed} EA(s)`);
+          } else {
+            message.warning(`Risk adjustment executed on ${successful} EA(s), failed on ${failed} EA(s)`);
+          }
+          
+          // Also add to queue for tracking
+          if (onRiskAdjust) {
+            const command = {
+              type: 'risk_adjustment',
+              adjustment_type: adjustmentType,
+              target_scope: targetScope,
+              adjustment_value: adjustmentValue,
+              adjustment_mode: adjustmentMode,
+              final_value: finalValue,
+              apply_immediately: applyImmediately,
+              affected_count: affectedCount,
+              status: 'completed',
+              results: results,
+              timestamp: new Date().toISOString()
+            };
+            await onRiskAdjust(command);
+          }
           
         } catch (error) {
           message.error('Failed to apply risk adjustment: ' + error.message);

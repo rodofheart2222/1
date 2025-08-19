@@ -1,10 +1,19 @@
+/* Import Liquid Glass Theme */
+@import '../../styles/liquid-glass-theme.css';
+
 .experts-panel {
-  background: #111111;
-  border: 1px solid #1A1A1A;
+  background: color-mix(in srgb, var(--lg-glass) 2%, transparent);
+  backdrop-filter: blur(12px) saturate(var(--lg-saturation));
+  -webkit-backdrop-filter: blur(12px) saturate(var(--lg-saturation));
+  border: 1px solid color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 8%), transparent);
   border-radius: 8px;
   padding: 20px;
-  color: #E0E0E0;
+  color: var(--lg-content);
   font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  box-shadow: 
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 5%), transparent),
+    0 4px 12px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 12%), transparent), 
+    0 12px 32px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 8%), transparent);
 }
 
 .experts-panel-header {
@@ -41,15 +50,19 @@
 }
 
 .stat-card {
-  background: linear-gradient(135deg, #1A1A1A 0%, #222222 100%);
-  border: 1px solid #333333;
+  background: color-mix(in srgb, var(--lg-glass) 1%, transparent);
+  backdrop-filter: blur(8px) saturate(var(--lg-saturation));
+  -webkit-backdrop-filter: blur(8px) saturate(var(--lg-saturation));
+  border: 1px solid color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 6%), transparent);
   border-radius: 6px;
   padding: 12px;
   display: flex;
   align-items: center;
   gap: 10px;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all var(--lg-transition);
+  box-shadow: 
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 3%), transparent),
+    0 2px 8px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 8%), transparent);
 }
 
 .stat-card:hover {
@@ -88,27 +101,41 @@
 }
 
 .ea-list {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid #1A1A1A;
+  background: color-mix(in srgb, var(--lg-glass) 1%, transparent);
+  backdrop-filter: blur(6px) saturate(var(--lg-saturation));
+  -webkit-backdrop-filter: blur(6px) saturate(var(--lg-saturation));
+  border: 1px solid color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 6%), transparent);
   border-radius: 6px;
   padding: 8px;
   max-height: 400px;
   overflow-y: auto;
+  box-shadow: 
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 3%), transparent),
+    0 2px 8px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 8%), transparent);
 }
 
 .ea-list-item {
-  background: linear-gradient(135deg, #1A1A1A 0%, #222222 100%);
-  border: 1px solid #333333;
+  background: color-mix(in srgb, var(--lg-glass) 1%, transparent);
+  backdrop-filter: blur(6px) saturate(var(--lg-saturation));
+  -webkit-backdrop-filter: blur(6px) saturate(var(--lg-saturation));
+  border: 1px solid color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 6%), transparent);
   border-radius: 6px;
   margin-bottom: 8px;
   padding: 12px !important;
-  transition: all 0.2s ease;
+  transition: all var(--lg-transition);
   cursor: pointer;
+  box-shadow: 
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 3%), transparent),
+    0 2px 8px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 6%), transparent);
 }
 
 .ea-list-item:hover {
-  border-color: #1565C0;
-  box-shadow: 0 4px 12px rgba(21, 101, 192, 0.2);
+  background: color-mix(in srgb, var(--lg-glass) 3%, transparent);
+  border-color: color-mix(in srgb, var(--lg-action) 60%, transparent);
+  box-shadow: 
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-light) calc(var(--lg-glass-reflex-light) * 8%), transparent),
+    0 4px 12px color-mix(in srgb, var(--lg-action) 20%, transparent),
+    0 8px 24px color-mix(in srgb, var(--lg-dark) calc(var(--lg-glass-reflex-dark) * 12%), transparent);
   transform: translateY(-1px);
 }
 

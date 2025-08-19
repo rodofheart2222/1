@@ -13,7 +13,7 @@ python3 start.py
 ## What You Get
 
 - ✅ **Automatic Database Setup** - SQLite database with all tables and migrations
-- ✅ **Backend API Server** - FastAPI server on http://127.0.0.1:8000
+- ✅ **Backend API Server** - FastAPI server on http://127.0.0.1:80
 - ✅ **Frontend Dashboard** - React app on http://localhost:3000  
 - ✅ **Dependency Installation** - All Python and Node.js packages
 - ✅ **Environment Configuration** - All environment variables set

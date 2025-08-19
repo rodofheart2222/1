@@ -2,7 +2,7 @@
 """
 Complete MT5 COC Dashboard Startup
 Usage: python main.py [URL]
-Example: python main.py http://155.38.174.196:3000
+Example: python main.py http://127.0.0.1:3000
 """
 
 import sys
@@ -21,7 +21,16 @@ def parse_url(url):
         url = 'http://' + url
     
     parsed = urlparse(url)
-    host = parsed.hostname or '155.38.174.196'
+    # Load from central configuration
+    try:
+        import json
+        with open('frontend/src/config.json', 'r') as f:
+            config_data = json.load(f)
+        default_host = config_data.get('backend', {}).get('host', '127.0.0.1')
+    except:
+        default_host = '127.0.0.1'
+    
+    host = parsed.hostname or default_host
     frontend_port = parsed.port or 3000
     
     return host, frontend_port
@@ -68,9 +77,9 @@ class MT5DashboardManager:
             self.ws_port = ws_port or Config.get_ws_port()
             self.frontend_port = frontend_port or Config.get_frontend_port()
         except ImportError:
-            # Fallback to defaults
+            # Fallback to defaults (use same values as centralized config)
             self.host = host or "127.0.0.1"
-            self.api_port = api_port or 8000
+            self.api_port = api_port or 80  # Changed to match centralized config
             self.ws_port = ws_port or 8765
             self.frontend_port = frontend_port or 3000
         
@@ -276,13 +285,27 @@ async def main():
         url = sys.argv[1]
         host, frontend_port = parse_url(url)
     else:
-        host = '155.38.174.196'
-        frontend_port = 3000
+        # Load from central configuration
+        try:
+            import json
+            with open('frontend/src/config.json', 'r') as f:
+                config_data = json.load(f)
+            host = config_data.get('backend', {}).get('host', '127.0.0.1')
+            frontend_port = config_data.get('frontend', {}).get('dev', {}).get('port', 3000)
+        except:
+            host = '127.0.0.1'
+            frontend_port = 3000
     
-    # Backend API port (usually 80 or 8000)
-    api_port = 80
-    # WebSocket port
-    ws_port = 8765
+    # Load ports from central configuration
+    try:
+        import json
+        with open('frontend/src/config.json', 'r') as f:
+            config_data = json.load(f)
+        api_port = config_data.get('backend', {}).get('port', 80)
+        ws_port = config_data.get('websocket', {}).get('port', 8765)
+    except:
+        api_port = 80
+        ws_port = 8765
     
     # Register signal handlers
     signal.signal(signal.SIGINT, signal_handler)

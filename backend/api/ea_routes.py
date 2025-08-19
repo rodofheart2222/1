@@ -2,7 +2,7 @@
 EA Communication Routes
 Handles communication between Soldier EAs and COC Dashboard
 """
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Query, UploadFile, File, Form
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Query, UploadFile, File, Form, Request
 from pydantic import BaseModel
 from typing import Dict, List, Optional, Any
 from datetime import datetime
@@ -12,20 +12,12 @@ import os
 import tempfile
 import logging
 from pathlib import Path
+from urllib.parse import parse_qsl
 
 logger = logging.getLogger(__name__)
 
-# Import WebSocket server for real-time updates
-try:
-    from backend.services.websocket_server import get_websocket_server
-    WEBSOCKET_AVAILABLE = True
-except ImportError:
-    try:
-        from services.websocket_server import get_websocket_server
-        WEBSOCKET_AVAILABLE = True
-    except ImportError:
-        WEBSOCKET_AVAILABLE = False
-        print("️ WebSocket server not available - real-time updates disabled")
+# Real-time updates via HTTP API polling only
+WEBSOCKET_AVAILABLE = False
 
 # Import price service for chart data
 try:
@@ -63,7 +55,11 @@ router = APIRouter(prefix="/api/ea", tags=["EA Communication"])
 def get_db_connection():
     """Get database connection with proper error handling"""
     try:
-        db_path = os.getenv("DATABASE_PATH", "data/mt5_dashboard.db")
+        # Import centralized database path
+        from ..config.central_config import DATABASE_PATH
+        db_path = DATABASE_PATH
+        logger.info(f"Using database path: {db_path}")
+        
         # Ensure directory exists
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         # Enable row factory if needed later
@@ -99,6 +95,39 @@ def safe_db_operation(operation_func):
     return wrapper
 
 
+def _create_ea_from_status_update(cursor: sqlite3.Cursor, status) -> int:
+    """Create a new EA instance from a status update (auto-re-registration)"""
+    import uuid
+    
+    # Validate status data before creating EA
+    try:
+        magic_number = int(status.magic_number) if hasattr(status, 'magic_number') else 0
+        symbol = str(status.symbol) if hasattr(status, 'symbol') else "UNKNOWN"
+        strategy_tag = str(status.strategy_tag) if hasattr(status, 'strategy_tag') else "Unknown"
+    except (ValueError, TypeError) as e:
+        logger.error(f"Invalid status data for auto-registration: {e}")
+        raise ValueError(f"Cannot create EA with invalid data: {e}")
+    
+    # Generate a new UUID if none provided
+    instance_uuid = status.instance_uuid or str(uuid.uuid4())
+    ea_name = f"{strategy_tag}_{symbol}_{magic_number}"
+    
+    logger.info(f"🆕 Auto-registering EA from status update: {ea_name} (UUID: {instance_uuid[:8]}...)")
+    logger.debug(f"   Magic: {magic_number} ({type(magic_number)}), Symbol: {symbol}, Strategy: {strategy_tag}")
+    
+    cursor.execute(
+        """
+        INSERT INTO eas (instance_uuid, magic_number, ea_name, symbol, strategy_tag, status, last_seen)
+        VALUES (?, ?, ?, ?, ?, 'active', CURRENT_TIMESTAMP)
+        """,
+        (instance_uuid, magic_number, ea_name, symbol, strategy_tag)
+    )
+    
+    ea_id = cursor.lastrowid
+    logger.info(f"✅ Auto-registered EA {ea_name} with ID {ea_id}")
+    return ea_id
+
+
 def _get_or_create_ea(cursor: sqlite3.Cursor, magic_number: int, symbol: str, strategy_tag: str) -> int:
     """Return ea.id for a given magic_number; create if missing."""
     cursor.execute("SELECT id FROM eas WHERE magic_number = ?", (magic_number,))
@@ -117,12 +146,14 @@ def _get_or_create_ea(cursor: sqlite3.Cursor, magic_number: int, symbol: str, st
         return ea_id
 
     # Create new EA entry
+    import uuid
+    ea_name = f"{strategy_tag}_{symbol}_{magic_number}"  # Create descriptive EA name
     cursor.execute(
         """
-        INSERT INTO eas (magic_number, symbol, strategy_tag)
-        VALUES (?, ?, ?)
+        INSERT INTO eas (instance_uuid, magic_number, ea_name, symbol, strategy_tag, status, last_seen)
+        VALUES (?, ?, ?, ?, ?, 'active', CURRENT_TIMESTAMP)
         """,
-        (magic_number, symbol, strategy_tag),
+        (str(uuid.uuid4()), magic_number, ea_name, symbol, strategy_tag),
     )
     cursor.execute("SELECT id FROM eas WHERE magic_number = ?", (magic_number,))
     row = cursor.fetchone()
@@ -131,6 +162,7 @@ def _get_or_create_ea(cursor: sqlite3.Cursor, magic_number: int, symbol: str, st
 
 # Pydantic models for request/response
 class EAStatusUpdate(BaseModel):
+    instance_uuid: Optional[str] = None  # New field for instance identification
     magic_number: int
     symbol: str
     strategy_tag: str
@@ -166,30 +198,201 @@ pending_commands: Dict[int, List[EACommand]] = {}
 ea_status_cache: Dict[int, EAStatusUpdate] = {}
 
 
+@router.post("/register")
+async def register_ea(request: Request):
+    """Register a new EA instance with the system"""
+    import uuid
+    conn = None
+    try:
+        # Debug logging
+        logger.info(f"EA Registration request received:")
+        logger.info(f"Method: {request.method}")
+        logger.info(f"URL: {request.url}")
+        logger.info(f"Headers: {dict(request.headers)}")
+        logger.info(f"Query params: {dict(request.query_params)}")
+        
+        # Extract parameters from query string
+        query_params = dict(request.query_params)
+        
+        # Try to extract parameters from form data if it's form-encoded
+        form_data = {}
+        try:
+            content_type = request.headers.get("content-type", "")
+            body = await request.body()
+            logger.info(f"Content-Type: {content_type}")
+            logger.info(f"Body: {body}")
+            
+            if content_type.startswith("application/x-www-form-urlencoded") and body:
+                form_data = dict(parse_qsl(body.decode()))
+                logger.info(f"Parsed form data: {form_data}")
+            elif body:
+                # Try to parse as query string even if content-type is different
+                try:
+                    form_data = dict(parse_qsl(body.decode()))
+                    logger.info(f"Parsed body as query string: {form_data}")
+                except:
+                    logger.info("Could not parse body as query string")
+        except Exception as e:
+            logger.error(f"Error parsing body: {e}")
+        
+        # Get parameters from query params first, then form data, with extensive logging
+        final_magic_number = query_params.get("magic_number") or form_data.get("magic_number")
+        final_symbol = query_params.get("symbol") or form_data.get("symbol") or "UNKNOWN"
+        final_strategy_tag = query_params.get("strategy_tag") or form_data.get("strategy_tag") or "UNKNOWN"  
+        final_version = query_params.get("version") or form_data.get("version") or "1.0"
+        
+        # Get or generate instance UUID
+        instance_uuid = query_params.get("instance_uuid") or form_data.get("instance_uuid")
+        if not instance_uuid:
+            instance_uuid = str(uuid.uuid4())
+            logger.info(f"Generated new instance UUID: {instance_uuid}")
+        else:
+            logger.info(f"Using provided instance UUID: {instance_uuid}")
+        
+        # Get additional instance info for differentiation
+        account_number = query_params.get("account_number") or form_data.get("account_number")
+        broker = query_params.get("broker") or form_data.get("broker")
+        timeframe = query_params.get("timeframe") or form_data.get("timeframe") or "M1"
+        server_info = query_params.get("server_info") or form_data.get("server_info")
+        
+        logger.info(f"Extracted parameters: magic_number={final_magic_number}, symbol={final_symbol}, strategy_tag={final_strategy_tag}, version={final_version}, uuid={instance_uuid}")
+        
+        # Convert magic_number to int if it's a string
+        if final_magic_number:
+            try:
+                final_magic_number = int(final_magic_number)
+                logger.info(f"Converted magic_number to int: {final_magic_number}")
+            except (ValueError, TypeError) as e:
+                logger.error(f"Failed to convert magic_number to int: {e}")
+                raise HTTPException(status_code=400, detail="magic_number must be a valid integer")
+        else:
+            logger.error("magic_number is missing from request")
+            raise HTTPException(status_code=400, detail="magic_number is required")
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Clean up stale EA instances (no update within 10 seconds)
+        cursor.execute("""
+            DELETE FROM eas 
+            WHERE last_seen IS NOT NULL 
+            AND datetime(last_seen) < datetime('now', '-10 seconds')
+        """)
+        stale_count = cursor.rowcount
+        if stale_count > 0:
+            logger.info(f"🧹 Cleaned up {stale_count} stale EA instances")
+        
+        # Check if this specific EA instance already exists (by UUID)
+        cursor.execute("SELECT id, magic_number, status FROM eas WHERE instance_uuid = ?", (instance_uuid,))
+        row = cursor.fetchone()
+        
+        if row:
+            ea_id = row[0]
+            existing_magic = row[1]
+            current_status = row[2]
+            
+            # Update existing EA instance registration
+            cursor.execute(
+                """
+                UPDATE eas 
+                SET ea_name = ?, symbol = ?, strategy_tag = ?, last_seen = CURRENT_TIMESTAMP, status = 'active',
+                    account_number = ?, broker = ?, timeframe = ?, server_info = ?
+                WHERE instance_uuid = ?
+                """,
+                (final_strategy_tag, final_symbol, final_strategy_tag, account_number, broker, timeframe, server_info, instance_uuid)
+            )
+            message = f"EA instance {instance_uuid[:8]}... (Magic: {final_magic_number}) re-registered successfully"
+        else:
+            # Create new EA instance entry
+            ea_name = f"{final_strategy_tag}_{final_symbol}_{final_magic_number}"  # Create a descriptive EA name
+            cursor.execute(
+                """
+                INSERT INTO eas (instance_uuid, magic_number, ea_name, symbol, strategy_tag, account_number, broker, timeframe, server_info, status, last_seen)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                """,
+                (instance_uuid, final_magic_number, ea_name, final_symbol, final_strategy_tag, account_number, broker, timeframe, server_info, 'active')
+            )
+            ea_id = cursor.lastrowid
+            message = f"New EA instance {instance_uuid[:8]}... (Magic: {final_magic_number}) registered successfully"
+        
+        conn.commit()
+        
+        logger.info(f"✅ {message}")
+        
+        return {
+            "success": True,
+            "message": message,
+            "ea_id": ea_id,
+            "instance_uuid": instance_uuid,
+            "magic_number": final_magic_number,
+            "status_endpoint": f"/api/ea/status",
+            "instance_status_endpoint": f"/api/ea/status/{instance_uuid}",
+            "commands_endpoint": f"/api/ea/commands/{final_magic_number}",
+            "instance_commands_endpoint": f"/api/ea/commands/instance/{instance_uuid}",
+            "acknowledge_endpoint": f"/api/ea/acknowledge"
+        }
+        
+    except HTTPException:
+        # Re-raise HTTPExceptions as-is (they already have proper status codes)
+        raise
+    except Exception as e:
+        logger.error(f"Failed to register EA {final_magic_number if 'final_magic_number' in locals() else 'UNKNOWN'}: {e}")
+        raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception as e:
+                logger.error(f"Failed to close database connection: {e}")
+
+
 @router.post("/status")
 async def receive_ea_status(status: EAStatusUpdate):
     """Receive status update from EA"""
     conn = None
     try:
-        # Store in cache for real-time dashboard updates
+        # Store in cache for real-time dashboard updates (keep magic_number for backward compatibility)
         ea_status_cache[status.magic_number] = status
 
         # Store in database
         conn = get_db_connection()
         cursor = conn.cursor()
+        
+        # Clean up stale EA instances during status updates (but less frequently to avoid overhead)
+        import random
+        if random.randint(1, 10) == 1:  # Only cleanup 10% of the time during status updates
+            cursor.execute("""
+                DELETE FROM eas 
+                WHERE last_seen IS NOT NULL 
+                AND datetime(last_seen) < datetime('now', '-10 seconds')
+                AND instance_uuid != ?
+            """, (status.instance_uuid,))
+            cleanup_count = cursor.rowcount
+            if cleanup_count > 0:
+                logger.debug(f"🧹 Cleaned up {cleanup_count} stale EA instances during status update")
 
-        # Ensure EA exists and get ea_id
-        ea_id = _get_or_create_ea(cursor, status.magic_number, status.symbol, status.strategy_tag)
+        # Find EA by UUID if provided, otherwise fall back to magic_number
+        if status.instance_uuid:
+            cursor.execute("SELECT id FROM eas WHERE instance_uuid = ?", (status.instance_uuid,))
+            row = cursor.fetchone()
+            if row:
+                ea_id = row[0]
+                logger.debug(f"📍 Found existing EA with UUID {status.instance_uuid}")
+            else:
+                # EA not found - it was likely cleaned up but is still active, so re-create it
+                logger.info(f"🔄 EA instance {status.instance_uuid} not found, re-creating from status update")
+                ea_id = _create_ea_from_status_update(cursor, status)
+        else:
+            # Fallback to old magic_number approach
+            ea_id = _get_or_create_ea(cursor, status.magic_number, status.symbol, status.strategy_tag)
 
         # Update EA paused/active status and last_seen
-        cursor.execute(
-            """
+        update_query = """
             UPDATE eas
             SET status = ?, last_seen = CURRENT_TIMESTAMP
             WHERE id = ?
-            """,
-            ("paused" if status.is_paused else "active", ea_id),
-        )
+        """
+        cursor.execute(update_query, ("paused" if status.is_paused else "active", ea_id))
 
         # Insert EA status snapshot (schema: ea_id, timestamp, current_profit, open_positions, sl_value, tp_value, trailing_active, module_status)
         cursor.execute(
@@ -254,47 +457,7 @@ async def receive_ea_status(status: EAStatusUpdate):
 
         conn.commit()
 
-        # Broadcast real-time update to WebSocket clients with portfolio analytics theme
-        if WEBSOCKET_AVAILABLE:
-            try:
-                websocket_server = get_websocket_server()
-                
-                # Apply portfolio analytics theme styling to EA data
-                theme_status = _apply_portfolio_theme_to_ea_status(status)
-                
-                ea_data = {
-                    "eaId": status.magic_number,  # Use camelCase for frontend consistency
-                    "ea_id": status.magic_number,  # Keep snake_case for backward compatibility
-                    "magicNumber": status.magic_number,  # Use camelCase for frontend consistency
-                    "magic_number": status.magic_number,  # Keep snake_case for backward compatibility
-                    "symbol": status.symbol,
-                    "strategyTag": status.strategy_tag,  # Use camelCase for frontend consistency
-                    "strategy_tag": status.strategy_tag,  # Keep snake_case for backward compatibility
-                    "currentProfit": status.current_profit,  # Use camelCase for frontend consistency
-                    "current_profit": status.current_profit,  # Keep snake_case for backward compatibility
-                    "openPositions": status.open_positions,  # Use camelCase for frontend consistency
-                    "open_positions": status.open_positions,  # Keep snake_case for backward compatibility
-                    "slValue": status.sl_value,  # Use camelCase for frontend consistency
-                    "sl_value": status.sl_value,  # Keep snake_case for backward compatibility
-                    "tpValue": status.tp_value,  # Use camelCase for frontend consistency
-                    "tp_value": status.tp_value,  # Keep snake_case for backward compatibility
-                    "trailingActive": status.trailing_active,  # Use camelCase for frontend consistency
-                    "trailing_active": status.trailing_active,  # Keep snake_case for backward compatibility
-                    "isPaused": status.is_paused,  # Use camelCase for frontend consistency
-                    "is_paused": status.is_paused,  # Keep snake_case for backward compatibility
-                    "moduleStatus": status.module_status,  # Use camelCase for frontend consistency
-                    "module_status": status.module_status,  # Keep snake_case for backward compatibility
-                    "performanceMetrics": status.performance_metrics,  # Use camelCase for frontend consistency
-                    "performance_metrics": status.performance_metrics,  # Keep snake_case for backward compatibility
-                    "lastTrades": status.last_trades,  # Use camelCase for frontend consistency
-                    "last_trades": status.last_trades,  # Keep snake_case for backward compatibility
-                    "timestamp": datetime.now().isoformat()
-                }
-                
-                import asyncio
-                asyncio.create_task(websocket_server.broadcast_ea_status(ea_data))
-            except Exception as e:
-                logger.error(f"WebSocket broadcast failed: {e}")
+        # Real-time updates available via HTTP API polling at /api/ea/list
 
         return {"status": "received", "ea_id": ea_id}
 
@@ -311,13 +474,162 @@ async def receive_ea_status(status: EAStatusUpdate):
 
 @router.get("/commands/{magic_number}")
 async def get_pending_commands(magic_number: int):
-    """Get pending commands for specific EA"""
-    if magic_number in pending_commands and pending_commands[magic_number]:
-        # Return first pending command
-        command = pending_commands[magic_number].pop(0)
-        return command.dict()
-    else:
-        raise HTTPException(status_code=404, detail="No pending commands")
+    """Get pending commands for specific EA (legacy endpoint using magic_number)"""
+    try:
+        logger.debug(f"🔍 Checking commands for EA {magic_number}")
+        
+        # First check in-memory queue
+        if magic_number in pending_commands and pending_commands[magic_number]:
+            # Return first pending command
+            command = pending_commands[magic_number].pop(0)
+            logger.info(f"📤 Sending in-memory command to EA {magic_number}: {command.command}")
+            return command.dict()
+        
+        # If no in-memory commands, check database
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        try:
+            # Get EA ID from magic number
+            cursor.execute("SELECT id FROM eas WHERE magic_number = ? LIMIT 1", (magic_number,))
+            ea_row = cursor.fetchone()
+            
+            if ea_row:
+                ea_id = ea_row[0]
+                
+                # Get pending commands from database
+                cursor.execute("""
+                    SELECT id, command_type, command_data 
+                    FROM command_queue 
+                    WHERE ea_id = ? AND executed = 0 
+                    ORDER BY created_at ASC 
+                    LIMIT 1
+                """, (ea_id,))
+                
+                command_row = cursor.fetchone()
+                
+                if command_row:
+                    command_id, command_type, command_data = command_row
+                    
+                    # Mark command as executed
+                    cursor.execute("UPDATE command_queue SET executed = 1 WHERE id = ?", (command_id,))
+                    conn.commit()
+                    
+                    # Parse command data
+                    try:
+                        command_data_dict = json.loads(command_data) if isinstance(command_data, str) else command_data
+                    except:
+                        command_data_dict = {}
+                    
+                    logger.info(f"📤 Sending database command to EA {magic_number}: {command_type}")
+                    
+                    return {
+                        "command": command_type,
+                        "parameters": command_data_dict.get("parameters", {}),
+                        "target_eas": [magic_number],
+                        "execution_time": None
+                    }
+        
+        finally:
+            conn.close()
+        
+        # No commands found
+        logger.debug(f"📭 No pending commands for EA {magic_number}")
+        return {"command": None}
+        
+    except Exception as e:
+        logger.error(f"Error getting commands for EA {magic_number}: {e}")
+        return {"command": None}
+
+
+@router.get("/commands/instance/{instance_uuid}")
+async def get_pending_commands_by_uuid(instance_uuid: str):
+    """Get pending commands for specific EA instance (UUID-based endpoint)"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Get magic_number from UUID
+        cursor.execute("SELECT magic_number FROM eas WHERE instance_uuid = ?", (instance_uuid,))
+        row = cursor.fetchone()
+        conn.close()
+        
+        if not row:
+            raise HTTPException(status_code=404, detail=f"EA instance {instance_uuid} not found")
+        
+        magic_number = row[0]
+        
+        # Check both UUID-based and magic_number-based command queues
+        uuid_key = f"uuid_{instance_uuid}"
+        
+        # Try UUID-based commands first
+        if uuid_key in pending_commands and pending_commands[uuid_key]:
+            command = pending_commands[uuid_key].pop(0)
+            logger.info(f"📤 Sending UUID-based command to EA {instance_uuid}: {command.command}")
+            return command.dict()
+        # Fall back to magic_number-based commands
+        elif magic_number in pending_commands and pending_commands[magic_number]:
+            command = pending_commands[magic_number].pop(0)
+            logger.info(f"📤 Sending magic-number-based command to EA {magic_number}: {command.command}")
+            return command.dict()
+        else:
+            # Check database for persistent commands
+            conn2 = get_db_connection()
+            cursor2 = conn2.cursor()
+            
+            try:
+                # Get EA ID from instance UUID
+                cursor2.execute("SELECT id FROM eas WHERE instance_uuid = ? LIMIT 1", (instance_uuid,))
+                ea_row = cursor2.fetchone()
+                
+                if ea_row:
+                    ea_id = ea_row[0]
+                    
+                    # Get pending commands from database
+                    cursor2.execute("""
+                        SELECT id, command_type, command_data 
+                        FROM command_queue 
+                        WHERE ea_id = ? AND executed = 0 
+                        ORDER BY created_at ASC 
+                        LIMIT 1
+                    """, (ea_id,))
+                    
+                    command_row = cursor2.fetchone()
+                    
+                    if command_row:
+                        command_id, command_type, command_data = command_row
+                        
+                        # Mark command as executed
+                        cursor2.execute("UPDATE command_queue SET executed = 1 WHERE id = ?", (command_id,))
+                        conn2.commit()
+                        
+                        # Parse command data
+                        try:
+                            command_data_dict = json.loads(command_data) if isinstance(command_data, str) else command_data
+                        except:
+                            command_data_dict = {}
+                        
+                        logger.info(f"📤 Sending database command to EA {instance_uuid}: {command_type}")
+                        
+                        return {
+                            "command": command_type,
+                            "parameters": command_data_dict.get("parameters", {}),
+                            "target_eas": [magic_number],
+                            "execution_time": None
+                        }
+            
+            finally:
+                conn2.close()
+            
+            # Return empty response instead of 404 to avoid errors
+            logger.debug(f"📭 No pending commands for EA instance {instance_uuid}")
+            return {"command": None}
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to get commands for instance {instance_uuid}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get commands: {str(e)}")
 
 
 @router.post("/acknowledge")
@@ -352,24 +664,7 @@ async def acknowledge_command(ack: CommandAcknowledgment):
 
         conn.commit()
 
-        # Broadcast command acknowledgment to WebSocket clients
-        if WEBSOCKET_AVAILABLE:
-            try:
-                websocket_server = get_websocket_server()
-                command_data = {
-                    "eaId": ack.magic_number,  # Use camelCase for frontend consistency
-                    "ea_id": ack.magic_number,  # Keep snake_case for backward compatibility
-                    "magicNumber": ack.magic_number,  # Use camelCase for frontend consistency
-                    "magic_number": ack.magic_number,  # Keep snake_case for backward compatibility
-                    "command": ack.command,
-                    "status": ack.status,
-                    "timestamp": ack.timestamp
-                }
-                
-                import asyncio
-                asyncio.create_task(websocket_server.broadcast_command_update(command_data))
-            except Exception as e:
-                logger.error(f"WebSocket broadcast failed: {e}")
+        # Command acknowledgment available via HTTP API polling at /api/ea/commands/{magic_number}
 
         return {"status": "acknowledged"}
 
@@ -387,27 +682,80 @@ async def acknowledge_command(ack: CommandAcknowledgment):
 
 
 @router.post("/command")
-async def send_command_to_ea(magic_number: int, command: EACommand):
+async def send_command_to_ea(request: dict):
     """Send command to specific EA"""
     conn = None
     try:
-        # Add command to pending queue
-        if magic_number not in pending_commands:
-            pending_commands[magic_number] = []
-
-        pending_commands[magic_number].append(command)
+        # Extract data from request
+        magic_number = request.get("magic_number")
+        command_type = request.get("command", request.get("command_type", "unknown"))
+        parameters = request.get("parameters", {})
+        instance_uuid = request.get("instance_uuid")
+        
+        logger.info(f"📝 Received command: {command_type} for EA {magic_number} (UUID: {instance_uuid})")
+        logger.info(f"🔍 Command parameters received: {parameters}")
+        logger.debug(f"🔍 Command targeting debug - Magic: {magic_number}, UUID: {instance_uuid}, UUID type: {type(instance_uuid)}")
+        logger.debug(f"🔍 Full request data: {dict(request)}")
+        
+        # Create command object
+        command = EACommand(
+            command=command_type,
+            parameters=parameters,
+            target_eas=[magic_number] if magic_number else [],
+            execution_time=request.get("execution_time")
+        )
+        
+        # Add command to appropriate queue
+        logger.debug(f"🎯 Queue targeting decision - UUID exists: {bool(instance_uuid)}, UUID value: '{instance_uuid}'")
+        
+        if instance_uuid:
+            # If UUID provided, target specific EA instance only
+            uuid_key = f"uuid_{instance_uuid}"
+            if uuid_key not in pending_commands:
+                pending_commands[uuid_key] = []
+            pending_commands[uuid_key].append(command)
+            logger.info(f"📋 Added UUID-targeted command to queue for EA {instance_uuid}: {len(pending_commands[uuid_key])} pending commands")
+            logger.debug(f"🎯 Command added to UUID queue ONLY - magic number queue NOT used")
+        elif magic_number:
+            # Only use magic number queue if no UUID provided (affects all EAs with same magic number)
+            if magic_number not in pending_commands:
+                pending_commands[magic_number] = []
+            pending_commands[magic_number].append(command)
+            logger.info(f"📋 Added magic-number command to queue for EA {magic_number} (may affect multiple instances): {len(pending_commands[magic_number])} pending commands")
+            logger.debug(f"🎯 Command added to magic number queue because no UUID provided")
+        else:
+            logger.error(f"❌ No targeting method available - neither UUID nor magic number provided!")
 
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Map magic_number to ea_id
-        cursor.execute("SELECT id FROM eas WHERE magic_number = ?", (magic_number,))
-        row = cursor.fetchone()
-        if row:
-            ea_id = row[0]
+        # Map to ea_id - prefer instance_uuid for specific targeting
+        if instance_uuid:
+            # Target specific EA instance by UUID
+            cursor.execute("SELECT id FROM eas WHERE instance_uuid = ?", (instance_uuid,))
+            row = cursor.fetchone()
+            if row:
+                ea_id = row[0]
+                logger.info(f"🎯 Targeting specific EA instance: {instance_uuid}")
+            else:
+                logger.warning(f"⚠️ EA instance {instance_uuid} not found, falling back to magic number")
+                # Fallback to magic number if UUID not found
+                cursor.execute("SELECT id FROM eas WHERE magic_number = ? LIMIT 1", (magic_number,))
+                row = cursor.fetchone()
+                if row:
+                    ea_id = row[0]
+                else:
+                    ea_id = _get_or_create_ea(cursor, magic_number, "UNKNOWN", "UNKNOWN")
         else:
-            # If EA hasn't reported yet, create minimal record
-            ea_id = _get_or_create_ea(cursor, magic_number, "UNKNOWN", "UNKNOWN")
+            # No UUID provided, use magic number (will affect all EAs with same magic number)
+            cursor.execute("SELECT id FROM eas WHERE magic_number = ? LIMIT 1", (magic_number,))
+            row = cursor.fetchone()
+            if row:
+                ea_id = row[0]
+                logger.info(f"🎯 Targeting EA by magic number (may affect multiple instances): {magic_number}")
+            else:
+                # If EA hasn't reported yet, create minimal record
+                ea_id = _get_or_create_ea(cursor, magic_number, "UNKNOWN", "UNKNOWN")
 
         command_data = {
             "parameters": command.parameters or {},
@@ -518,83 +866,172 @@ async def send_batch_commands(command: EACommand):
 @router.get("/status/all")
 async def get_all_ea_status():
     """Get status of all EAs (latest snapshot per EA)"""
+    conn = None
     try:
+        logger.info("Getting all EA status...")
         conn = get_db_connection()
         cursor = conn.cursor()
+        
+        # Clean up stale EA instances before showing status
+        cursor.execute("""
+            DELETE FROM eas 
+            WHERE last_seen IS NOT NULL 
+            AND datetime(last_seen) < datetime('now', '-10 seconds')
+        """)
+        cleanup_count = cursor.rowcount
+        if cleanup_count > 0:
+            logger.info(f"🧹 Cleaned up {cleanup_count} stale EA instances from status list")
 
-        # Join eas with the latest status per ea_id
-        cursor.execute(
-            """
-            SELECT e.magic_number, e.symbol, e.strategy_tag, e.status,
-                   s.current_profit, s.open_positions, s.sl_value, s.tp_value,
-                   s.trailing_active, s.module_status, s.timestamp
-            FROM eas e
-            LEFT JOIN (
-              SELECT x.* FROM ea_status x
-              JOIN (
-                SELECT ea_id, MAX(timestamp) AS max_ts
-                FROM ea_status
-                GROUP BY ea_id
-              ) y ON x.ea_id = y.ea_id AND x.timestamp = y.max_ts
-            ) s ON s.ea_id = e.id
-            ORDER BY COALESCE(s.timestamp, e.last_seen) DESC
-            """
-        )
+        # Get all EAs with basic info first, then join with status if available
+        # Simplified query to avoid any potential JOIN issues
+        query = """
+            SELECT 
+                instance_uuid, magic_number, symbol, 
+                COALESCE(strategy_tag, ea_name) as strategy_tag, 
+                status, account_number, broker, timeframe, 
+                COALESCE(server_info, broker) as server_info,
+                0.0 as current_profit, 0 as open_positions, 
+                0.0 as sl_value, 0.0 as tp_value, 
+                0 as trailing_active, '{}' as module_status, 
+                updated_at as timestamp
+            FROM eas 
+            ORDER BY updated_at DESC
+        """
+        
+        logger.debug(f"Executing query: {query}")
+        cursor.execute(query)
 
         eas: List[Dict[str, Any]] = []
-        for row in cursor.fetchall():
-            # Create mock EA status for theme application
-            mock_status = EAStatusUpdate(
-                magic_number=row[0],
-                symbol=row[1],
-                strategy_tag=row[2],
-                current_profit=row[4] or 0.0,
-                open_positions=row[5] or 0,
-                sl_value=row[6] or 0.0,
-                tp_value=row[7] or 0.0,
-                trailing_active=bool(row[8]) if row[8] is not None else False,
-                module_status={},
-                performance_metrics={"profit_factor": 1.0 + (row[4] or 0.0) * 0.1},
-                last_trades=[],
-                coc_override=False,
-                is_paused=(row[3] == "paused"),
-                timestamp=row[10] or ""
-            )
-            
-            # Apply portfolio theme
-            theme_data = _apply_portfolio_theme_to_ea_status(mock_status)
-            
-            eas.append(
+        rows = cursor.fetchall()
+        logger.info(f"Found {len(rows)} EA records in database")
+        
+        # Handle empty result set gracefully
+        if not rows:
+            if conn:
+                conn.close()
+            logger.info("No EAs found, returning empty list")
+            return {
+                "eas": [],
+                "total_count": 0,
+                "active_count": 0,
+                "timestamp": datetime.now().isoformat()
+            }
+        
+        for i, row in enumerate(rows):
+            try:
+                logger.debug(f"Processing EA {i+1}/{len(rows)}: Magic={row[1] if len(row) > 1 else 'N/A'}")
+                
+                # Validate row has enough columns
+                if len(row) < 16:
+                    logger.warning(f"Row {i} has insufficient columns ({len(row)}/16): {row}")
+                    continue
+                
+                # Debug logging for problematic data
+                logger.debug(f"Row {i} data: uuid={row[0]}, magic={row[1]} ({type(row[1])}), symbol={row[2]}, strategy={row[3]}")
+                
+                # Validate and sanitize magic_number
+                magic_number = row[1]
+                if not isinstance(magic_number, int):
+                    try:
+                        magic_number = int(magic_number) if magic_number is not None else 0
+                        logger.warning(f"Row {i}: Converted magic_number from {type(row[1])} to int: {magic_number}")
+                    except (ValueError, TypeError):
+                        logger.error(f"Row {i}: Invalid magic_number '{row[1]}' ({type(row[1])}), skipping EA")
+                        continue
+                
+                # Create mock EA status for theme application (updated indexes for new schema)
+                mock_status = EAStatusUpdate(
+                    magic_number=magic_number,  # Validated magic_number
+                    symbol=row[2] or "UNKNOWN",        # symbol is now index 2
+                    strategy_tag=row[3] or "Unknown Strategy",  # strategy_tag is now index 3
+                    current_profit=row[9] or 0.0,   # current_profit is now index 9
+                    open_positions=row[10] or 0,    # open_positions is now index 10
+                    sl_value=row[11] or 0.0,        # sl_value is now index 11
+                    tp_value=row[12] or 0.0,        # tp_value is now index 12
+                    trailing_active=bool(row[13]) if row[13] is not None else False,  # trailing_active is now index 13
+                    module_status={},
+                    performance_metrics={"profit_factor": 1.0 + (row[9] or 0.0) * 0.1},  # current_profit is index 9
+                    last_trades=[],
+                    coc_override=False,
+                    is_paused=(row[4] == "paused"),  # status is index 4
+                    timestamp=row[15] or ""          # timestamp is index 15
+                )
+                
+                # Apply portfolio theme with error handling
+                try:
+                    theme_data = _apply_portfolio_theme_to_ea_status(mock_status)
+                except Exception as theme_error:
+                    logger.error(f"Failed to apply portfolio theme: {theme_error}")
+                    theme_data = {"error": "theme_generation_failed"}
+                
+                eas.append(
                 {
-                    "magicNumber": row[0],  # Use camelCase for frontend consistency
-                    "magic_number": row[0],  # Keep snake_case for backward compatibility
-                    "symbol": row[1],
-                    "strategyTag": row[2],  # Use camelCase for frontend consistency
-                    "strategy_tag": row[2],  # Keep snake_case for backward compatibility
-                    "currentProfit": row[4] or 0.0,  # Use camelCase for frontend consistency
-                    "current_profit": row[4] or 0.0,  # Keep snake_case for backward compatibility
-                    "openPositions": row[5] or 0,  # Use camelCase for frontend consistency
-                    "open_positions": row[5] or 0,  # Keep snake_case for backward compatibility
-                    "slValue": row[6],  # Use camelCase for frontend consistency
-                    "sl_value": row[6],  # Keep snake_case for backward compatibility
-                    "tpValue": row[7],  # Use camelCase for frontend consistency
-                    "tp_value": row[7],  # Keep snake_case for backward compatibility
-                    "trailingActive": bool(row[8]) if row[8] is not None else False,  # Use camelCase for frontend consistency
-                    "trailing_active": bool(row[8]) if row[8] is not None else False,  # Keep snake_case for backward compatibility
-                    "cocOverride": False,  # Use camelCase for frontend consistency
-                    "coc_override": False,  # Keep snake_case for backward compatibility
-                    "isPaused": (row[3] == "paused"),  # Use camelCase for frontend consistency
-                    "is_paused": (row[3] == "paused"),  # Keep snake_case for backward compatibility
-                    "lastUpdate": row[10] or None,  # Use camelCase for frontend consistency
-                    "last_update": row[10] or None,  # Keep snake_case for backward compatibility
-                    "themeData": theme_data  # Portfolio analytics theme data
+                    # New UUID field for unique instance identification
+                    "instanceUuid": row[0],    # Use camelCase for frontend consistency
+                    "instance_uuid": row[0],   # Keep snake_case for backward compatibility
+                    
+                    # Original fields with updated indexes
+                    "magicNumber": row[1],     # magic_number is now index 1
+                    "magic_number": row[1],
+                    "symbol": row[2],
+                    "strategyTag": row[3],     # strategy_tag is now index 3
+                    "strategy_tag": row[3],
+                    "status": row[4],          # EA status
+                    
+                    # Additional instance info
+                    "accountNumber": row[5],   # account_number
+                    "account_number": row[5],
+                    "broker": row[6],
+                    "timeframe": row[7],
+                    "serverInfo": row[8],      # server_info
+                    "server_info": row[8],
+                    
+                    # Performance data (updated indexes)
+                    "currentProfit": row[9] or 0.0,   # current_profit is now index 9
+                    "current_profit": row[9] or 0.0,
+                    "openPositions": row[10] or 0,    # open_positions is now index 10
+                    "open_positions": row[10] or 0,
+                    "slValue": row[11],               # sl_value is now index 11
+                    "sl_value": row[11],
+                    "tpValue": row[12],               # tp_value is now index 12
+                    "tp_value": row[12],
+                    "trailingActive": bool(row[13]) if row[13] is not None else False,  # trailing_active is now index 13
+                    "trailing_active": bool(row[13]) if row[13] is not None else False,
+                    
+                    # Status fields
+                    "cocOverride": False,
+                    "coc_override": False,
+                    "isPaused": (row[4] == "paused"),  # status field
+                    "is_paused": (row[4] == "paused"),
+                    "lastUpdate": row[15] or None,     # timestamp is now index 15
+                    "last_update": row[15] or None,
+                    "themeData": theme_data
                 }
-            )
+                )
 
-        conn.close()
+            except Exception as row_error:
+                logger.error(f"Error processing EA row {i}: {row_error}")
+                logger.debug(f"Problematic row data: {row}")
+                continue  # Skip this row and continue with others
+
+        if conn:
+            conn.close()
+        
+        logger.info(f"Successfully processed {len(eas)} EAs")
         return {"eas": eas, "count": len(eas)}
 
     except Exception as e:
+        logger.error(f"Critical error in get_all_ea_status: {e}")
+        logger.error(f"Exception type: {type(e).__name__}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        
+        if conn:
+            try:
+                conn.close()
+            except:
+                pass
+        
         raise HTTPException(status_code=500, detail=f"Failed to get EA status: {str(e)}")
 
 
@@ -674,8 +1111,12 @@ async def get_ea_status(magic_number: int):
             timestamp=row[6] or ""
         )
         
-        # Apply portfolio theme
-        theme_data = _apply_portfolio_theme_to_ea_status(mock_status)
+        # Apply portfolio theme with error handling
+        try:
+            theme_data = _apply_portfolio_theme_to_ea_status(mock_status)
+        except Exception as theme_error:
+            logger.error(f"Failed to apply portfolio theme: {theme_error}")
+            theme_data = {"error": "theme_generation_failed"}
 
         ea_data = {
             "magicNumber": magic_number,  # Use camelCase for frontend consistency

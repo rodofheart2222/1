@@ -18,7 +18,7 @@ Options:
     --prod          Start in production mode
     --backend-only  Start only the backend server
     --frontend-only Start only the frontend server
-    --port PORT     Specify backend port (default: 8000)
+    --port PORT     Specify backend port (default: 80)
     --frontend-port PORT  Specify frontend port (default: 3000)
     --host HOST     Specify backend host (default: 127.0.0.1)
     --no-browser    Don't open browser automatically
@@ -59,7 +59,7 @@ class MT5DashboardStarter:
         # Default configuration
         self.config = {
             'mode': 'dev',
-            'backend_port': 8000,
+            'backend_port': 80,
             'frontend_port': 3000,
             'host': '127.0.0.1',
             'backend_only': False,
@@ -514,7 +514,7 @@ def main():
     parser.add_argument('--prod', action='store_true', help='Start in production mode')
     parser.add_argument('--backend-only', action='store_true', help='Start only the backend server')
     parser.add_argument('--frontend-only', action='store_true', help='Start only the frontend server')
-    parser.add_argument('--port', type=int, default=8000, help='Backend port (default: 8000)')
+    parser.add_argument('--port', type=int, default=80, help='Backend port (default: 80)')
     parser.add_argument('--frontend-port', type=int, default=3000, help='Frontend port (default: 3000)')
     parser.add_argument('--host', default='127.0.0.1', help='Backend host (default: 127.0.0.1)')
     parser.add_argument('--no-browser', action='store_true', help="Don't open browser automatically")

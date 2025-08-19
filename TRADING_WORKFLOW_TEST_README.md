@@ -71,17 +71,17 @@ python run_complete_test_system.py --host 192.168.1.100
 
 #### 1. Start Backend Server Only
 ```bash
-python backend/start_complete_server.py --host 155.138.174.196 --port 80 --ws-port 8765
+python backend/start_complete_server.py --host 127.0.0.1 --port 80 --ws-port 8765
 ```
 
 #### 2. Start EA Simulator Only
 ```bash
-python simulate_ea_responses.py --magic 12345 --symbol EURUSD --host 155.138.174.196
+python simulate_ea_responses.py --magic 12345 --symbol EURUSD --host 127.0.0.1
 ```
 
 #### 3. Run Tests Only (requires server + simulator running)
 ```bash
-python test_complete_trading_workflow.py --ea-magic 12345 --symbol EURUSD --host 155.138.174.196
+python test_complete_trading_workflow.py --ea-magic 12345 --symbol EURUSD --host 127.0.0.1
 ```
 
 ## 📊 Test Output
@@ -91,7 +91,7 @@ The test system provides real-time feedback with emojis and structured logging:
 
 ```
 🚀 Starting Complete MT5 Trading Workflow Tests
-EA Magic: 12345, Symbol: EURUSD, Host: 155.138.174.196
+EA Magic: 12345, Symbol: EURUSD, Host: 127.0.0.1
 
 ✅ Connect & Heartbeat: PASS (1234.56ms) - EA 12345 connected, Status=Connected, heartbeat < 2s
 ✅ Open Orders (OCO): PASS (2345.67ms) - Buy Limit @ 1.0827 and Sell Stop @ 1.0867 placed successfully
@@ -149,7 +149,7 @@ timestamp,tag,operation,status,duration_ms,latency_ms,message,details
   "system_config": {
     "ea_magic": 12345,
     "symbol": "EURUSD",
-    "host": "155.138.174.196"
+    "host": "127.0.0.1"
   },
   "results_summary": {
     "total_tests": 7,
@@ -170,7 +170,7 @@ timestamp,tag,operation,status,duration_ms,latency_ms,message,details
 python run_complete_test_system.py \
   --ea-magic 12345 \          # EA Magic Number
   --symbol EURUSD \           # Trading Symbol
-  --host 155.138.174.196 \    # Server Host
+  --host 127.0.0.1 \    # Server Host
   --no-report                 # Skip final report generation
 ```
 
@@ -179,7 +179,7 @@ python run_complete_test_system.py \
 python test_complete_trading_workflow.py \
   --ea-magic 12345 \          # EA Magic Number
   --symbol EURUSD \           # Trading Symbol
-  --host 155.138.174.196 \    # Server Host
+  --host 127.0.0.1 \    # Server Host
   --port 80 \                 # API Port
   --ws-port 8765              # WebSocket Port
 ```
@@ -189,14 +189,14 @@ python test_complete_trading_workflow.py \
 python simulate_ea_responses.py \
   --magic 12345 \             # EA Magic Number
   --symbol EURUSD \           # Trading Symbol
-  --host 155.138.174.196 \    # Server Host
+  --host 127.0.0.1 \    # Server Host
   --port 80                   # Server Port
 ```
 
 ### Environment Variables
 ```bash
 # Optional environment configuration
-export MT5_TEST_HOST=155.138.174.196
+export MT5_TEST_HOST=127.0.0.1
 export MT5_TEST_PORT=80
 export MT5_TEST_WS_PORT=8765
 export MT5_TEST_EA_MAGIC=12345
@@ -225,7 +225,7 @@ export MT5_TEST_SYMBOL=EURUSD
 
 #### 1. Connection Refused
 ```
-Error: Connection refused to 155.138.174.196:80
+Error: Connection refused to 127.0.0.1:80
 ```
 **Solution**: Ensure backend server is running:
 ```bash
@@ -271,15 +271,15 @@ python test_complete_trading_workflow.py --ea-magic 12345
 Test individual API endpoints:
 ```bash
 # Check EA status
-curl http://155.138.174.196:80/api/ea/status/12345
+curl http://127.0.0.1:80/api/ea/status/12345
 
 # Send command
-curl -X POST http://155.138.174.196:80/api/ea/command/12345 \
+curl -X POST http://127.0.0.1:80/api/ea/command/12345 \
   -H "Content-Type: application/json" \
   -d '{"command":"PING","parameters":{}}'
 
 # Check system health
-curl http://155.138.174.196:80/health
+curl http://127.0.0.1:80/health
 ```
 
 ## 🔍 Test Scenarios Detail
